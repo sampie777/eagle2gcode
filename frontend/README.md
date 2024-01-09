@@ -10,3 +10,6 @@ Files needed for upload:
 - copper_bottom.gbr
 - copper_top.gbr
 - drill_1_16.xln
+
+Gerber specification:
+https://www.bosco.co.za/DownloadDocs/The_Gerber_Format_Specification.pdf
