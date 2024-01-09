@@ -1,5 +1,4 @@
 import {processDrillFile} from "./processors/drill.ts";
-import {processProfileFile} from "./processors/profile.ts";
 import {processJobFile} from "./processors/job.ts";
 import {processGerberFile} from "./processors/gerber.ts";
 import {useProject} from "../gui/ProjectContext.ts";
@@ -31,7 +30,7 @@ export namespace Upload {
         const project = useProject();
 
         if (name.match(fileMatchers.job)) return project.job = processJobFile(content)
-        if (name.match(fileMatchers.profile)) return project.profile = processProfileFile(content)
+        if (name.match(fileMatchers.profile)) return project.profile = processGerberFile(content)
         if (name.match(fileMatchers.copper_top)) return project.copper_top = processGerberFile(content)
         if (name.match(fileMatchers.copper_bottom)) return project.copper_bottom = processGerberFile(content)
         if (name.match(fileMatchers.soldermask_top)) return project.soldermask_top = processGerberFile(content)

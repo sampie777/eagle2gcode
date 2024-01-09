@@ -9,8 +9,6 @@ export type Drill = {
     size: number,
 }
 
-export type Profile = Point[];
-
 export type Job = {
     title: string
     width: number,
@@ -55,7 +53,7 @@ export type GerberCommand = {
 export type Project = {
     isLoaded: boolean,
     job: Job,
-    profile: Profile,
+    profile: GerberCommand[],
     copper_top: GerberCommand[],
     copper_bottom: GerberCommand[],
     soldermask_top: GerberCommand[],

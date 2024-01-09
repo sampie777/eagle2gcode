@@ -17,7 +17,7 @@ function App() {
     const getScreenForState = () => {
         switch (screen()) {
             case 1:
-                return <ViewerRoot/>
+                return <ViewerRoot onReset={() => setScreen(0)}/>
             default:
                 return <ImportRoot onSuccess={onProjectLoaded}/>
         }

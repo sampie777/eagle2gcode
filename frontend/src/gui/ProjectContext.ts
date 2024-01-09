@@ -28,23 +28,48 @@ export const exampleProject: Project = {
     profile: [
         {
             x: 0,
-            y: 0
+            y: 0,
+            operation: "closed",
+            aperture: {
+                shape: "circle",
+                diameter: 0.254
+            }
         },
         {
             x: 15.24,
-            y: 0
+            y: 0,
+            operation: "open",
+            aperture: {
+                shape: "circle",
+                diameter: 0.254
+            }
         },
         {
             x: 15.24,
-            y: 16.51
+            y: 16.51,
+            operation: "open",
+            aperture: {
+                shape: "circle",
+                diameter: 0.254
+            }
         },
         {
             x: 0,
-            y: 16.51
+            y: 16.51,
+            operation: "open",
+            aperture: {
+                shape: "circle",
+                diameter: 0.254
+            }
         },
         {
             x: 0,
-            y: 0
+            y: 0,
+            operation: "open",
+            aperture: {
+                shape: "circle",
+                diameter: 0.254
+            }
         }
     ],
     copper_top: [
