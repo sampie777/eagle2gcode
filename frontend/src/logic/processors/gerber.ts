@@ -1,12 +1,12 @@
-import {Copper, CopperAperture} from "../types.ts";
+import {Aperture, GerberCommand} from "../types.ts";
 import {Gerber} from "./gerberutils.ts";
 
 
-export const processCopperFile = (content: string): Copper[] => {
+export const processGerberFile = (content: string): GerberCommand[] => {
     const config = Gerber.preprocessGerberFile(content);
 
-    const result: Copper[] = [];
-    let lastAperture: CopperAperture | undefined;
+    const result: GerberCommand[] = [];
+    let lastAperture: Aperture | undefined;
 
     const useNewAperture = (line: string) => {
         const [_, id] = line.match(/^D(\d+)\*/);

@@ -1,12 +1,12 @@
-import {CopperAperture, CopperOperation} from "../types.ts";
+import {Aperture, ApertureOperation} from "../types.ts";
 
 export namespace Gerber {
     export type GerberConfig = {
-        apertures: { [key: string]: CopperAperture },
+        apertures: { [key: string]: Aperture },
         unitFactor: number,
     };
 
-    export const operationCodeToString = (code: number): CopperOperation => {
+    export const operationCodeToString = (code: number): ApertureOperation => {
         switch (code) {
             case 1:
                 return "open";
@@ -18,7 +18,7 @@ export namespace Gerber {
         console.error("Undefined operation", code)
     }
 
-    const apertureToAperture = (shape: string, dimensions: string[]): CopperAperture =>{
+    const apertureToAperture = (shape: string, dimensions: string[]): Aperture =>{
         if (shape == "C") return {
             shape: "circle",
             diameter: +dimensions[0],
@@ -47,7 +47,7 @@ export namespace Gerber {
     }
 
     export const preprocessGerberFile = (content: string): GerberConfig => {
-        const apertures: { [key: string]: CopperAperture } = {};
+        const apertures: { [key: string]: Aperture } = {};
         let unitFactor = 1; // mm or mil
         let unitDecimalFactor = 1 / 1000;
 

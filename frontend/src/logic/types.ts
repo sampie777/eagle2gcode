@@ -17,8 +17,8 @@ export type Job = {
     height: number,
 }
 
-export type CopperOperation = "open" | "closed" | "flash";
-export type CopperAperture = ApertureCircle | ApertureRectangle | AperturePolygon | ApertureObround;
+export type ApertureOperation = "open" | "closed" | "flash";
+export type Aperture = ApertureCircle | ApertureRectangle | AperturePolygon | ApertureObround;
 
 export type ApertureCircle = {
     shape: "circle",
@@ -45,9 +45,9 @@ export type ApertureObround = {
     innerDiameter?: number,
 }
 
-export type Copper = {
+export type GerberCommand = {
     x: number,
     y: number,
-    operation: CopperOperation,
-    aperture: CopperAperture,
+    operation: ApertureOperation,
+    aperture: Aperture,
 }

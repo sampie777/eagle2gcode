@@ -1,7 +1,7 @@
 import {processDrillFile} from "./processors/drill.ts";
 import {processProfileFile} from "./processors/profile.ts";
 import {processJobFile} from "./processors/job.ts";
-import {processCopperFile} from "./processors/copper.ts";
+import {processGerberFile} from "./processors/gerber.ts";
 
 export namespace Upload {
     export type Type = {
@@ -30,7 +30,11 @@ export namespace Upload {
         if (name.match(fileMatchers.drill)) return processDrillFile(content)
         if (name.match(fileMatchers.profile)) return processProfileFile(content)
         if (name.match(fileMatchers.job)) return processJobFile(content)
-        if (name.match(fileMatchers.copper_top)) return processCopperFile(content)
-        if (name.match(fileMatchers.copper_bottom)) return processCopperFile(content)
+        if (name.match(fileMatchers.copper_top)) return processGerberFile(content)
+        if (name.match(fileMatchers.copper_bottom)) return processGerberFile(content)
+        if (name.match(fileMatchers.soldermask_top)) return processGerberFile(content)
+        if (name.match(fileMatchers.soldermask_bottom)) return processGerberFile(content)
+        if (name.match(fileMatchers.silkscreen_top)) return processGerberFile(content)
+        if (name.match(fileMatchers.silkscreen_bottom)) return processGerberFile(content)
     }
 }
