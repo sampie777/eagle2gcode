@@ -2,7 +2,7 @@ import {Profile} from "../types.ts";
 
 export const processProfileFile = (content: string): Profile => {
     const result: Profile = [];
-    let unitFactor = 1 / 1000;
+    let unitFactor = 1 / 10000;
 
     const useNewLocation = (line: string) => {
         const [_, x, y] = line.match(/^X(\d+)Y(\d+)D/)

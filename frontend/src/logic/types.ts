@@ -10,3 +10,9 @@ export type Drill = {
 }
 
 export type Profile = Point[];
+
+export type Job = {
+    title: string
+    width: number,
+    height: number,
+}

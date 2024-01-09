@@ -1,5 +1,6 @@
 import {processDrillFile} from "./processors/drill.ts";
 import {processProfileFile} from "./processors/profile.ts";
+import {processJobFile} from "./processors/job.ts";
 
 export namespace Upload {
     export type Type = {
@@ -27,5 +28,6 @@ export namespace Upload {
     export const processFile = (name: string, content: string) => {
         if (name.match(fileMatchers.drill)) return processDrillFile(content)
         if (name.match(fileMatchers.profile)) return processProfileFile(content)
+        if (name.match(fileMatchers.job)) return processJobFile(content)
     }
 }
