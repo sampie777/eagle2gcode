@@ -3,7 +3,9 @@ import './style.less';
 import Row from "./Row.tsx";
 import {Upload} from "../../logic/upload.ts";
 
-type Props = {}
+type Props = {
+    onSuccess: () => void
+}
 
 const ImportRoot: Component<Props> = (props) => {
     const [uploads, setUploads] = createSignal<Upload.Type[]>([]);
@@ -43,16 +45,19 @@ const ImportRoot: Component<Props> = (props) => {
 
         <div class={"result"}>
             <div>
-            {Object.keys(Upload.fileMatchers).map(key => {
-                    const upload: Upload.Type | null = uploads().find(it => it.file.name.match(Upload.fileMatchers[key]))
-                    return <Row type={key} upload={upload}/>
-                }
-            )}
+                {Object.keys(Upload.fileMatchers).map(key => {
+                        const upload: Upload.Type | null = uploads().find(it => it.file.name.match(Upload.fileMatchers[key]))
+                        return <Row type={key} upload={upload}/>
+                    }
+                )}
             </div>
         </div>
         <br/>
 
-        <button disabled={!Upload.allFilesUploaded(uploads())}>Next</button>
+        <button disabled={!Upload.allFilesUploaded(uploads())}
+                onClick={props.onSuccess}>
+            Next
+        </button>
     </div>;
 }
 
