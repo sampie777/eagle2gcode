@@ -26,6 +26,8 @@ const ImportRoot: Component<Props> = (props) => {
             setUploads(prev => [...prev])
 
             upload.content = await upload.file.text();
+            console.log("result", Upload.processFile(upload.file.name, upload.content))
+
             upload.status = "done"
             setUploads(prev => [...prev])
         }

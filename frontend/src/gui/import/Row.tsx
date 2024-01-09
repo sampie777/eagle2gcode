@@ -17,7 +17,7 @@ const Row: Component<Props> = (props) => {
             {upload ? <AiFillCheckCircle/> : <AiOutlineCheckCircle/>}
         </span>
 
-        <span class={"type"}>{capitalize(props.type)}</span>
+        <span class={"type"}>{capitalize(props.type.replace(/_/gi, " "))}</span>
 
         {upload == null ? null :
             <span class={"info"}>
