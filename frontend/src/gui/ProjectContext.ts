@@ -1,5 +1,5 @@
 import {createContext, useContext} from "solid-js";
-import {Project} from "../logic/types.ts";
+import {Project} from "../logic/types/project.ts";
 
 export const emptyProject = {
     isLoaded: false,

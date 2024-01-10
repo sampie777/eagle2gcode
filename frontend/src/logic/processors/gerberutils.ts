@@ -1,4 +1,4 @@
-import {Aperture, ApertureOperation} from "../types.ts";
+import {Aperture, ApertureOperation} from "../types/cam.ts";
 
 export namespace Gerber {
     export type GerberConfig = {

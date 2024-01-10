@@ -9,7 +9,8 @@ import {
     WebGLRenderer
 } from "three";
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
-import {Drill, GerberCommand, Point, Project} from "../types.ts";
+import {Drill, GerberCommand, Point} from "../types/cam.ts";
+import {Project} from "../types/project.ts";
 
 export namespace Graphics {
     const requestRender = (renderer: WebGLRenderer, scene: Scene, camera: PerspectiveCamera, controls?: OrbitControls) =>

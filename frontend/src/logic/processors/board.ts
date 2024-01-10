@@ -1,3 +1,5 @@
+import {Eagle} from "../types/eagle.ts";
+
 declare global {
     interface Element {
         getAttributeInt: (name: string) => number | null;
@@ -10,102 +12,7 @@ Element.prototype.getAttributeInt = function (name: string): number | null {
     return +value
 }
 
-type Wire = {
-    layer: string,
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number,
-    width: number,
-    curve: number | null,
-}
-
-type Pad = {
-    name: string,
-    x: number,
-    y: number,
-    drill: number,
-    shape: string,
-    rotation: string | null,
-}
-
-type Rectangle = {
-    layer: string,
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number,
-}
-
-type Text = {
-    x: number,
-    y: number,
-    size: number,
-    ratio: number,
-    layer: string,
-    rotation: string | null,
-    value: string,
-}
-
-type Layer = {
-    number: string
-    name: string
-    color: number
-    fill: number
-    visible: boolean
-    active: boolean
-}
-
-type Library = {
-    name: string
-    urn: string
-    packages: Package[]
-}
-
-type Package = {
-    name: string
-    urn: string
-    library_version: string
-    wires: Wire[]
-    pads: Pad[]
-    text: Text[]
-    rectangles: Rectangle[]
-}
-
-type Component = {
-    name: string
-    library: string
-    library_urn: string
-    package: string
-    x: number
-    y: number
-    attributes: Attribute[]
-}
-
-type Attribute = {
-    layer: string
-    display: boolean
-    name: string
-    x: number
-    y: number
-    size: number
-    ratio: number | null
-    rotation: string | null
-    value: string | null
-}
-
-type Signal = {
-    name: string
-    wires: Wire[]
-    contacts: Contact[]
-}
-
-type Contact = {
-    element: string
-    pad: number
-}
-
-function getWires(element: Element): Wire[] {
+function getWires(element: Element): Eagle.Wire[] {
     return Array.from(element.getElementsByTagName("wire"))
         .map(it => ({
             layer: it.getAttribute("layer"),
@@ -118,7 +25,7 @@ function getWires(element: Element): Wire[] {
         }));
 }
 
-function getPads(element: Element): Pad[] {
+function getPads(element: Element): Eagle.Pad[] {
     return Array.from(element.getElementsByTagName("pad"))
         .map(it => ({
             name: it.getAttribute("name"),
@@ -130,7 +37,7 @@ function getPads(element: Element): Pad[] {
         }));
 }
 
-function getRectangle(element: Element): Rectangle[] {
+function getRectangle(element: Element): Eagle.Rectangle[] {
     return Array.from(element.getElementsByTagName("rectangle"))
         .map(it => ({
             layer: it.getAttribute("layer"),
@@ -141,7 +48,7 @@ function getRectangle(element: Element): Rectangle[] {
         }));
 }
 
-function getText(element: Element): Text[] {
+function getText(element: Element): Eagle.Text[] {
     return (Array.from(element.getElementsByTagName("text")) as Element[])
         .map(it => ({
             x: it.getAttributeInt("x") ?? 0,
@@ -154,7 +61,7 @@ function getText(element: Element): Text[] {
         }));
 }
 
-const getLayers = (xml: Document): Layer[] => {
+const getLayers = (xml: Document): Eagle.Layer[] => {
     return Array.from(xml.getElementsByTagName("layers")[0].children)
         .map(it => ({
             number: it.getAttribute("number"),
@@ -166,7 +73,7 @@ const getLayers = (xml: Document): Layer[] => {
         }))
 };
 
-const getLibraries = (xml: Document): Library[] => {
+const getLibraries = (xml: Document): Eagle.Library[] => {
     return Array.from(xml.getElementsByTagName("libraries")[0].children)
         .map(library => {
             const packages = Array.from(library.getElementsByTagName("package"))
@@ -188,14 +95,14 @@ const getLibraries = (xml: Document): Library[] => {
         })
 };
 
-const getPlain = (xml: Document): Wire[] => {
+const getPlain = (xml: Document): Eagle.Wire[] => {
     return getWires(xml.getElementsByTagName("plain")[0])
 };
 
-const getComponents = (xml: Document): Component[] => {
+const getComponents = (xml: Document): Eagle.Component[] => {
     return Array.from(xml.getElementsByTagName("elements")[0].children)
         .map(component => {
-            const attributes: Attribute[] = Array.from(component.getElementsByTagName("attribute"))
+            const attributes: Eagle.Attribute[] = Array.from(component.getElementsByTagName("attribute"))
                 .map(it => ({
                     layer: it.getAttribute("layer"),
                     display: it.getAttribute("display") != "off",
@@ -220,10 +127,10 @@ const getComponents = (xml: Document): Component[] => {
         })
 };
 
-const getSignals = (xml: Document): Signal[] => {
+const getSignals = (xml: Document): Eagle.Signal[] => {
     return Array.from(xml.getElementsByTagName("signals")[0].children)
         .map(signal => {
-            const contacts: Contact[] = Array.from(signal.getElementsByTagName("contactref"))
+            const contacts: Eagle.Contact[] = Array.from(signal.getElementsByTagName("contactref"))
                 .map(it => ({
                     element: it.getAttribute("element"),
                     pad: it.getAttributeInt("pad") ?? 0,
@@ -242,11 +149,14 @@ const getSignals = (xml: Document): Signal[] => {
 export const processBoardFile = (content: string) => {
     const parser = new DOMParser();
     const xml = parser.parseFromString(content, "text/xml");
-    console.log(xml)
 
-    console.log("layers", JSON.stringify(getLayers(xml)))
-    console.log("libraries", JSON.stringify(getLibraries(xml)))
-    console.log("plain", JSON.stringify(getPlain(xml)))
-    console.log("components", JSON.stringify(getComponents(xml)))
-    console.log("signals", JSON.stringify(getSignals(xml)))
+    const board: Eagle.Board = {
+        layers: getLayers(xml),
+        libraries: getLibraries(xml),
+        plain: getPlain(xml),
+        components: getComponents(xml),
+        signals: getSignals(xml),
+    }
+
+    return board
 }

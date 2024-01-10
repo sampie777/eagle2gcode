@@ -1,4 +1,4 @@
-import {Aperture, GerberCommand} from "../types.ts";
+import {Aperture, GerberCommand} from "../types/cam.ts";
 import {Gerber} from "./gerberutils.ts";
 
 
