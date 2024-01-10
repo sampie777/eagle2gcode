@@ -29,11 +29,11 @@ export namespace Graphics {
 
         const camera = new PerspectiveCamera(75, 600 / 600, 0.1, 1000);
 
-        // const controls = new OrbitControls(camera, renderer.domElement);
-        // controls.enableDamping = true;
-        // controls.addEventListener("change", (e) => {
-        //     requestRender(renderer, scene, camera, controls);
-        // })
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.addEventListener("change", (e) => {
+            requestRender(renderer, scene, camera, controls);
+        })
 
         requestRender(renderer, scene, camera);
         return {

@@ -1,7 +1,18 @@
-import {DoubleSide, Group, Mesh, MeshBasicMaterial, Scene, Shape, ShapeGeometry, Vector2} from "three";
+import {
+    CylinderGeometry,
+    DoubleSide,
+    Group,
+    Mesh,
+    MeshBasicMaterial,
+    Scene,
+    Shape,
+    ShapeGeometry,
+    Vector2
+} from "three";
 import {Eagle} from "../types/eagle.ts";
 import {defaultLine} from "./utils.ts";
 
+const pcbThickness = 1;
 
 export const drawBoard = (scene: Scene, board: Eagle.Board) => {
     drawOutline(board, scene);
@@ -56,6 +67,10 @@ const drawComponents = (board: Eagle.Board, scene: Scene) => {
         })
         pack.pads.forEach(it => {
             const mesh = createPad(board, it);
+            group.add(mesh)
+        })
+        pack.pads.forEach(it => {
+            const mesh = createDrill(board, it);
             group.add(mesh)
         })
 
@@ -139,6 +154,27 @@ const createPad = (board: Eagle.Board, pad: Eagle.Pad) => {
 
     mesh.position.x -= 0.5 * padWidth;
     mesh.position.y -= 0.5 * padWidth;
+
+    mesh.position.x += pad.x
+    mesh.position.y += pad.y
+    return mesh
+}
+
+const createDrill = (board: Eagle.Board, pad: Eagle.Pad) => {
+    const geometry = new CylinderGeometry(
+        pad.drill / 2,
+        pad.drill / 2,
+        pcbThickness,
+        32,
+        1,
+        true);
+    const padLayer = board.layers.find(it => it.name == "Drills")
+    const material = new MeshBasicMaterial({color: 0x95833d});
+    material.side = DoubleSide;
+    const mesh = new Mesh(geometry, material);
+
+    mesh.rotateX(0.5 * Math.PI)
+    mesh.position.z -= 0.5 * pcbThickness;
 
     mesh.position.x += pad.x
     mesh.position.y += pad.y
