@@ -51,14 +51,14 @@ export namespace Graphics {
         camera.up = new Vector3(0, 0, 1)
         camera.position.x = project.job.width / 2
         camera.position.y = project.job.height / 2
-        camera.position.z = 20
+        camera.position.z = 15
         camera.lookAt(camera.position.x, camera.position.y + 1, 0)  // Look straight down
 
-        drawDefaultLines(scene, project.profile)
-        drawDefaultLines(scene, project.copper_top)
-        drawDefaultLines(scene, project.silkscreen_top)
-        drawDefaultLines(scene, project.soldermask_top)
-        drawDefaultCircle(scene, project.drills)
+        // drawDefaultLines(scene, project.profile)
+        // drawDefaultLines(scene, project.copper_top)
+        // drawDefaultLines(scene, project.silkscreen_top)
+        // drawDefaultLines(scene, project.soldermask_top)
+        // drawDefaultCircle(scene, project.drills)
         drawBoard(scene, project.board)
     }
 

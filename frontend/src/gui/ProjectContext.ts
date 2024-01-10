@@ -986,7 +986,7 @@ export const exampleProject: Project = {
                                 y: 0,
                                 drill: 1.016,
                                 shape: "long",
-                                rotation: "R90"
+                                rotation: 0.25
                             },
                             {
                                 name: "2",
@@ -994,7 +994,7 @@ export const exampleProject: Project = {
                                 y: 0,
                                 drill: 1.016,
                                 shape: "long",
-                                rotation: "R90"
+                                rotation: 0.25
                             }
                         ],
                         text: [
@@ -1083,6 +1083,7 @@ export const exampleProject: Project = {
                 package: "C025-040X050",
                 x: 10.16,
                 y: 3.81,
+                rotation: null,
                 attributes: [
                     {
                         layer: "25",
@@ -1128,7 +1129,8 @@ export const exampleProject: Project = {
                         rotation: null,
                         value: null
                     }
-                ]
+                ],
+                smashed: true
             },
             {
                 name: "LED",
@@ -1137,6 +1139,7 @@ export const exampleProject: Project = {
                 package: "1X02",
                 x: 10.16,
                 y: 11.43,
+                rotation: null,
                 attributes: [
                     {
                         layer: "25",
@@ -1171,7 +1174,8 @@ export const exampleProject: Project = {
                         rotation: null,
                         value: null
                     }
-                ]
+                ],
+                smashed: true
             },
             {
                 name: "R1",
@@ -1180,6 +1184,7 @@ export const exampleProject: Project = {
                 package: "0204/7",
                 x: 3.81,
                 y: 7.62,
+                rotation: 0.25,
                 attributes: [
                     {
                         layer: "25",
@@ -1189,7 +1194,7 @@ export const exampleProject: Project = {
                         y: 5.08,
                         size: 0.9906,
                         ratio: 10,
-                        rotation: "R90",
+                        rotation: 0.25,
                         value: null
                     },
                     {
@@ -1200,7 +1205,7 @@ export const exampleProject: Project = {
                         y: 25.4,
                         size: 1.778,
                         ratio: null,
-                        rotation: "R90",
+                        rotation: 0.25,
                         value: "79"
                     },
                     {
@@ -1211,7 +1216,7 @@ export const exampleProject: Project = {
                         y: 25.4,
                         size: 1.778,
                         ratio: null,
-                        rotation: "R90",
+                        rotation: 0.25,
                         value: "R"
                     },
                     {
@@ -1222,10 +1227,11 @@ export const exampleProject: Project = {
                         y: 5.9944,
                         size: 0.9906,
                         ratio: 10,
-                        rotation: "R90",
+                        rotation: 0.25,
                         value: null
                     }
-                ]
+                ],
+                smashed: true
             }
         ],
         signals: [

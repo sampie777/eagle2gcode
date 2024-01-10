@@ -1,6 +1,13 @@
-import {DoubleSide, Mesh, MeshBasicMaterial, Scene, Shape, ShapeGeometry, Vector2} from "three";
+import {DoubleSide, Group, Mesh, MeshBasicMaterial, Scene, Shape, ShapeGeometry, Vector2} from "three";
 import {Eagle} from "../types/eagle.ts";
 import {defaultLine} from "./utils.ts";
+
+
+export const drawBoard = (scene: Scene, board: Eagle.Board) => {
+    drawOutline(board, scene);
+    drawSignals(board, scene);
+    drawComponents(board, scene);
+};
 
 const colors = {
     4: 0xa00909,
@@ -23,24 +30,117 @@ function drawOutline(board: Eagle.Board, scene: Scene) {
     })
 }
 
-export const drawBoard = (scene: Scene, board: Eagle.Board) => {
-    drawOutline(board, scene);
+const findPackage = (board: Eagle.Board, component: Eagle.Component): Eagle.Package | undefined => {
+    const library = board.libraries.find(it => it.urn == component.library_urn);
+    if (library == null) return;
+    return library.packages.find(it => it.name == component.package);
+};
 
+const drawSignals = (board: Eagle.Board, scene: Scene) => {
     board.signals.forEach(signal => {
         signal.wires.forEach(wire => {
-            // scene.add(defaultLine({x: wire.x1, y: wire.y1}, {x: wire.x2, y: wire.y2}, layerToColor(wire.layer)))
-
-            const shape = new Shape();
-            shape.moveTo(wire.x1, wire.y1);
-            shape.lineTo(wire.x1 + wire.width, wire.y1 + wire.width);
-            shape.lineTo(wire.x2 + wire.width, wire.y2 + wire.width);
-            shape.lineTo(wire.x2, wire.y2);
-
-            const geometry = new ShapeGeometry(shape);
-            const material = new MeshBasicMaterial({color: layerToColor(board.layers, wire.layer)});
-            material.side = DoubleSide;
-            const mesh = new Mesh(geometry, material);
-            scene.add(mesh)
+            scene.add(createWire(board, wire))
         })
     })
-};
+}
+
+const drawComponents = (board: Eagle.Board, scene: Scene) => {
+    board.components.forEach(component => {
+        const pack = findPackage(board, component);
+        if (pack == null) return;
+
+        const group = new Group();
+        pack.wires.forEach(it => {
+            const mesh = createWire(board, it);
+            group.add(mesh)
+        })
+        pack.pads.forEach(it => {
+            const mesh = createPad(board, it);
+            group.add(mesh)
+        })
+
+        group.position.x += component.x;
+        group.position.y += component.y;
+        if (component.rotation) {
+            group.rotateZ(component.rotation * 2 * Math.PI)
+        }
+        scene.add(group)
+    })
+}
+
+const createWire = (board: Eagle.Board, wire: Eagle.Wire) => {
+    const from = new Vector2(wire.x1, wire.y1);
+    const to = new Vector2(wire.x2, wire.y2);
+    const between = (new Vector2()).subVectors(to, from)
+
+    const shape = new Shape();
+    shape.moveTo(0, -0.5 * wire.width);
+    shape.lineTo(between.length(), -0.5 * wire.width);
+    shape.arc(0, 0.5 * wire.width, 0.5 * wire.width, 1.5 * 3.14, 0.5 * 3.14);
+    shape.lineTo(between.length(), 0.5 * wire.width);
+    shape.lineTo(0, 0.5 * wire.width);
+    shape.arc(0, -0.5 * wire.width, 0.5 * wire.width, 0.5 * 3.14, 1.5 * 3.14);
+
+    const geometry = new ShapeGeometry(shape);
+    const material = new MeshBasicMaterial({color: layerToColor(board.layers, wire.layer)});
+    material.side = DoubleSide;
+    const mesh = new Mesh(geometry, material);
+
+    mesh.rotateZ(between.angle())
+    mesh.position.x = from.x
+    mesh.position.y = from.y
+
+    return mesh
+}
+
+const createPad = (board: Eagle.Board, pad: Eagle.Pad) => {
+    const padWidth = pad.drill * 1.8;
+
+    const shape = new Shape();
+    if (pad.shape == "octagon") {
+        const verticeLength = padWidth / (1 + Math.sqrt(2))
+        const diagonalVerticeLength = verticeLength * Math.sqrt(0.5);
+
+        shape.moveTo(diagonalVerticeLength, 0);
+        shape.lineTo(diagonalVerticeLength + verticeLength, 0);
+        shape.lineTo(2 * diagonalVerticeLength + verticeLength, diagonalVerticeLength);
+        shape.lineTo(2 * diagonalVerticeLength + verticeLength, diagonalVerticeLength + verticeLength);
+        shape.lineTo(diagonalVerticeLength + verticeLength, 2 * diagonalVerticeLength + verticeLength);
+        shape.lineTo(diagonalVerticeLength, 2 * diagonalVerticeLength + verticeLength);
+        shape.lineTo(0, diagonalVerticeLength + verticeLength);
+        shape.lineTo(0, diagonalVerticeLength);
+        shape.lineTo(diagonalVerticeLength, 0);
+
+        // Create hole
+        shape.absarc(padWidth / 2, padWidth / 2, pad.drill / 2,
+            1.25 * Math.PI, 1.2501 * Math.PI, true)
+    } else if (pad.shape == "long") {
+        const verticeLength = padWidth / (1 + Math.sqrt(2))
+        const diagonalVerticeLength = verticeLength * Math.sqrt(0.5);
+
+        shape.moveTo(0, 0);
+        shape.arc(padWidth / 2, 0, padWidth / 2, Math.PI, 2 * Math.PI, false);
+        shape.lineTo(padWidth, padWidth);
+        shape.arc(padWidth / -2, 0, padWidth / 2, 0, Math.PI, false);
+        shape.lineTo(0, 0)
+
+        // Create hole
+        shape.absarc(padWidth / 2, padWidth / 2, pad.drill / 2,
+            1.25 * Math.PI, 1.2501 * Math.PI, true)
+    } else {
+        console.error("Unknown pad shape", pad)
+    }
+
+    const geometry = new ShapeGeometry(shape);
+    const padLayer = board.layers.find(it => it.name == "Pads")
+    const material = new MeshBasicMaterial({color: layerToColor(board.layers, padLayer?.number ?? "0")});
+    material.side = DoubleSide;
+    const mesh = new Mesh(geometry, material);
+
+    mesh.position.x -= 0.5 * padWidth;
+    mesh.position.y -= 0.5 * padWidth;
+
+    mesh.position.x += pad.x
+    mesh.position.y += pad.y
+    return mesh
+}

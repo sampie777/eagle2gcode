@@ -12,6 +12,12 @@ Element.prototype.getAttributeInt = function (name: string): number | null {
     return +value
 }
 
+const rotationToNumber = (value: string | null): number | null => {
+    if (value == null) return null;
+    const [_, direction, amount] = value.match(/^([LR])(\d+)$/)
+    return +amount / 360 * (direction == "R" ? 1 : -1);
+}
+
 function getWires(element: Element): Eagle.Wire[] {
     return Array.from(element.getElementsByTagName("wire"))
         .map(it => ({
@@ -33,7 +39,7 @@ function getPads(element: Element): Eagle.Pad[] {
             y: it.getAttributeInt("y") ?? 0,
             drill: it.getAttributeInt("drill") ?? 0,
             shape: it.getAttribute("shape"),
-            rotation: it.getAttribute("rot"),
+            rotation: rotationToNumber(it.getAttribute("rot")),
         }));
 }
 
@@ -56,7 +62,7 @@ function getText(element: Element): Eagle.Text[] {
             size: it.getAttributeInt("size") ?? 0,
             ratio: it.getAttributeInt("ratio") ?? 0,
             layer: it.getAttribute("layer"),
-            rotation: it.getAttribute("rot"),
+            rotation: rotationToNumber(it.getAttribute("rot")),
             value: it.textContent,
         }));
 }
@@ -111,7 +117,7 @@ const getComponents = (xml: Document): Eagle.Component[] => {
                     y: it.getAttributeInt("y") ?? 0,
                     size: it.getAttributeInt("size") ?? 0,
                     ratio: it.getAttributeInt("ratio"),
-                    rotation: it.getAttribute("rot"),
+                    rotation: rotationToNumber(it.getAttribute("rot")),
                     value: it.getAttribute("value"),
                 }))
 
@@ -122,7 +128,9 @@ const getComponents = (xml: Document): Eagle.Component[] => {
                 package: component.getAttribute("package"),
                 x: component.getAttributeInt("x") ?? 0,
                 y: component.getAttributeInt("y") ?? 0,
+                rotation: rotationToNumber(component.getAttribute("rot")),
                 attributes: attributes,
+                smashed: component.getAttribute("smashed") == "yes",
             }
         })
 };

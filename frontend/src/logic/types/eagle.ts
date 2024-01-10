@@ -14,8 +14,8 @@ export namespace Eagle {
         x: number,
         y: number,
         drill: number,
-        shape: string,
-        rotation: string | null,
+        shape: "octagon" | "long" | string,
+        rotation: number | null,
     }
 
     export type Rectangle = {
@@ -32,7 +32,7 @@ export namespace Eagle {
         size: number,
         ratio: number,
         layer: string | null,
-        rotation: string | null,
+        rotation: number | null,
         value: string,
     }
 
@@ -68,7 +68,9 @@ export namespace Eagle {
         package: string
         x: number
         y: number
+        rotation: number | null
         attributes: Attribute[]
+        smashed: boolean
     }
 
     export type Attribute = {
@@ -79,7 +81,7 @@ export namespace Eagle {
         y: number
         size: number
         ratio: number | null
-        rotation: string | null
+        rotation: number | null
         value: string | null
     }
 
