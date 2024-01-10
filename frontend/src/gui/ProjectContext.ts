@@ -1,8 +1,15 @@
 import {createContext, useContext} from "solid-js";
 import {Project} from "../logic/types/project.ts";
 
-export const emptyProject = {
+export const emptyProject: Project = {
     isLoaded: false,
+    board: {
+        layers: [],
+        libraries: [],
+        plain: [],
+        components: [],
+        signals: [],
+    },
     job: {
         title: "No project loaded",
         width: 0,
@@ -20,6 +27,1299 @@ export const emptyProject = {
 
 export const exampleProject: Project = {
     isLoaded: true,
+    board: {
+        layers: [
+            {
+                number: "1",
+                name: "Top",
+                color: 4,
+                fill: 1,
+                visible: true,
+                active: true
+            },
+            {
+                number: "16",
+                name: "Bottom",
+                color: 1,
+                fill: 1,
+                visible: true,
+                active: true
+            },
+            {
+                number: "17",
+                name: "Pads",
+                color: 2,
+                fill: 1,
+                visible: true,
+                active: true
+            },
+            {
+                number: "18",
+                name: "Vias",
+                color: 2,
+                fill: 1,
+                visible: true,
+                active: true
+            },
+            {
+                number: "19",
+                name: "Unrouted",
+                color: 6,
+                fill: 1,
+                visible: true,
+                active: true
+            },
+            {
+                number: "20",
+                name: "Dimension",
+                color: 24,
+                fill: 1,
+                visible: true,
+                active: true
+            },
+            {
+                number: "21",
+                name: "tPlace",
+                color: 7,
+                fill: 1,
+                visible: true,
+                active: true
+            },
+            {
+                number: "22",
+                name: "bPlace",
+                color: 7,
+                fill: 1,
+                visible: true,
+                active: true
+            },
+            {
+                number: "23",
+                name: "tOrigins",
+                color: 15,
+                fill: 1,
+                visible: true,
+                active: true
+            },
+            {
+                number: "24",
+                name: "bOrigins",
+                color: 15,
+                fill: 1,
+                visible: true,
+                active: true
+            },
+            {
+                number: "25",
+                name: "tNames",
+                color: 7,
+                fill: 1,
+                visible: true,
+                active: true
+            },
+            {
+                number: "26",
+                name: "bNames",
+                color: 7,
+                fill: 1,
+                visible: true,
+                active: true
+            },
+            {
+                number: "27",
+                name: "tValues",
+                color: 7,
+                fill: 1,
+                visible: true,
+                active: true
+            },
+            {
+                number: "28",
+                name: "bValues",
+                color: 7,
+                fill: 1,
+                visible: true,
+                active: true
+            },
+            {
+                number: "29",
+                name: "tStop",
+                color: 7,
+                fill: 3,
+                visible: false,
+                active: true
+            },
+            {
+                number: "30",
+                name: "bStop",
+                color: 7,
+                fill: 6,
+                visible: false,
+                active: true
+            },
+            {
+                number: "31",
+                name: "tCream",
+                color: 7,
+                fill: 4,
+                visible: false,
+                active: true
+            },
+            {
+                number: "32",
+                name: "bCream",
+                color: 7,
+                fill: 5,
+                visible: false,
+                active: true
+            },
+            {
+                number: "33",
+                name: "tFinish",
+                color: 6,
+                fill: 3,
+                visible: false,
+                active: true
+            },
+            {
+                number: "34",
+                name: "bFinish",
+                color: 6,
+                fill: 6,
+                visible: false,
+                active: true
+            },
+            {
+                number: "35",
+                name: "tGlue",
+                color: 7,
+                fill: 4,
+                visible: false,
+                active: true
+            },
+            {
+                number: "36",
+                name: "bGlue",
+                color: 7,
+                fill: 5,
+                visible: false,
+                active: true
+            },
+            {
+                number: "37",
+                name: "tTest",
+                color: 7,
+                fill: 1,
+                visible: false,
+                active: true
+            },
+            {
+                number: "38",
+                name: "bTest",
+                color: 7,
+                fill: 1,
+                visible: false,
+                active: true
+            },
+            {
+                number: "39",
+                name: "tKeepout",
+                color: 4,
+                fill: 11,
+                visible: true,
+                active: true
+            },
+            {
+                number: "40",
+                name: "bKeepout",
+                color: 1,
+                fill: 11,
+                visible: true,
+                active: true
+            },
+            {
+                number: "41",
+                name: "tRestrict",
+                color: 4,
+                fill: 10,
+                visible: true,
+                active: true
+            },
+            {
+                number: "42",
+                name: "bRestrict",
+                color: 1,
+                fill: 10,
+                visible: true,
+                active: true
+            },
+            {
+                number: "43",
+                name: "vRestrict",
+                color: 2,
+                fill: 10,
+                visible: true,
+                active: true
+            },
+            {
+                number: "44",
+                name: "Drills",
+                color: 7,
+                fill: 1,
+                visible: false,
+                active: true
+            },
+            {
+                number: "45",
+                name: "Holes",
+                color: 7,
+                fill: 1,
+                visible: false,
+                active: true
+            },
+            {
+                number: "46",
+                name: "Milling",
+                color: 3,
+                fill: 1,
+                visible: false,
+                active: true
+            },
+            {
+                number: "47",
+                name: "Measures",
+                color: 7,
+                fill: 1,
+                visible: false,
+                active: true
+            },
+            {
+                number: "48",
+                name: "Document",
+                color: 7,
+                fill: 1,
+                visible: true,
+                active: true
+            },
+            {
+                number: "49",
+                name: "Reference",
+                color: 7,
+                fill: 1,
+                visible: true,
+                active: true
+            },
+            {
+                number: "51",
+                name: "tDocu",
+                color: 7,
+                fill: 1,
+                visible: true,
+                active: true
+            },
+            {
+                number: "52",
+                name: "bDocu",
+                color: 7,
+                fill: 1,
+                visible: true,
+                active: true
+            },
+            {
+                number: "88",
+                name: "SimResults",
+                color: 9,
+                fill: 1,
+                visible: false,
+                active: false
+            },
+            {
+                number: "89",
+                name: "SimProbes",
+                color: 9,
+                fill: 1,
+                visible: false,
+                active: false
+            },
+            {
+                number: "90",
+                name: "Modules",
+                color: 5,
+                fill: 1,
+                visible: false,
+                active: false
+            },
+            {
+                number: "91",
+                name: "Nets",
+                color: 2,
+                fill: 1,
+                visible: false,
+                active: false
+            },
+            {
+                number: "92",
+                name: "Busses",
+                color: 1,
+                fill: 1,
+                visible: false,
+                active: false
+            },
+            {
+                number: "93",
+                name: "Pins",
+                color: 2,
+                fill: 1,
+                visible: false,
+                active: false
+            },
+            {
+                number: "94",
+                name: "Symbols",
+                color: 4,
+                fill: 1,
+                visible: false,
+                active: false
+            },
+            {
+                number: "95",
+                name: "Names",
+                color: 7,
+                fill: 1,
+                visible: false,
+                active: false
+            },
+            {
+                number: "96",
+                name: "Values",
+                color: 7,
+                fill: 1,
+                visible: false,
+                active: false
+            },
+            {
+                number: "97",
+                name: "Info",
+                color: 7,
+                fill: 1,
+                visible: false,
+                active: false
+            },
+            {
+                number: "98",
+                name: "Guide",
+                color: 6,
+                fill: 1,
+                visible: false,
+                active: false
+            }
+        ],
+        libraries: [
+            {
+                name: "rcl",
+                urn: "urn:adsk.eagle:library:334",
+                packages: [
+                    {
+                        name: "C025-040X050",
+                        urn: "urn:adsk.eagle:footprint:23139/1",
+                        library_version: "11",
+                        wires: [
+                            {
+                                layer: "21",
+                                x1: -2.159,
+                                y1: 1.905,
+                                x2: 2.159,
+                                y2: 1.905,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: 2.159,
+                                y1: -1.905,
+                                x2: -2.159,
+                                y2: -1.905,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: 2.413,
+                                y1: 1.651,
+                                x2: 2.413,
+                                y2: -1.651,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: -2.413,
+                                y1: 1.651,
+                                x2: -2.413,
+                                y2: -1.651,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: 2.159,
+                                y1: 1.905,
+                                x2: 2.413,
+                                y2: 1.651,
+                                width: 0.1524,
+                                curve: -90
+                            },
+                            {
+                                layer: "21",
+                                x1: -2.413,
+                                y1: 1.651,
+                                x2: -2.159,
+                                y2: 1.905,
+                                width: 0.1524,
+                                curve: -90
+                            },
+                            {
+                                layer: "21",
+                                x1: 2.159,
+                                y1: -1.905,
+                                x2: 2.413,
+                                y2: -1.651,
+                                width: 0.1524,
+                                curve: 90
+                            },
+                            {
+                                layer: "21",
+                                x1: -2.413,
+                                y1: -1.651,
+                                x2: -2.159,
+                                y2: -1.905,
+                                width: 0.1524,
+                                curve: 90
+                            },
+                            {
+                                layer: "51",
+                                x1: 0.762,
+                                y1: 0,
+                                x2: 0.381,
+                                y2: 0,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: 0.381,
+                                y1: 0,
+                                x2: 0.254,
+                                y2: 0,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: 0.254,
+                                y1: 0,
+                                x2: 0.254,
+                                y2: 0.762,
+                                width: 0.254,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: 0.254,
+                                y1: 0,
+                                x2: 0.254,
+                                y2: -0.762,
+                                width: 0.254,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: -0.254,
+                                y1: 0.762,
+                                x2: -0.254,
+                                y2: 0,
+                                width: 0.254,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: -0.254,
+                                y1: 0,
+                                x2: -0.254,
+                                y2: -0.762,
+                                width: 0.254,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: -0.254,
+                                y1: 0,
+                                x2: -0.381,
+                                y2: 0,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "51",
+                                x1: -0.381,
+                                y1: 0,
+                                x2: -0.762,
+                                y2: 0,
+                                width: 0.1524,
+                                curve: null
+                            }
+                        ],
+                        pads: [
+                            {
+                                name: "1",
+                                x: -1.27,
+                                y: 0,
+                                drill: 0.8128,
+                                shape: "octagon",
+                                rotation: null
+                            },
+                            {
+                                name: "2",
+                                x: 1.27,
+                                y: 0,
+                                drill: 0.8128,
+                                shape: "octagon",
+                                rotation: null
+                            }
+                        ],
+                        text: [
+                            {
+                                x: -2.286,
+                                y: 2.159,
+                                size: 1.27,
+                                ratio: 10,
+                                layer: "25",
+                                rotation: null,
+                                value: ">NAME"
+                            },
+                            {
+                                x: -2.286,
+                                y: -3.429,
+                                size: 1.27,
+                                ratio: 10,
+                                layer: "27",
+                                rotation: null,
+                                value: ">VALUE"
+                            }
+                        ],
+                        rectangles: []
+                    },
+                    {
+                        name: "0204/7",
+                        urn: "urn:adsk.eagle:footprint:22998/1",
+                        library_version: "11",
+                        wires: [
+                            {
+                                layer: "51",
+                                x1: 3.81,
+                                y1: 0,
+                                x2: 2.921,
+                                y2: 0,
+                                width: 0.508,
+                                curve: null
+                            },
+                            {
+                                layer: "51",
+                                x1: -3.81,
+                                y1: 0,
+                                x2: -2.921,
+                                y2: 0,
+                                width: 0.508,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: -2.54,
+                                y1: 0.762,
+                                x2: -2.286,
+                                y2: 1.016,
+                                width: 0.1524,
+                                curve: -90
+                            },
+                            {
+                                layer: "21",
+                                x1: -2.54,
+                                y1: -0.762,
+                                x2: -2.286,
+                                y2: -1.016,
+                                width: 0.1524,
+                                curve: 90
+                            },
+                            {
+                                layer: "21",
+                                x1: 2.286,
+                                y1: -1.016,
+                                x2: 2.54,
+                                y2: -0.762,
+                                width: 0.1524,
+                                curve: 90
+                            },
+                            {
+                                layer: "21",
+                                x1: 2.286,
+                                y1: 1.016,
+                                x2: 2.54,
+                                y2: 0.762,
+                                width: 0.1524,
+                                curve: -90
+                            },
+                            {
+                                layer: "21",
+                                x1: -2.54,
+                                y1: -0.762,
+                                x2: -2.54,
+                                y2: 0.762,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: -2.286,
+                                y1: 1.016,
+                                x2: -1.905,
+                                y2: 1.016,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: -1.778,
+                                y1: 0.889,
+                                x2: -1.905,
+                                y2: 1.016,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: -2.286,
+                                y1: -1.016,
+                                x2: -1.905,
+                                y2: -1.016,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: -1.778,
+                                y1: -0.889,
+                                x2: -1.905,
+                                y2: -1.016,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: 1.778,
+                                y1: 0.889,
+                                x2: 1.905,
+                                y2: 1.016,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: 1.778,
+                                y1: 0.889,
+                                x2: -1.778,
+                                y2: 0.889,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: 1.778,
+                                y1: -0.889,
+                                x2: 1.905,
+                                y2: -1.016,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: 1.778,
+                                y1: -0.889,
+                                x2: -1.778,
+                                y2: -0.889,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: 2.286,
+                                y1: 1.016,
+                                x2: 1.905,
+                                y2: 1.016,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: 2.286,
+                                y1: -1.016,
+                                x2: 1.905,
+                                y2: -1.016,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: 2.54,
+                                y1: -0.762,
+                                x2: 2.54,
+                                y2: 0.762,
+                                width: 0.1524,
+                                curve: null
+                            }
+                        ],
+                        pads: [
+                            {
+                                name: "1",
+                                x: -3.81,
+                                y: 0,
+                                drill: 0.8128,
+                                shape: "octagon",
+                                rotation: null
+                            },
+                            {
+                                name: "2",
+                                x: 3.81,
+                                y: 0,
+                                drill: 0.8128,
+                                shape: "octagon",
+                                rotation: null
+                            }
+                        ],
+                        text: [
+                            {
+                                x: -2.54,
+                                y: 1.2954,
+                                size: 0.9906,
+                                ratio: 10,
+                                layer: "25",
+                                rotation: null,
+                                value: ">NAME"
+                            },
+                            {
+                                x: -1.6256,
+                                y: -0.4826,
+                                size: 0.9906,
+                                ratio: 10,
+                                layer: "27",
+                                rotation: null,
+                                value: ">VALUE"
+                            }
+                        ],
+                        rectangles: [
+                            {
+                                layer: "21",
+                                x1: 2.54,
+                                y1: -0.254,
+                                x2: 2.921,
+                                y2: 0.254
+                            },
+                            {
+                                layer: "21",
+                                x1: -2.921,
+                                y1: -0.254,
+                                x2: -2.54,
+                                y2: 0.254
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                name: "pinhead",
+                urn: "urn:adsk.eagle:library:325",
+                packages: [
+                    {
+                        name: "1X02",
+                        urn: "urn:adsk.eagle:footprint:22309/1",
+                        library_version: "4",
+                        wires: [
+                            {
+                                layer: "21",
+                                x1: -1.905,
+                                y1: 1.27,
+                                x2: -0.635,
+                                y2: 1.27,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: -0.635,
+                                y1: 1.27,
+                                x2: 0,
+                                y2: 0.635,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: 0,
+                                y1: 0.635,
+                                x2: 0,
+                                y2: -0.635,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: 0,
+                                y1: -0.635,
+                                x2: -0.635,
+                                y2: -1.27,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: -2.54,
+                                y1: 0.635,
+                                x2: -2.54,
+                                y2: -0.635,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: -1.905,
+                                y1: 1.27,
+                                x2: -2.54,
+                                y2: 0.635,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: -2.54,
+                                y1: -0.635,
+                                x2: -1.905,
+                                y2: -1.27,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: -0.635,
+                                y1: -1.27,
+                                x2: -1.905,
+                                y2: -1.27,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: 0,
+                                y1: 0.635,
+                                x2: 0.635,
+                                y2: 1.27,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: 0.635,
+                                y1: 1.27,
+                                x2: 1.905,
+                                y2: 1.27,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: 1.905,
+                                y1: 1.27,
+                                x2: 2.54,
+                                y2: 0.635,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: 2.54,
+                                y1: 0.635,
+                                x2: 2.54,
+                                y2: -0.635,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: 2.54,
+                                y1: -0.635,
+                                x2: 1.905,
+                                y2: -1.27,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: 1.905,
+                                y1: -1.27,
+                                x2: 0.635,
+                                y2: -1.27,
+                                width: 0.1524,
+                                curve: null
+                            },
+                            {
+                                layer: "21",
+                                x1: 0.635,
+                                y1: -1.27,
+                                x2: 0,
+                                y2: -0.635,
+                                width: 0.1524,
+                                curve: null
+                            }
+                        ],
+                        pads: [
+                            {
+                                name: "1",
+                                x: -1.27,
+                                y: 0,
+                                drill: 1.016,
+                                shape: "long",
+                                rotation: "R90"
+                            },
+                            {
+                                name: "2",
+                                x: 1.27,
+                                y: 0,
+                                drill: 1.016,
+                                shape: "long",
+                                rotation: "R90"
+                            }
+                        ],
+                        text: [
+                            {
+                                x: -2.6162,
+                                y: 1.8288,
+                                size: 1.27,
+                                ratio: 10,
+                                layer: "25",
+                                rotation: null,
+                                value: ">NAME"
+                            },
+                            {
+                                x: -2.54,
+                                y: -3.175,
+                                size: 1.27,
+                                ratio: 0,
+                                layer: "27",
+                                rotation: null,
+                                value: ">VALUE"
+                            }
+                        ],
+                        rectangles: [
+                            {
+                                layer: "51",
+                                x1: -1.524,
+                                y1: -0.254,
+                                x2: -1.016,
+                                y2: 0.254
+                            },
+                            {
+                                layer: "51",
+                                x1: 1.016,
+                                y1: -0.254,
+                                x2: 1.524,
+                                y2: 0.254
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        plain: [
+            {
+                layer: "20",
+                x1: 0,
+                y1: 0,
+                x2: 15.24,
+                y2: 0,
+                width: 0,
+                curve: null
+            },
+            {
+                layer: "20",
+                x1: 15.24,
+                y1: 0,
+                x2: 15.24,
+                y2: 16.51,
+                width: 0,
+                curve: null
+            },
+            {
+                layer: "20",
+                x1: 15.24,
+                y1: 16.51,
+                x2: 0,
+                y2: 16.51,
+                width: 0,
+                curve: null
+            },
+            {
+                layer: "20",
+                x1: 0,
+                y1: 16.51,
+                x2: 0,
+                y2: 0,
+                width: 0,
+                curve: null
+            }
+        ],
+        components: [
+            {
+                name: "C1",
+                library: "rcl",
+                library_urn: "urn:adsk.eagle:library:334",
+                package: "C025-040X050",
+                x: 10.16,
+                y: 3.81,
+                attributes: [
+                    {
+                        layer: "25",
+                        display: true,
+                        name: "NAME",
+                        x: 7.874,
+                        y: 5.969,
+                        size: 1.27,
+                        ratio: 10,
+                        rotation: null,
+                        value: null
+                    },
+                    {
+                        layer: "27",
+                        display: false,
+                        name: "POPULARITY",
+                        x: 25.4,
+                        y: 1.27,
+                        size: 1.778,
+                        ratio: null,
+                        rotation: null,
+                        value: "4"
+                    },
+                    {
+                        layer: "27",
+                        display: false,
+                        name: "SPICEPREFIX",
+                        x: 25.4,
+                        y: 1.27,
+                        size: 1.778,
+                        ratio: null,
+                        rotation: null,
+                        value: "C"
+                    },
+                    {
+                        layer: "27",
+                        display: true,
+                        name: "VALUE",
+                        x: 7.874,
+                        y: 0.381,
+                        size: 1.27,
+                        ratio: 10,
+                        rotation: null,
+                        value: null
+                    }
+                ]
+            },
+            {
+                name: "LED",
+                library: "pinhead",
+                library_urn: "urn:adsk.eagle:library:325",
+                package: "1X02",
+                x: 10.16,
+                y: 11.43,
+                attributes: [
+                    {
+                        layer: "25",
+                        display: true,
+                        name: "NAME",
+                        x: 7.5438,
+                        y: 13.2588,
+                        size: 1.27,
+                        ratio: 10,
+                        rotation: null,
+                        value: null
+                    },
+                    {
+                        layer: "27",
+                        display: false,
+                        name: "POPULARITY",
+                        x: 26.67,
+                        y: 2.54,
+                        size: 1.778,
+                        ratio: null,
+                        rotation: null,
+                        value: "98"
+                    },
+                    {
+                        layer: "27",
+                        display: true,
+                        name: "VALUE",
+                        x: 7.62,
+                        y: 8.255,
+                        size: 1.27,
+                        ratio: null,
+                        rotation: null,
+                        value: null
+                    }
+                ]
+            },
+            {
+                name: "R1",
+                library: "rcl",
+                library_urn: "urn:adsk.eagle:library:334",
+                package: "0204/7",
+                x: 3.81,
+                y: 7.62,
+                attributes: [
+                    {
+                        layer: "25",
+                        display: true,
+                        name: "NAME",
+                        x: 2.5146,
+                        y: 5.08,
+                        size: 0.9906,
+                        ratio: 10,
+                        rotation: "R90",
+                        value: null
+                    },
+                    {
+                        layer: "27",
+                        display: false,
+                        name: "POPULARITY",
+                        x: 17.78,
+                        y: 25.4,
+                        size: 1.778,
+                        ratio: null,
+                        rotation: "R90",
+                        value: "79"
+                    },
+                    {
+                        layer: "27",
+                        display: false,
+                        name: "SPICEPREFIX",
+                        x: 17.78,
+                        y: 25.4,
+                        size: 1.778,
+                        ratio: null,
+                        rotation: "R90",
+                        value: "R"
+                    },
+                    {
+                        layer: "27",
+                        display: true,
+                        name: "VALUE",
+                        x: 4.2926,
+                        y: 5.9944,
+                        size: 0.9906,
+                        ratio: 10,
+                        rotation: "R90",
+                        value: null
+                    }
+                ]
+            }
+        ],
+        signals: [
+            {
+                name: "+5V",
+                wires: [],
+                contacts: [
+                    {
+                        component: "LED",
+                        pad: "1"
+                    }
+                ]
+            },
+            {
+                name: "N$1",
+                wires: [
+                    {
+                        layer: "1",
+                        x1: 11.43,
+                        y1: 3.81,
+                        x2: 11.43,
+                        y2: 7.62,
+                        width: 0.508,
+                        curve: null
+                    },
+                    {
+                        layer: "1",
+                        x1: 11.43,
+                        y1: 7.62,
+                        x2: 11.43,
+                        y2: 11.43,
+                        width: 0.508,
+                        curve: null
+                    },
+                    {
+                        layer: "1",
+                        x1: 3.81,
+                        y1: 11.43,
+                        x2: 7.62,
+                        y2: 7.62,
+                        width: 0.508,
+                        curve: null
+                    },
+                    {
+                        layer: "1",
+                        x1: 7.62,
+                        y1: 7.62,
+                        x2: 11.43,
+                        y2: 7.62,
+                        width: 0.508,
+                        curve: null
+                    }
+                ],
+                contacts: [
+                    {
+                        component: "LED",
+                        pad: "2"
+                    },
+                    {
+                        component: "R1",
+                        pad: "2"
+                    },
+                    {
+                        component: "C1",
+                        pad: "2"
+                    }
+                ]
+            },
+            {
+                name: "GND",
+                wires: [
+                    {
+                        layer: "1",
+                        x1: 3.81,
+                        y1: 3.81,
+                        x2: 8.89,
+                        y2: 3.81,
+                        width: 0.508,
+                        curve: null
+                    }
+                ],
+                contacts: [
+                    {
+                        component: "C1",
+                        pad: "1"
+                    },
+                    {
+                        component: "R1",
+                        pad: "1"
+                    }
+                ]
+            }
+        ]
+    },
     job: {
         title: "untitled",
         width: 15.24,

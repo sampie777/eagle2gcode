@@ -31,7 +31,7 @@ export namespace Eagle {
         y: number,
         size: number,
         ratio: number,
-        layer: string,
+        layer: string | null,
         rotation: string | null,
         value: string,
     }
@@ -90,8 +90,8 @@ export namespace Eagle {
     }
 
     export type Contact = {
-        element: string
-        pad: number
+        component: string
+        pad: string
     }
 
     export type Board = {

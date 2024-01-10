@@ -46,7 +46,7 @@ const ImportRoot: Component<Props> = (props) => {
         <div class={"result"}>
             <div>
                 {Object.keys(Upload.fileMatchers).map(key => {
-                        const upload: Upload.Type | null = uploads().find(it => it.file.name.match(Upload.fileMatchers[key]))
+                        const upload: Upload.Type | undefined = uploads().find(it => it.file.name.match(Upload.fileMatchers[key]))
                         return <Row type={key} upload={upload}/>
                     }
                 )}

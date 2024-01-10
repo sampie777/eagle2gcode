@@ -30,7 +30,7 @@ export namespace Upload {
     export const processFile = (name: string, content: string) => {
         const project = useProject();
 
-        if (name.match(fileMatchers.board)) return processBoardFile(content)
+        if (name.match(fileMatchers.board)) return project.board = processBoardFile(content)
         // if (name.match(fileMatchers.job)) return project.job = processJobFile(content)
         // if (name.match(fileMatchers.profile)) return project.profile = processGerberFile(content)
         // if (name.match(fileMatchers.copper_top)) return project.copper_top = processGerberFile(content)

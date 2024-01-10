@@ -1,4 +1,5 @@
 import {Drill, GerberCommand, Job} from "./cam.ts";
+import {Eagle} from "./eagle.ts";
 
 
 export type Project = {
@@ -12,4 +13,5 @@ export type Project = {
     silkscreen_top: GerberCommand[],
     silkscreen_bottom: GerberCommand[],
     drills: Drill[],
+    board: Eagle.Board,
 }

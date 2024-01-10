@@ -1,16 +1,16 @@
 import {
     AxesHelper,
-    BufferGeometry, CircleGeometry, Color,
-    Line,
-    LineBasicMaterial, MeshBasicMaterial,
+    Color,
     PerspectiveCamera,
     Scene,
     Vector3,
     WebGLRenderer
 } from "three";
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
-import {Drill, GerberCommand, Point} from "../types/cam.ts";
+import {GerberCommand} from "../types/cam.ts";
 import {Project} from "../types/project.ts";
+import {defaultLine, drawDefaultCircle} from "./utils.ts";
+import {drawBoard} from "./board.ts";
 
 export namespace Graphics {
     const requestRender = (renderer: WebGLRenderer, scene: Scene, camera: PerspectiveCamera, controls?: OrbitControls) =>
@@ -48,18 +48,18 @@ export namespace Graphics {
     }
 
     const update = (scene: Scene, camera: PerspectiveCamera, project: Project) => {
-        console.log(project)
+        camera.up = new Vector3(0, 0, 1)
         camera.position.x = project.job.width / 2
-        camera.position.y = 20
-        camera.position.z = project.job.height / 2
-        camera.lookAt(camera.position.x, 0, camera.position.z)
-        camera.rotateZ(1.5 * 3.14)
+        camera.position.y = project.job.height / 2
+        camera.position.z = 20
+        camera.lookAt(camera.position.x, camera.position.y + 1, 0)  // Look straight down
 
         drawDefaultLines(scene, project.profile)
         drawDefaultLines(scene, project.copper_top)
         drawDefaultLines(scene, project.silkscreen_top)
         drawDefaultLines(scene, project.soldermask_top)
         drawDefaultCircle(scene, project.drills)
+        drawBoard(scene, project.board)
     }
 
     const drawDefaultLines = (scene: Scene, inputs: GerberCommand[]) => {
@@ -77,30 +77,4 @@ export namespace Graphics {
         })
     }
 
-    const drawDefaultCircle = (scene: Scene, inputs: Drill[]) => {
-        inputs.forEach(it => {
-            scene.add(defaultCircle({x: it.x, y: it.y}, it.size, 0xcc5555))
-        })
-    }
-
-    const defaultLine = (from: Point, to: Point, color = 0x000000ff) => {
-        const material = new LineBasicMaterial({color: color});
-        const geometry = new BufferGeometry().setFromPoints([
-            pointToVector(from),
-            pointToVector(to),
-        ])
-        return new Line(geometry, material)
-    }
-
-    const defaultCircle = (from: Point, size: number, color = 0x000000ff) => {
-        const material = new MeshBasicMaterial({color: color});
-        const geometry = new CircleGeometry(size / 2, 32)
-        const line = new Line(geometry, material);
-        line.rotateX(0.5 * 3.14)
-        line.position.z = from.x;
-        line.position.x = from.y;
-        return line
-    }
-
-    const pointToVector = (input: Point, zoffset = 0): Vector3 => new Vector3(input.y, zoffset, input.x);
 }

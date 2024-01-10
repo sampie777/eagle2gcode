@@ -5,7 +5,7 @@ import {Upload} from "../../logic/upload.ts";
 
 type Props = {
     type: string
-    upload: Upload.Type | null
+    upload: Upload.Type | undefined
 }
 
 const Row: Component<Props> = (props) => {

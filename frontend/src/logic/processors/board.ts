@@ -55,7 +55,7 @@ function getText(element: Element): Eagle.Text[] {
             y: it.getAttributeInt("y") ?? 0,
             size: it.getAttributeInt("size") ?? 0,
             ratio: it.getAttributeInt("ratio") ?? 0,
-            layer: it.getAttribute("shape"),
+            layer: it.getAttribute("layer"),
             rotation: it.getAttribute("rot"),
             value: it.textContent,
         }));
@@ -132,8 +132,8 @@ const getSignals = (xml: Document): Eagle.Signal[] => {
         .map(signal => {
             const contacts: Eagle.Contact[] = Array.from(signal.getElementsByTagName("contactref"))
                 .map(it => ({
-                    element: it.getAttribute("element"),
-                    pad: it.getAttributeInt("pad") ?? 0,
+                    component: it.getAttribute("element"),
+                    pad: it.getAttribute("pad"),
                 }))
 
             const wires = getWires(signal)
