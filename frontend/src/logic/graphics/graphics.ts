@@ -9,7 +9,7 @@ import {
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 import {GerberCommand} from "../types/cam.ts";
 import {Project} from "../types/project.ts";
-import {defaultLine, drawDefaultCircle} from "./utils.ts";
+import {defaultLine} from "./utils.ts";
 import {drawBoard} from "./board.ts";
 
 export namespace Graphics {
@@ -38,7 +38,7 @@ export namespace Graphics {
         requestRender(renderer, scene, camera);
         return {
             canvas: renderer.domElement,
-            update: (project: Project) => update(scene, camera, project)
+            update: (project: Project) => update(scene, camera, project, controls)
         };
     }
 
@@ -47,12 +47,15 @@ export namespace Graphics {
         renderer.render(scene, camera);
     }
 
-    const update = (scene: Scene, camera: PerspectiveCamera, project: Project) => {
+    const update = (scene: Scene, camera: PerspectiveCamera, project: Project, controls?: OrbitControls) => {
         camera.up = new Vector3(0, 0, 1)
         camera.position.x = project.job.width / 2
         camera.position.y = project.job.height / 2
         camera.position.z = 15
         camera.lookAt(camera.position.x, camera.position.y + 1, 0)  // Look straight down
+        if (controls){
+            controls.target = new Vector3(camera.position.x, camera.position.y, 0)
+        }
 
         // drawDefaultLines(scene, project.profile)
         // drawDefaultLines(scene, project.copper_top)

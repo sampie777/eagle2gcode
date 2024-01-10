@@ -1,6 +1,6 @@
 import {
     CylinderGeometry,
-    DoubleSide,
+    DoubleSide, ExtrudeGeometry,
     Group,
     Mesh,
     MeshBasicMaterial,
@@ -10,7 +10,6 @@ import {
     Vector2
 } from "three";
 import {Eagle} from "../types/eagle.ts";
-import {defaultLine} from "./utils.ts";
 
 const pcbThickness = 1;
 
@@ -33,12 +32,20 @@ const layerToColor = (layers: Eagle.Layer[], layer: string) => {
 }
 
 function drawOutline(board: Eagle.Board, scene: Scene) {
+    if (board.plain.length == 0) return;
+
+    const shape = new Shape();
+    shape.moveTo(board.plain[0].x1, board.plain[0].y1)
     board.plain.forEach(wire => {
-        scene.add(defaultLine(
-            {x: wire.x1, y: wire.y1},
-            {x: wire.x2, y: wire.y2},
-            layerToColor(board.layers, wire.layer)))
+        shape.lineTo(wire.x2, wire.y2);
     })
+
+    const geometry = new ExtrudeGeometry(shape, {
+        depth: -1 * pcbThickness,
+    })
+    const material = new MeshBasicMaterial({color: 0x0e442d});
+    material.side = DoubleSide;
+    scene.add(new Mesh(geometry, material))
 }
 
 const findPackage = (board: Eagle.Board, component: Eagle.Component): Eagle.Package | undefined => {
@@ -130,9 +137,6 @@ const createPad = (board: Eagle.Board, pad: Eagle.Pad) => {
         shape.absarc(padWidth / 2, padWidth / 2, pad.drill / 2,
             1.25 * Math.PI, 1.2501 * Math.PI, true)
     } else if (pad.shape == "long") {
-        const verticeLength = padWidth / (1 + Math.sqrt(2))
-        const diagonalVerticeLength = verticeLength * Math.sqrt(0.5);
-
         shape.moveTo(0, 0);
         shape.arc(padWidth / 2, 0, padWidth / 2, Math.PI, 2 * Math.PI, false);
         shape.lineTo(padWidth, padWidth);
@@ -167,7 +171,7 @@ const createDrill = (board: Eagle.Board, pad: Eagle.Pad) => {
         pcbThickness,
         32,
         1,
-        true);
+        false);
     const padLayer = board.layers.find(it => it.name == "Drills")
     const material = new MeshBasicMaterial({color: 0x95833d});
     material.side = DoubleSide;
