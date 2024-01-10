@@ -6,8 +6,8 @@ import ViewerRoot from "./gui/viewer/ViewerRoot.tsx";
 import {emptyProject, exampleProject, ProjectContext} from "./gui/ProjectContext.ts";
 
 function App() {
-    // const initialProject = emptyProject;
-    const initialProject = exampleProject;
+    const initialProject = emptyProject;
+    // const initialProject = exampleProject;
     const [screen, setScreen] = createSignal(initialProject.isLoaded ? 1 : 0);
 
     const onProjectLoaded = () => {
