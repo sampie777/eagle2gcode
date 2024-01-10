@@ -21,13 +21,13 @@ export namespace Graphics {
         update: (project: Project) => void
     } => {
         const renderer = new WebGLRenderer();
-        renderer.setSize(800, 500);
+        renderer.setSize(600, 600);
 
         const scene = new Scene();
         scene.background = new Color(0.018, 0.018, 0.018)
         scene.add(new AxesHelper(5));
 
-        const camera = new PerspectiveCamera(75, 800 / 500, 0.1, 1000);
+        const camera = new PerspectiveCamera(75, 600 / 600, 0.1, 1000);
 
         // const controls = new OrbitControls(camera, renderer.domElement);
         // controls.enableDamping = true;

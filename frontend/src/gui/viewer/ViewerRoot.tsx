@@ -2,6 +2,7 @@ import {Component} from "solid-js";
 import {useProject} from "../ProjectContext.ts";
 import Canvas from "./Canvas.tsx";
 import './style.less'
+import example_board from '../../assets/Board_cut.png';
 
 type Props = {
     onReset: () => void;
@@ -19,7 +20,12 @@ const ViewerRoot: Component<Props> = (props) => {
             <button onClick={props.onReset}>New project</button>
         </div>
 
-        <Canvas />
+        <div style={{display: "flex", "flex-direction": 'row', "align-items": "center"}}>
+            <Canvas/>
+            <div>
+                <img src={example_board} />
+            </div>
+        </div>
     </div>;
 }
 
