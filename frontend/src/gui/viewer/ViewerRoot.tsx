@@ -3,6 +3,7 @@ import {useProject} from "../ProjectContext.ts";
 import Canvas from "./Canvas.tsx";
 import './style.less'
 import example_board from '../../assets/Board_cut.png';
+import FlatcamSettings from "./flatcam/FlatcamSettings.tsx";
 
 type Props = {
     onReset: () => void;
@@ -22,9 +23,10 @@ const ViewerRoot: Component<Props> = (props) => {
 
         <div style={{display: "flex", "flex-direction": 'row', "align-items": "center"}}>
             <Canvas/>
-            <div>
-                <img src={example_board} />
-            </div>
+            {/*<div>*/}
+            {/*    <img src={example_board} />*/}
+            {/*</div>*/}
+            <FlatcamSettings />
         </div>
     </div>;
 }
