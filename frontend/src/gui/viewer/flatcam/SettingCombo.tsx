@@ -4,6 +4,7 @@ type Props = {
     label: string,
     values: string[],
     defaultValue: string,
+    onChange: (value: string) => void
 }
 
 const SettingCombo: Component<Props> = (props) => {
@@ -14,7 +15,9 @@ const SettingCombo: Component<Props> = (props) => {
             {props.label}
         </label>
 
-        <select id={id} value={props.defaultValue}>
+        <select id={id}
+                value={props.defaultValue}
+                onChange={e => props.onChange(e.target.value)}>
             {props.values.map(it => <option>{it}</option>)}
         </select>
     </div>;

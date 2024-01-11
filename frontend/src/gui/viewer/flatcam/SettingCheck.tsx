@@ -3,6 +3,7 @@ import {Component} from "solid-js";
 type Props = {
     label: string,
     defaultValue: boolean,
+    onChange: (value: boolean) => void;
 }
 
 const SettingCheck: Component<Props> = (props) => {
@@ -15,7 +16,8 @@ const SettingCheck: Component<Props> = (props) => {
 
         <input id={id}
                type={"checkbox"}
-               checked={props.defaultValue}/>
+               checked={props.defaultValue}
+               onChange={e => props.onChange(e.target.checked)}/>
     </div>;
 }
 

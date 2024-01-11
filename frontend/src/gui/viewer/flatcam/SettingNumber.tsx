@@ -3,6 +3,7 @@ import {Component} from "solid-js";
 type Props = {
     label: string,
     defaultValue: number,
+    onChange: (value: number) => void
 }
 
 const SettingNumber: Component<Props> = (props) => {
@@ -15,7 +16,8 @@ const SettingNumber: Component<Props> = (props) => {
 
         <input id={id}
                type={"number"}
-               value={props.defaultValue} />
+               value={props.defaultValue}
+               onChange={e => props.onChange(+e.target.value)}/>
     </div>;
 }
 
