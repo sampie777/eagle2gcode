@@ -6,10 +6,12 @@ import SettingNumber from "./SettingNumber.tsx";
 import './style.less';
 import {FlatcamConfig, FlatcamCopperLayer} from "../../../logic/types/flatcam.ts";
 import {Flatcam} from "../../../logic/flatcam.ts";
+import {useProject} from "../../ProjectContext.ts";
 
 type Props = {}
 
 const FlatcamSettings: Component<Props> = (props) => {
+    const project = useProject();
     const [commands, setCommands] = createSignal<string | undefined>();
 
     const config: FlatcamConfig = {
@@ -42,7 +44,7 @@ const FlatcamSettings: Component<Props> = (props) => {
     }
 
     const onGenerate = () => {
-        const result = Flatcam.generateCommands(config);
+        const result = Flatcam.generateCommands(project, config);
         setCommands(result);
         navigator.clipboard.writeText(result);
     }
