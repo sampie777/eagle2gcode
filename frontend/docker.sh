@@ -1,5 +1,5 @@
 #!/bin/bash
-NAME="sajansen/eagle2code"
+NAME="sajansen/eagle2gcode"
 
 VERSION=$(sed 's/.*"version": "\(.*\)".*/\1/;t;d' ./package.json)
 progname=$(basename $0)
