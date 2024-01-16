@@ -2,10 +2,10 @@ import {Project} from "../types/project.ts";
 import {Trace} from "../types/gcode.ts";
 
 export const getProjectDimensions = (project: Project): { x: number, y: number, width: number, height: number } => {
-    let minX = 100;
-    let maxX = 0;
-    let minY = 100;
-    let maxY = 0;
+    let minX = 10000;
+    let maxX = -10000;
+    let minY = 10000;
+    let maxY = -10000;
 
     const checkForBoundaries = (trace: Trace) => {
         trace.forEach(it => {

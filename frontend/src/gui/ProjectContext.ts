@@ -4026,9 +4026,7 @@ export const exampleProject: Project = {
             {
                 x: 3.048,
                 y: 5.08
-            }
-        ],
-        [
+            },
             {
                 x: 3.048,
                 y: 5.08
@@ -4036,9 +4034,7 @@ export const exampleProject: Project = {
             {
                 x: 4.572,
                 y: 5.08
-            }
-        ],
-        [
+            },
             {
                 x: 4.572,
                 y: 5.08
@@ -4106,9 +4102,7 @@ export const exampleProject: Project = {
             {
                 x: 4.826,
                 y: 5.334
-            }
-        ],
-        [
+            },
             {
                 x: 4.826,
                 y: 5.334
@@ -4116,9 +4110,7 @@ export const exampleProject: Project = {
             {
                 x: 4.826,
                 y: 5.715
-            }
-        ],
-        [
+            },
             {
                 x: 4.826,
                 y: 5.715
@@ -4126,9 +4118,7 @@ export const exampleProject: Project = {
             {
                 x: 4.699,
                 y: 5.842
-            }
-        ],
-        [
+            },
             {
                 x: 4.699,
                 y: 5.842
@@ -4136,9 +4126,7 @@ export const exampleProject: Project = {
             {
                 x: 4.699,
                 y: 9.398
-            }
-        ],
-        [
+            },
             {
                 x: 4.699,
                 y: 9.398
@@ -4146,9 +4134,7 @@ export const exampleProject: Project = {
             {
                 x: 4.826,
                 y: 9.525
-            }
-        ],
-        [
+            },
             {
                 x: 4.826,
                 y: 9.525
@@ -4156,9 +4142,7 @@ export const exampleProject: Project = {
             {
                 x: 4.826,
                 y: 9.906
-            }
-        ],
-        [
+            },
             {
                 x: 4.826,
                 y: 9.906
@@ -4226,9 +4210,7 @@ export const exampleProject: Project = {
             {
                 x: 4.572,
                 y: 10.16
-            }
-        ],
-        [
+            },
             {
                 x: 4.572,
                 y: 10.16
@@ -4236,9 +4218,7 @@ export const exampleProject: Project = {
             {
                 x: 3.048,
                 y: 10.16
-            }
-        ],
-        [
+            },
             {
                 x: 3.048,
                 y: 10.16
@@ -4306,9 +4286,7 @@ export const exampleProject: Project = {
             {
                 x: 2.794,
                 y: 9.906
-            }
-        ],
-        [
+            },
             {
                 x: 2.794,
                 y: 9.906
@@ -4316,9 +4294,7 @@ export const exampleProject: Project = {
             {
                 x: 2.794,
                 y: 9.525
-            }
-        ],
-        [
+            },
             {
                 x: 2.794,
                 y: 9.525
@@ -4326,9 +4302,7 @@ export const exampleProject: Project = {
             {
                 x: 2.921,
                 y: 9.398
-            }
-        ],
-        [
+            },
             {
                 x: 2.921,
                 y: 9.398
@@ -4336,9 +4310,7 @@ export const exampleProject: Project = {
             {
                 x: 2.921,
                 y: 5.842
-            }
-        ],
-        [
+            },
             {
                 x: 2.921,
                 y: 5.842
@@ -4394,9 +4366,7 @@ export const exampleProject: Project = {
             {
                 x: 7.747,
                 y: 2.159
-            }
-        ],
-        [
+            },
             {
                 x: 7.747,
                 y: 2.159
@@ -4464,9 +4434,7 @@ export const exampleProject: Project = {
             {
                 x: 8.001,
                 y: 1.905
-            }
-        ],
-        [
+            },
             {
                 x: 8.001,
                 y: 1.905
@@ -4474,9 +4442,7 @@ export const exampleProject: Project = {
             {
                 x: 12.319,
                 y: 1.905
-            }
-        ],
-        [
+            },
             {
                 x: 12.319,
                 y: 1.905
@@ -4544,9 +4510,7 @@ export const exampleProject: Project = {
             {
                 x: 12.573,
                 y: 2.159
-            }
-        ],
-        [
+            },
             {
                 x: 12.573,
                 y: 2.159
@@ -4554,9 +4518,7 @@ export const exampleProject: Project = {
             {
                 x: 12.573,
                 y: 5.461
-            }
-        ],
-        [
+            },
             {
                 x: 12.573,
                 y: 5.461
@@ -4624,9 +4586,7 @@ export const exampleProject: Project = {
             {
                 x: 12.319,
                 y: 5.715
-            }
-        ],
-        [
+            },
             {
                 x: 12.319,
                 y: 5.715
@@ -4634,9 +4594,7 @@ export const exampleProject: Project = {
             {
                 x: 8.001,
                 y: 5.715
-            }
-        ],
-        [
+            },
             {
                 x: 8.001,
                 y: 5.715
@@ -4880,9 +4838,7 @@ export const exampleProject: Project = {
             {
                 x: 9.906,
                 y: 3.81
-            }
-        ],
-        [
+            },
             {
                 x: 9.906,
                 y: 3.81
@@ -4900,9 +4856,7 @@ export const exampleProject: Project = {
             {
                 x: 10.414,
                 y: 3.81
-            }
-        ],
-        [
+            },
             {
                 x: 10.414,
                 y: 3.81
@@ -4944,9 +4898,7 @@ export const exampleProject: Project = {
             {
                 x: 7.62,
                 y: 10.795
-            }
-        ],
-        [
+            },
             {
                 x: 7.62,
                 y: 10.795
@@ -4958,9 +4910,7 @@ export const exampleProject: Project = {
             {
                 x: 8.255,
                 y: 12.7
-            }
-        ],
-        [
+            },
             {
                 x: 8.255,
                 y: 12.7
@@ -4968,9 +4918,7 @@ export const exampleProject: Project = {
             {
                 x: 9.525,
                 y: 12.7
-            }
-        ],
-        [
+            },
             {
                 x: 9.525,
                 y: 12.7
@@ -5198,9 +5146,7 @@ export const exampleProject: Project = {
             {
                 x: 9.586,
                 y: 14.4653
-            }
-        ],
-        [
+            },
             {
                 x: 9.586,
                 y: 14.4653
@@ -5218,9 +5164,7 @@ export const exampleProject: Project = {
             {
                 x: 8.5979,
                 y: 13.3223
-            }
-        ],
-        [
+            },
             {
                 x: 8.5979,
                 y: 13.3223
@@ -5252,9 +5196,7 @@ export const exampleProject: Project = {
             {
                 x: 7.6073,
                 y: 13.3223
-            }
-        ],
-        [
+            },
             {
                 x: 7.6073,
                 y: 13.3223

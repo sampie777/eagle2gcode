@@ -1,6 +1,6 @@
 import {
     AxesHelper, BufferGeometry,
-    Color, Line, LineBasicMaterial,
+    Color, GridHelper, Line, LineBasicMaterial,
     PerspectiveCamera,
     Scene, Shape,
     Vector3,
@@ -19,6 +19,7 @@ export namespace Graphics {
         showTraces: boolean,
         showSilkscreen: boolean,
         showSoldermask: boolean,
+        showGrid: boolean,
     };
 
     const requestRender = (renderer: WebGLRenderer, scene: Scene, camera: PerspectiveCamera, controls?: OrbitControls) =>
@@ -33,7 +34,6 @@ export namespace Graphics {
 
         const scene = new Scene();
         scene.background = new Color(0.018, 0.018, 0.018)
-        scene.add(new AxesHelper(5));
 
         const camera = new PerspectiveCamera(75, 600 / 600, 0.1, 1000);
 
@@ -77,6 +77,11 @@ export namespace Graphics {
             controls.target = new Vector3(camera.position.x, camera.position.y, 0)
         }
 
+        scene.add(new AxesHelper(2));
+        if (config.showGrid) {
+            drawGrid(dimensions, scene);
+        }
+
         drawDefaultLines(scene, project.profile, 0x88763e)
         if (config.showTraces) {
             drawDefaultLines(scene, project.traces_top, 0xa00909)
@@ -90,9 +95,25 @@ export namespace Graphics {
             drawDefaultLines(scene, project.soldermask_top, 0x31b079)
             drawDefaultLines(scene, project.soldermask_bottom, 0x31b079)
         }
-        
+
         drawBoard(scene, project.board, config.boardOpacity)
     }
+
+    const drawGrid = (dimensions: { x: number; y: number; width: number; height: number }, scene: Scene) => {
+        const gridSize = 2 * Math.ceil(Math.max(dimensions.x + dimensions.width, dimensions.y + dimensions.height) / 10) * 10;
+        const gridHelper = new GridHelper(gridSize, gridSize, 0xffffff);
+        gridHelper.rotateX(0.5 * Math.PI)
+        gridHelper.material.transparent = true;
+        gridHelper.material.opacity = 0.2;
+        scene.add(gridHelper)
+
+        const gridHelper2 = new GridHelper(gridSize, gridSize / 10, 0xffffff, 0xffffff);
+        gridHelper2.rotateX(0.5 * Math.PI)
+        gridHelper2.material.transparent = true;
+        gridHelper2.material.opacity = 0.15;
+        scene.add(gridHelper2)
+    }
+
     const drawDefaultLines = (scene: Scene, traces: Trace[], color: ColorRepresentation) => {
         traces.forEach(it => scene.add(drawTrace(it, color)))
     }

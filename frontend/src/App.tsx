@@ -9,8 +9,8 @@ import {Screens} from "./logic/screens.ts";
 import './gui/default.less';
 
 function App() {
-    const initialProject = emptyProject;
-    // const initialProject = exampleProject;
+    // const initialProject = emptyProject;
+    const initialProject = exampleProject;
     const [screen, setScreen] = createSignal(initialProject.isLoaded ? Screens.Viewer : Screens.FlatcamCommandGeneration);
 
     const getScreenForState = () => {

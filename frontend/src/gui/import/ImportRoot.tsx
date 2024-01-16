@@ -1,13 +1,28 @@
-import {Component, createSignal} from "solid-js";
+import {Component, createEffect, createSignal} from "solid-js";
 import './style.less';
 import Row from "./Row.tsx";
 import {Upload} from "../../logic/upload.ts";
 import {ScreenProps} from "../../logic/screens.ts";
+import {emptyProject, useProject} from "../ProjectContext.ts";
 
 type Props = ScreenProps
 
 const ImportRoot: Component<Props> = (props) => {
+    const project = useProject();
     const [uploads, setUploads] = createSignal<Upload.Type[]>([]);
+
+    createEffect(() => {
+        project.isLoaded = emptyProject.isLoaded;
+        project.profile = emptyProject.profile;
+        project.traces_top = emptyProject.traces_top;
+        project.traces_bottom = emptyProject.traces_bottom;
+        project.silkscreen_top = emptyProject.silkscreen_top;
+        project.silkscreen_bottom = emptyProject.silkscreen_bottom;
+        project.soldermask_top = emptyProject.soldermask_top;
+        project.soldermask_bottom = emptyProject.soldermask_bottom;
+        project.drills = emptyProject.drills;
+        project.board = emptyProject.board;
+    })
 
     const onFilesChange = async (e: Event) => {
         const files = Array.from((e.target as HTMLInputElement).files);

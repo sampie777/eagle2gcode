@@ -11,6 +11,7 @@ const Canvas: Component<Props> = (props) => {
     const [showTraces, setShowTraces] = createSignal(true);
     const [showSilkscreen, setShowSilkscreen] = createSignal(true);
     const [showSoldermask, setShowSoldermask] = createSignal(true);
+    const [showGrid, setShowGrid] = createSignal(true);
     const project = useProject();
     const {canvas, update} = Graphics.start();
 
@@ -20,6 +21,7 @@ const Canvas: Component<Props> = (props) => {
             showTraces: showTraces(),
             showSilkscreen: showSilkscreen(),
             showSoldermask: showSoldermask(),
+            showGrid: showGrid(),
         })
     })
 
@@ -53,6 +55,13 @@ const Canvas: Component<Props> = (props) => {
                        checked={showSoldermask()}
                        onChange={e => setShowSoldermask(e.target.checked)}/>
                 Soldermask
+            </label>
+
+            <label>
+                <input type="checkbox"
+                       checked={showGrid()}
+                       onChange={e => setShowGrid(e.target.checked)}/>
+                Grid
             </label>
         </div>
     </div>;
