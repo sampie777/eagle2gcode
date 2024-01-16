@@ -26,7 +26,6 @@ const Canvas: Component<Props> = (props) => {
         })
     })
 
-    console.log("Render")
     return <div class={"Canvas"}>
         {canvas}
 

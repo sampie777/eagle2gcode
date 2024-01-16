@@ -1,7 +1,7 @@
 import {Dimension, Project} from "../types/project.ts";
 import {Drill} from "../types/cam.ts";
-import {DrillConfig, Trace} from "../types/gcode.ts";
-import {getProjectDimensions} from "../processors/project.ts";
+import {DrillConfig} from "../types/gcode.ts";
+import {getProjectAlignmentDrills, getProjectDimensions} from "../processors/project.ts";
 
 const drillAlignmentToGcode = (dimensions: Dimension, drill: Drill, config: DrillConfig): string => {
     const x = config.offsetX + ((dimensions.x + dimensions.width) - (drill.x - dimensions.x));
@@ -32,29 +32,8 @@ const drillToGcode = (drill: Drill, config: DrillConfig): string => {
 export const generateDrillAlignmentFile = (project: Project, config: DrillConfig): string => {
     if (project.drills.length == 0) return "";
 
-    let leftMostHole: Drill | undefined;
-    let rightMostHole: Drill | undefined;
-    project.drills
-        .filter(it => it.size < 1.5)
-        .forEach(it => {
-            if (leftMostHole == undefined || it.x < leftMostHole.x) leftMostHole = it;
-            if (rightMostHole == undefined || it.x > rightMostHole.x) rightMostHole = it;
-        })
-
-    if (leftMostHole == undefined || rightMostHole == undefined) {
-        // If there are no small drills, then ignore the size constraint
-        project.drills
-            .forEach(it => {
-                if (leftMostHole == undefined || it.x < leftMostHole.x) leftMostHole = it;
-                if (rightMostHole == undefined || it.x > rightMostHole.x) rightMostHole = it;
-            })
-    }
-
-    if (leftMostHole == undefined) leftMostHole = rightMostHole;
-    if (rightMostHole == undefined) rightMostHole = leftMostHole;
-    if (leftMostHole == undefined || rightMostHole == undefined) return "";
-
     const dimensions = getProjectDimensions(project)
+    const drills = getProjectAlignmentDrills(project)
 
     return [
         "G21",
@@ -75,8 +54,7 @@ export const generateDrillAlignmentFile = (project: Project, config: DrillConfig
         "M117 Remove Z-stop!",
         "M300 S500 P500 ; Beep",
         "G4 P1",
-        drillAlignmentToGcode(dimensions, leftMostHole, config),
-        drillAlignmentToGcode(dimensions, rightMostHole, config),
+        ...drills.map(it => drillAlignmentToGcode(dimensions, it, config)),
         "G00 X0.0000Y0.0000",
         "M300 S2000 P500 ; Beep end",
         "M05",

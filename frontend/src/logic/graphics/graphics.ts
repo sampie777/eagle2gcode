@@ -11,7 +11,7 @@ import {Project} from "../types/project.ts";
 import {drawBoard} from "./board.ts";
 import {Trace} from "../types/gcode.ts";
 import {ColorRepresentation} from "three/src/math/Color";
-import {getProjectDimensions} from "../processors/project.ts";
+import {getProjectAlignmentDrills, getProjectDimensions} from "../processors/project.ts";
 import {Drill} from "../types/cam.ts";
 
 export namespace Graphics {
@@ -32,12 +32,12 @@ export namespace Graphics {
         update: (project: Project, config: RenderConfig) => void
     } => {
         const renderer = new WebGLRenderer();
-        renderer.setSize(600, 600);
+        renderer.setSize(800, 600);
 
         const scene = new Scene();
         scene.background = new Color(0.018, 0.018, 0.018)
 
-        const camera = new PerspectiveCamera(75, 600 / 600, 0.1, 1000);
+        const camera = new PerspectiveCamera(75, 800 / 600, 0.1, 1000);
 
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
@@ -98,7 +98,8 @@ export namespace Graphics {
             drawDefaultLines(scene, project.soldermask_bottom, 0x31b079)
         }
         if (config.showDrills) {
-            project.drills.forEach(it => scene.add(drawDrill(it, 0xff00ff)))
+            project.drills.forEach(it => scene.add(drawDrill(it, 0xaa00aa)))
+            getProjectAlignmentDrills(project).forEach(it => scene.add(drawDrill(it, 0xff55cc)))
         }
 
         drawBoard(scene, project.board, config.boardOpacity)

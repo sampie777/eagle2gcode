@@ -21,11 +21,13 @@ const ImportRoot: Component<Props> = (props) => {
         project.soldermask_top = [];
         project.soldermask_bottom = [];
         project.drills = [];
-        project.board.layers = [];
-        project.board.libraries = [];
-        project.board.plain = [];
-        project.board.components = [];
-        project.board.signals = [];
+        project.board = {
+            layers: [],
+            libraries: [],
+            plain: [],
+            components: [],
+            signals: [],
+        }
     })
 
     const onFilesChange = async (e: Event) => {

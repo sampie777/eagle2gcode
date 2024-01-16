@@ -1,5 +1,6 @@
 import {Dimension, Project} from "../types/project.ts";
 import {Trace} from "../types/gcode.ts";
+import {Drill} from "../types/cam.ts";
 
 export const getProjectDimensions = (project: Project): Dimension => {
     let minX = 10000;
@@ -30,4 +31,30 @@ export const getProjectDimensions = (project: Project): Dimension => {
         width: maxX - minX,
         height: maxY - minY
     }
+}
+
+export const getProjectAlignmentDrills = (project: Project): Drill[] => {
+    let leftMostHole: Drill | undefined;
+    let rightMostHole: Drill | undefined;
+    project.drills
+        .filter(it => it.size < 1.5)
+        .forEach(it => {
+            if (leftMostHole == undefined || it.x < leftMostHole.x) leftMostHole = it;
+            if (rightMostHole == undefined || it.x > rightMostHole.x) rightMostHole = it;
+        })
+
+    if (leftMostHole == undefined || rightMostHole == undefined) {
+        // If there are no small drills, then ignore the size constraint
+        project.drills
+            .forEach(it => {
+                if (leftMostHole == undefined || it.x < leftMostHole.x) leftMostHole = it;
+                if (rightMostHole == undefined || it.x > rightMostHole.x) rightMostHole = it;
+            })
+    }
+
+    if (leftMostHole == undefined) leftMostHole = rightMostHole;
+    if (rightMostHole == undefined) rightMostHole = leftMostHole;
+    if (leftMostHole == undefined || rightMostHole == undefined) return [];
+
+    return [leftMostHole, rightMostHole];
 }
