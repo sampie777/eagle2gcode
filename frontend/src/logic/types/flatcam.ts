@@ -10,7 +10,7 @@ export type FlatcamConfig = {
         cutoutProfile: boolean
         offsetX: number
         offsetY: number
-        feedrate: number
+        feedRate: number
         iterations: number
         removeGndPads: boolean
         usePrinterBedMesh: boolean

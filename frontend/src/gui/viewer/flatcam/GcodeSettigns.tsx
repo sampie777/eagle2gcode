@@ -23,7 +23,7 @@ const GcodeSettigns: Component<Props> = (props) => {
             cutoutProfile: false,
             offsetX: 34,
             offsetY: 26,
-            feedrate: 1400,
+            feedRate: 1400,
             iterations: 40,
             removeGndPads: false,
             usePrinterBedMesh: false,
@@ -67,8 +67,8 @@ const GcodeSettigns: Component<Props> = (props) => {
                            onChange={(value) => onChange("traces.offsetX", value)}/>
             <SettingNumber label={"Offset Y"} defaultValue={config.traces.offsetY}
                            onChange={(value) => onChange("traces.offsetY", value)}/>
-            <SettingNumber label={"Feed rate"} defaultValue={config.traces.feedrate}
-                           onChange={(value) => onChange("traces.feedrate", value)}/>
+            <SettingNumber label={"Feed rate"} defaultValue={config.traces.feedRate}
+                           onChange={(value) => onChange("traces.feedRate", value)}/>
             <SettingNumber label={"Iterations"} defaultValue={config.traces.iterations}
                            onChange={(value) => onChange("traces.iterations", value)}/>
             <SettingCheck label={"Remove GND pads"} defaultValue={config.traces.removeGndPads}

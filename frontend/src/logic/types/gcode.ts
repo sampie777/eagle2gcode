@@ -10,6 +10,18 @@ export enum GcodeCopperLayer {
     Bottom = "Bottom",
 }
 
+export type TracesConfig = {
+    copperLayer: GcodeCopperLayer
+    mirror: boolean
+    cutoutProfile: boolean
+    offsetX: number
+    offsetY: number
+    feedRate: number
+    iterations: number
+    removeGndPads: boolean
+    usePrinterBedMesh: boolean
+};
+
 export type DrillConfig = {
     offsetX: number,
     offsetY: number,
@@ -19,17 +31,7 @@ export type DrillConfig = {
 }
 
 export type GcodeConfig = {
-    traces: {
-        copperLayer: GcodeCopperLayer
-        mirror: boolean
-        cutoutProfile: boolean
-        offsetX: number
-        offsetY: number
-        feedrate: number
-        iterations: number
-        removeGndPads: boolean
-        usePrinterBedMesh: boolean
-    },
+    traces: TracesConfig,
     silkscreen: {
         top: boolean
         bottom: boolean
