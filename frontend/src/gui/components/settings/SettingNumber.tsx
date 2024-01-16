@@ -1,9 +1,13 @@
 import {Component} from "solid-js";
+import './style.less'
 
 type Props = {
     label: string,
     defaultValue: number,
-    onChange: (value: number) => void
+    onChange: (value: number) => void,
+    step?: number,
+    min?: number,
+    max?: number,
 }
 
 const SettingNumber: Component<Props> = (props) => {
@@ -16,8 +20,11 @@ const SettingNumber: Component<Props> = (props) => {
 
         <input id={id}
                type={"number"}
+               step={props.step}
+               min={props.min}
+               max={props.max}
                value={props.defaultValue}
-               onChange={e => props.onChange(+e.target.value)}/>
+               onInput={e => props.onChange(+e.target.value)}/>
     </div>;
 }
 

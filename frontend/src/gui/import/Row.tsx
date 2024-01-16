@@ -1,7 +1,8 @@
 import {Component} from "solid-js";
-import {AiFillCheckCircle, AiOutlineCheckCircle} from "solid-icons/ai";
+import {AiFillCheckCircle, AiOutlineCheckCircle, AiOutlineLoading} from "solid-icons/ai";
 import {capitalize} from "../../logic/utils/utils.ts";
 import {Upload} from "../../logic/upload.ts";
+import LoadingIcon from "../components/LoadingIcon.tsx";
 
 type Props = {
     type: string
@@ -14,7 +15,10 @@ const Row: Component<Props> = (props) => {
     return <div class={`Row ${upload ? "completed" : "missing"}`}
                 title={upload ? upload.file.name : ""}>
         <span class={"mark"}>
-            {upload ? <AiFillCheckCircle/> : <AiOutlineCheckCircle/>}
+            {upload ? (upload.status == "done"
+                    ? <AiFillCheckCircle/>
+                    : <LoadingIcon/>)
+                : <AiOutlineCheckCircle/>}
         </span>
 
         <span class={"type"}>{capitalize(props.type.replace(/_/gi, " "))}</span>

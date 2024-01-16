@@ -1,4 +1,5 @@
 import {Component} from "solid-js";
+import './style.less'
 
 type Props = {
     label: string,

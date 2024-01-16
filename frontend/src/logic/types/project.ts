@@ -1,17 +1,17 @@
 import {Drill, GerberCommand, Job} from "./cam.ts";
 import {Eagle} from "./eagle.ts";
+import {Trace} from "./gcode.ts";
 
 
 export type Project = {
     isLoaded: boolean,
-    job: Job,
-    profile: GerberCommand[],
-    copper_top: GerberCommand[],
-    copper_bottom: GerberCommand[],
-    soldermask_top: GerberCommand[],
-    soldermask_bottom: GerberCommand[],
-    silkscreen_top: GerberCommand[],
-    silkscreen_bottom: GerberCommand[],
+    profile: Trace[],
+    traces_top: Trace[],
+    traces_bottom: Trace[],
+    silkscreen_top: Trace[],
+    silkscreen_bottom: Trace[],
+    soldermask_top: Trace[],
+    soldermask_bottom: Trace[],
     drills: Drill[],
     board: Eagle.Board,
 }

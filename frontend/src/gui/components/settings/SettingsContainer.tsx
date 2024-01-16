@@ -1,4 +1,5 @@
 import {Component, createSignal} from "solid-js";
+import './style.less'
 
 type Props = {
     name: string

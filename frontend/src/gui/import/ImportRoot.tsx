@@ -2,10 +2,9 @@ import {Component, createSignal} from "solid-js";
 import './style.less';
 import Row from "./Row.tsx";
 import {Upload} from "../../logic/upload.ts";
+import {ScreenProps} from "../../logic/screens.ts";
 
-type Props = {
-    onSuccess: () => void
-}
+type Props = ScreenProps
 
 const ImportRoot: Component<Props> = (props) => {
     const [uploads, setUploads] = createSignal<Upload.Type[]>([]);
@@ -27,7 +26,7 @@ const ImportRoot: Component<Props> = (props) => {
             upload.status = "reading";
             setUploads(prev => [...prev])
 
-            upload.content = await upload.file.text();
+            upload.content = (await upload.file.text()).replace(/\r/g, "")
             console.log("result", upload.file.name, Upload.processFile(upload.file.name, upload.content))
 
             upload.status = "done"
@@ -54,10 +53,15 @@ const ImportRoot: Component<Props> = (props) => {
         </div>
         <br/>
 
-        <button disabled={!Upload.allFilesUploaded(uploads())}
-                onClick={props.onSuccess}>
-            Next
-        </button>
+        <div class={"actions"}>
+            <button onClick={props.onBack}>
+                Back
+            </button>
+            <button disabled={uploads().length == 0}
+                    onClick={props.onNext}>
+                Next
+            </button>
+        </div>
     </div>;
 }
 

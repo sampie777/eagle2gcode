@@ -3,7 +3,7 @@ import {
     DoubleSide, ExtrudeGeometry,
     Group,
     Mesh,
-    MeshBasicMaterial,
+    MeshBasicMaterial, MeshStandardMaterial,
     Scene,
     Shape,
     ShapeGeometry,
@@ -13,10 +13,10 @@ import {Eagle} from "../types/eagle.ts";
 
 const pcbThickness = 1;
 
-export const drawBoard = (scene: Scene, board: Eagle.Board) => {
-    drawOutline(board, scene);
-    drawSignals(board, scene);
-    drawComponents(board, scene);
+export const drawBoard = (scene: Scene, board: Eagle.Board, opacity: number) => {
+    drawOutline(board, scene, opacity);
+    drawSignals(board, scene, opacity);
+    drawComponents(board, scene, opacity);
 };
 
 const colors = {
@@ -31,7 +31,7 @@ const layerToColor = (layers: Eagle.Layer[], layer: string) => {
     return value ?? 0x888888;
 }
 
-function drawOutline(board: Eagle.Board, scene: Scene) {
+function drawOutline(board: Eagle.Board, scene: Scene, opacity: number) {
     if (board.plain.length == 0) return;
 
     const shape = new Shape();
@@ -43,7 +43,7 @@ function drawOutline(board: Eagle.Board, scene: Scene) {
     const geometry = new ExtrudeGeometry(shape, {
         depth: -1 * pcbThickness,
     })
-    const material = new MeshBasicMaterial({color: 0x0e442d});
+    const material = new MeshBasicMaterial({color: 0x0e442d, transparent: true, opacity: 0.8 * opacity});
     material.side = DoubleSide;
     scene.add(new Mesh(geometry, material))
 }
@@ -54,30 +54,30 @@ const findPackage = (board: Eagle.Board, component: Eagle.Component): Eagle.Pack
     return library.packages.find(it => it.name == component.package);
 };
 
-const drawSignals = (board: Eagle.Board, scene: Scene) => {
+const drawSignals = (board: Eagle.Board, scene: Scene, opacity: number) => {
     board.signals.forEach(signal => {
         signal.wires.forEach(wire => {
-            scene.add(createWire(board, wire))
+            scene.add(createWire(board, wire, opacity))
         })
     })
 }
 
-const drawComponents = (board: Eagle.Board, scene: Scene) => {
+const drawComponents = (board: Eagle.Board, scene: Scene, opacity: number) => {
     board.components.forEach(component => {
         const pack = findPackage(board, component);
         if (pack == null) return;
 
         const group = new Group();
         pack.wires.forEach(it => {
-            const mesh = createWire(board, it);
+            const mesh = createWire(board, it, opacity);
             group.add(mesh)
         })
         pack.pads.forEach(it => {
-            const mesh = createPad(board, it);
+            const mesh = createPad(board, it, opacity);
             group.add(mesh)
         })
         pack.pads.forEach(it => {
-            const mesh = createDrill(board, it);
+            const mesh = createDrill(board, it, opacity);
             group.add(mesh)
         })
 
@@ -90,7 +90,7 @@ const drawComponents = (board: Eagle.Board, scene: Scene) => {
     })
 }
 
-const createWire = (board: Eagle.Board, wire: Eagle.Wire) => {
+const createWire = (board: Eagle.Board, wire: Eagle.Wire, opacity: number) => {
     const from = new Vector2(wire.x1, wire.y1);
     const to = new Vector2(wire.x2, wire.y2);
     const between = (new Vector2()).subVectors(to, from)
@@ -104,7 +104,11 @@ const createWire = (board: Eagle.Board, wire: Eagle.Wire) => {
     shape.arc(0, -0.5 * wire.width, 0.5 * wire.width, 0.5 * 3.14, 1.5 * 3.14);
 
     const geometry = new ShapeGeometry(shape);
-    const material = new MeshBasicMaterial({color: layerToColor(board.layers, wire.layer)});
+    const material = new MeshBasicMaterial({
+        color: layerToColor(board.layers, wire.layer),
+        transparent: true,
+        opacity: opacity
+    });
     material.side = DoubleSide;
     const mesh = new Mesh(geometry, material);
 
@@ -115,7 +119,7 @@ const createWire = (board: Eagle.Board, wire: Eagle.Wire) => {
     return mesh
 }
 
-const createPad = (board: Eagle.Board, pad: Eagle.Pad) => {
+const createPad = (board: Eagle.Board, pad: Eagle.Pad, opacity: number) => {
     const padWidth = pad.drill * 1.8;
 
     const shape = new Shape();
@@ -152,7 +156,11 @@ const createPad = (board: Eagle.Board, pad: Eagle.Pad) => {
 
     const geometry = new ShapeGeometry(shape);
     const padLayer = board.layers.find(it => it.name == "Pads")
-    const material = new MeshBasicMaterial({color: layerToColor(board.layers, padLayer?.number ?? "0")});
+    const material = new MeshBasicMaterial({
+        color: layerToColor(board.layers, padLayer?.number ?? "0"),
+        transparent: true,
+        opacity: opacity
+    });
     material.side = DoubleSide;
     const mesh = new Mesh(geometry, material);
 
@@ -164,7 +172,7 @@ const createPad = (board: Eagle.Board, pad: Eagle.Pad) => {
     return mesh
 }
 
-const createDrill = (board: Eagle.Board, pad: Eagle.Pad) => {
+const createDrill = (board: Eagle.Board, pad: Eagle.Pad, opacity: number) => {
     const geometry = new CylinderGeometry(
         pad.drill / 2,
         pad.drill / 2,
@@ -172,8 +180,7 @@ const createDrill = (board: Eagle.Board, pad: Eagle.Pad) => {
         32,
         1,
         false);
-    const padLayer = board.layers.find(it => it.name == "Drills")
-    const material = new MeshBasicMaterial({color: 0x95833d});
+    const material = new MeshBasicMaterial({color: 0x95833d, transparent: true, opacity: opacity});
     material.side = DoubleSide;
     const mesh = new Mesh(geometry, material);
 

@@ -1,16 +1,19 @@
 import {Component, createSignal} from "solid-js";
-import SettingsContainer from "./SettingsContainer.tsx";
-import SettingCombo from "./SettingCombo.tsx";
-import SettingCheck from "./SettingCheck.tsx";
-import SettingNumber from "./SettingNumber.tsx";
+import SettingsContainer from "./../../components/settings/SettingsContainer.tsx";
+import SettingCombo from "./../../components/settings/SettingCombo.tsx";
+import SettingCheck from "./../../components/settings/SettingCheck.tsx";
+import SettingNumber from "./../../components/settings/SettingNumber.tsx";
 import './style.less';
 import {FlatcamConfig, FlatcamCopperLayer} from "../../../logic/types/flatcam.ts";
 import {Flatcam} from "../../../logic/flatcam.ts";
 import {useProject} from "../../ProjectContext.ts";
+import {Gcode, generateFiles, generateSilkscreenFile} from "../../../logic/gcode.ts";
 
-type Props = {}
+type Props = {
+    onBack?: () => void
+}
 
-const FlatcamSettings: Component<Props> = (props) => {
+const GcodeSettigns: Component<Props> = (props) => {
     const project = useProject();
     const [commands, setCommands] = createSignal<string | undefined>();
 
@@ -21,7 +24,6 @@ const FlatcamSettings: Component<Props> = (props) => {
             cutoutProfile: false,
             offsetX: 34,
             offsetY: 26,
-            diaWidth: 0.20188,
             feedrate: 1400,
             iterations: 40,
             removeGndPads: false,
@@ -44,9 +46,8 @@ const FlatcamSettings: Component<Props> = (props) => {
     }
 
     const onGenerate = () => {
-        const result = Flatcam.generateCommands(project, config);
-        setCommands(result);
-        navigator.clipboard.writeText(result);
+        console.log(Gcode.generateFiles(project))
+        alert("File generation not supported yet")
     }
 
     return <div class={"FlatcamSettings"}>
@@ -63,8 +64,6 @@ const FlatcamSettings: Component<Props> = (props) => {
                            onChange={(value) => onChange("traces.offsetX", value)}/>
             <SettingNumber label={"Offset Y"} defaultValue={config.traces.offsetY}
                            onChange={(value) => onChange("traces.offsetY", value)}/>
-            <SettingNumber label={"Dia width"} defaultValue={config.traces.diaWidth}
-                           onChange={(value) => onChange("traces.diaWidth", value)}/>
             <SettingNumber label={"Feedrate"} defaultValue={config.traces.feedrate}
                            onChange={(value) => onChange("traces.feedrate", value)}/>
             <SettingNumber label={"Iterations"} defaultValue={config.traces.iterations}
@@ -92,6 +91,7 @@ const FlatcamSettings: Component<Props> = (props) => {
         </SettingsContainer>
 
         <div class={"actions"}>
+            <button onClick={props.onBack}>Back</button>
             <button onClick={onGenerate}>Generate</button>
         </div>
 
@@ -103,4 +103,4 @@ const FlatcamSettings: Component<Props> = (props) => {
     </div>;
 }
 
-export default FlatcamSettings;
+export default GcodeSettigns;
