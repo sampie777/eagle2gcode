@@ -5,6 +5,7 @@ import {useProject} from "../gui/ProjectContext.ts";
 import {processBoardFile} from "./processors/board.ts";
 import {Flatcam} from "./flatcam.ts";
 import {processTraces} from "./processors/traces.ts";
+import {Project} from "./types/project.ts";
 
 export namespace Upload {
     export type Type = {
@@ -28,9 +29,7 @@ export namespace Upload {
     export const allFilesUploaded = (uploads: Type[]) => Object.values(fileMatchers)
         .every(matcher => uploads.some(it => it.file.name.match(matcher)))
 
-    export const processFile = (name: string, content: string) => {
-        const project = useProject();
-
+    export const processFile = (project: Project, name: string, content: string) => {
         if (name.match(fileMatchers.board)) return project.board = processBoardFile(content)
         if (name.match(fileMatchers.profile)) return project.profile = processTraces(content)
         if (name.match(fileMatchers.traces_top)) return project.traces_top = processTraces(content)

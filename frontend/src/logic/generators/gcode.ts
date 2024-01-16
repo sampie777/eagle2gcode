@@ -1,5 +1,6 @@
-import {Project} from "./types/project.ts";
-import {Trace} from "./types/gcode.ts";
+import {Project} from "../types/project.ts";
+import {GcodeConfig, Trace} from "../types/gcode.ts";
+import {generateDrillAlignmentFile, generateDrillFile} from "./drills.ts";
 
 export namespace Gcode {
     function generateBackAndForthTraces(traces: Trace[], iterations: number) {
@@ -57,10 +58,12 @@ export namespace Gcode {
         ].join("\n");
     }
 
-    export const generateFiles = (project: Project) => {
+    export const generateFiles = (project: Project, config: GcodeConfig) => {
         return {
             "etching": generateCopperFile(project),
             "silkscreen": generateSilkscreenFile(project),
+            "drill_alignment": generateDrillAlignmentFile(project, config.drills),
+            "drills": generateDrillFile(project, config.drills),
         }
     }
 }

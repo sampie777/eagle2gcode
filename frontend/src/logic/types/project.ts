@@ -15,3 +15,10 @@ export type Project = {
     drills: Drill[],
     board: Eagle.Board,
 }
+
+export type Dimension = {
+    x: number,
+    y: number,
+    width: number,
+    height: number
+}

@@ -4,10 +4,9 @@ import SettingCombo from "./../../components/settings/SettingCombo.tsx";
 import SettingCheck from "./../../components/settings/SettingCheck.tsx";
 import SettingNumber from "./../../components/settings/SettingNumber.tsx";
 import './style.less';
-import {FlatcamConfig, FlatcamCopperLayer} from "../../../logic/types/flatcam.ts";
-import {Flatcam} from "../../../logic/flatcam.ts";
 import {useProject} from "../../ProjectContext.ts";
-import {Gcode, generateFiles, generateSilkscreenFile} from "../../../logic/gcode.ts";
+import {GcodeConfig, GcodeCopperLayer} from "../../../logic/types/gcode.ts";
+import {Gcode} from "../../../logic/generators/gcode.ts";
 
 type Props = {
     onBack?: () => void
@@ -17,9 +16,9 @@ const GcodeSettigns: Component<Props> = (props) => {
     const project = useProject();
     const [commands, setCommands] = createSignal<string | undefined>();
 
-    const config: FlatcamConfig = {
+    const config: GcodeConfig = {
         traces: {
-            copperLayer: FlatcamCopperLayer.Top,
+            copperLayer: GcodeCopperLayer.Top,
             mirror: true,
             cutoutProfile: false,
             offsetX: 34,
@@ -37,6 +36,9 @@ const GcodeSettigns: Component<Props> = (props) => {
         drills: {
             offsetX: 12,
             offsetY: 27.5,
+            feedRateMove: 1400,
+            feedRateDrill: 10,
+            feedRateUp: 50,
         }
     }
 
@@ -46,14 +48,14 @@ const GcodeSettigns: Component<Props> = (props) => {
     }
 
     const onGenerate = () => {
-        console.log(Gcode.generateFiles(project))
+        console.log(Gcode.generateFiles(project, config))
         alert("File generation not supported yet")
     }
 
     return <div class={"FlatcamSettings"}>
         <SettingsContainer name={"Traces"} visible={true}>
             <SettingCombo label={"Copper layer"}
-                          values={Object.values(FlatcamCopperLayer)}
+                          values={Object.values(GcodeCopperLayer)}
                           defaultValue={config.traces.copperLayer}
                           onChange={(value) => onChange("traces.copperLayer", value)}/>
             <SettingCheck label={"Mirror"} defaultValue={config.traces.mirror}
@@ -64,7 +66,7 @@ const GcodeSettigns: Component<Props> = (props) => {
                            onChange={(value) => onChange("traces.offsetX", value)}/>
             <SettingNumber label={"Offset Y"} defaultValue={config.traces.offsetY}
                            onChange={(value) => onChange("traces.offsetY", value)}/>
-            <SettingNumber label={"Feedrate"} defaultValue={config.traces.feedrate}
+            <SettingNumber label={"Feed rate"} defaultValue={config.traces.feedrate}
                            onChange={(value) => onChange("traces.feedrate", value)}/>
             <SettingNumber label={"Iterations"} defaultValue={config.traces.iterations}
                            onChange={(value) => onChange("traces.iterations", value)}/>
@@ -88,6 +90,12 @@ const GcodeSettigns: Component<Props> = (props) => {
                            onChange={(value) => onChange("drills.offsetX", value)}/>
             <SettingNumber label={"Offset Y"} defaultValue={config.drills.offsetY}
                            onChange={(value) => onChange("drills.offsetY", value)}/>
+            <SettingNumber label={"Feed rate Move"} defaultValue={config.drills.feedRateMove}
+                           onChange={(value) => onChange("drills.feedRateMove", value)}/>
+            <SettingNumber label={"Feed rate Drill"} defaultValue={config.drills.feedRateDrill}
+                           onChange={(value) => onChange("drills.feedRateDrill", value)}/>
+            <SettingNumber label={"Feed rate Up"} defaultValue={config.drills.feedRateUp}
+                           onChange={(value) => onChange("drills.feedRateUp", value)}/>
         </SettingsContainer>
 
         <div class={"actions"}>

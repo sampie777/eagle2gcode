@@ -12,16 +12,20 @@ const ImportRoot: Component<Props> = (props) => {
     const [uploads, setUploads] = createSignal<Upload.Type[]>([]);
 
     createEffect(() => {
-        project.isLoaded = emptyProject.isLoaded;
-        project.profile = emptyProject.profile;
-        project.traces_top = emptyProject.traces_top;
-        project.traces_bottom = emptyProject.traces_bottom;
-        project.silkscreen_top = emptyProject.silkscreen_top;
-        project.silkscreen_bottom = emptyProject.silkscreen_bottom;
-        project.soldermask_top = emptyProject.soldermask_top;
-        project.soldermask_bottom = emptyProject.soldermask_bottom;
-        project.drills = emptyProject.drills;
-        project.board = emptyProject.board;
+        project.isLoaded = false;
+        project.profile = [];
+        project.traces_top = [];
+        project.traces_bottom = [];
+        project.silkscreen_top = [];
+        project.silkscreen_bottom = [];
+        project.soldermask_top = [];
+        project.soldermask_bottom = [];
+        project.drills = [];
+        project.board.layers = [];
+        project.board.libraries = [];
+        project.board.plain = [];
+        project.board.components = [];
+        project.board.signals = [];
     })
 
     const onFilesChange = async (e: Event) => {
@@ -42,7 +46,7 @@ const ImportRoot: Component<Props> = (props) => {
             setUploads(prev => [...prev])
 
             upload.content = (await upload.file.text()).replace(/\r/g, "")
-            console.log("result", upload.file.name, Upload.processFile(upload.file.name, upload.content))
+            console.log("result", upload.file.name, Upload.processFile(project, upload.file.name, upload.content))
 
             upload.status = "done"
             setUploads(prev => [...prev])

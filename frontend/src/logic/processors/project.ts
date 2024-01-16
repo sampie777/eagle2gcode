@@ -1,7 +1,7 @@
-import {Project} from "../types/project.ts";
+import {Dimension, Project} from "../types/project.ts";
 import {Trace} from "../types/gcode.ts";
 
-export const getProjectDimensions = (project: Project): { x: number, y: number, width: number, height: number } => {
+export const getProjectDimensions = (project: Project): Dimension => {
     let minX = 10000;
     let maxX = -10000;
     let minY = 10000;

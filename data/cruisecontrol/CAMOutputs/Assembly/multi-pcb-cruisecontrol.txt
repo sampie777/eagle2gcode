@@ -1,0 +1,18 @@
+Partlist exported from C:/Users/samuel/Documents/EAGLE/projects/carcomputer/multi-pcb-cruisecontrol.sch at 10-1-2024 13:13
+
+Qty Value     Device          Package      Parts            Description                      MF MPN OC_FARNELL OC_NEWARK POPULARITY SPICEPREFIX
+2             AK300/2         AK300/2      APP, ECU         CONNECTOR                               unknown    unknown                         
+1   0.1u      C-EU025-050X050 C025-050X050 C4               CAPACITOR, European symbol                                   16         C          
+2   100u      C-EU025-050X050 C025-050X050 C1, C2           CAPACITOR, European symbol                                   16         C          
+4   10k       R-EU_0207/7     0207/7       R8, R9, R10, R11 RESISTOR, European symbol                                    46         R          
+2   150       R-EU_0207/7     0207/7       R1, R2           RESISTOR, European symbol                                    46         R          
+1   1N40047   1N40047         DO41-7.6     D1               DIODE                                                                              
+2   1k        R-EU_0207/7     0207/7       R12, R13         RESISTOR, European symbol                                    46         R          
+3   2.52B-ZR  2.52B-ZR        B2B-ZR2.5    X1, X2, X5       ZH CONNECTOR 1.5 mm, 4 pin 1 row                                                   
+3   2k        R-EU_0207/7     0207/7       R3, R7, R20      RESISTOR, European symbol                                    46         R          
+1   351       351             351          K1               RELAY                                   unknown    unknown   5                     
+1   6B-ZR     6B-ZR           B6B-ZR2.5    X4               ZH CONNECTOR 1.5 mm, 4 pin 1 row                                                   
+2   >65       R-EU_0207/7     0207/7       R30, R31         RESISTOR, European symbol                                    46         R          
+1   BC618     BC618           TO92-EBC     T1               NPN Transistor                                               0                     
+2   BZX83C5V1 BZX857          DO41Z7.6     D5, D6           Z DIODE                                                                            
+1   LM358N    LM358N          DIL08        IC1              OP AMP also LM158; LM258; LM2904                             7                     

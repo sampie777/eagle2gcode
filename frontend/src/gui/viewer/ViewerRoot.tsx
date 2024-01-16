@@ -12,6 +12,8 @@ const ViewerRoot: Component<Props> = (props) => {
     const project = useProject();
     project.isLoaded = true;
 
+    console.log(project)
+
     const dimensions = getProjectDimensions(project);
 
     return <div class={"Viewer"}>
