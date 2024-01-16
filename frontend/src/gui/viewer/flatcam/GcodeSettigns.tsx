@@ -14,7 +14,7 @@ type Props = {
 
 const GcodeSettigns: Component<Props> = (props) => {
     const project = useProject();
-    const [commands, setCommands] = createSignal<string | undefined>();
+    const [files, setFiles] = createSignal<{[key: string]: string}>({});
 
     const config: GcodeConfig = {
         traces: {
@@ -48,8 +48,9 @@ const GcodeSettigns: Component<Props> = (props) => {
     }
 
     const onGenerate = () => {
-        console.log(Gcode.generateFiles(project, config))
-        alert("File generation not supported yet")
+        const files = Gcode.generateFiles(project, config);
+        console.log(files)
+        setFiles(files);
     }
 
     return <div class={"FlatcamSettings"}>
@@ -103,11 +104,11 @@ const GcodeSettigns: Component<Props> = (props) => {
             <button onClick={onGenerate}>Generate</button>
         </div>
 
-        {commands() == null ? null :
-            <textarea class={"result"} autofocus={true}>
-                {commands()}
-            </textarea>
-        }
+        <div class={"files"}>
+            {Object.keys(files()).map(it =>
+                <a href={`data:text/plain;charset=utf-8,${encodeURIComponent(files()[it])}`} download={it}>{it}</a>
+            )}
+        </div>
     </div>;
 }
 

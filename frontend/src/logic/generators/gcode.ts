@@ -60,10 +60,10 @@ export namespace Gcode {
 
     export const generateFiles = (project: Project, config: GcodeConfig) => {
         return {
-            "etching": generateCopperFile(project),
-            "silkscreen": generateSilkscreenFile(project),
-            "drill_alignment": generateDrillAlignmentFile(project, config.drills),
-            "drills": generateDrillFile(project, config.drills),
+            "1_etching.gcode": generateCopperFile(project),
+            "2_drill_alignment.gcode": generateDrillAlignmentFile(project, config.drills),
+            "3_silkscreen.gcode": generateSilkscreenFile(project),
+            "4_drills.gcode": generateDrillFile(project, config.drills),
         }
     }
 }
