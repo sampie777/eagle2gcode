@@ -1,7 +1,6 @@
 import {Component, createEffect, createSignal} from "solid-js";
 import {useProject} from "../ProjectContext.ts";
 import {Graphics} from "../../logic/graphics/graphics.ts";
-import {Accessor, Signal} from "solid-js/types/reactive/signal";
 
 type Props = {
 }
@@ -11,6 +10,7 @@ const Canvas: Component<Props> = (props) => {
     const [showTraces, setShowTraces] = createSignal(true);
     const [showSilkscreen, setShowSilkscreen] = createSignal(true);
     const [showSoldermask, setShowSoldermask] = createSignal(true);
+    const [showDrills, setShowDrills] = createSignal(true);
     const [showGrid, setShowGrid] = createSignal(true);
     const project = useProject();
     const {canvas, update} = Graphics.start();
@@ -21,6 +21,7 @@ const Canvas: Component<Props> = (props) => {
             showTraces: showTraces(),
             showSilkscreen: showSilkscreen(),
             showSoldermask: showSoldermask(),
+            showDrills: showDrills(),
             showGrid: showGrid(),
         })
     })
@@ -55,6 +56,13 @@ const Canvas: Component<Props> = (props) => {
                        checked={showSoldermask()}
                        onChange={e => setShowSoldermask(e.target.checked)}/>
                 Soldermask
+            </label>
+
+            <label>
+                <input type="checkbox"
+                       checked={showDrills()}
+                       onChange={e => setShowDrills(e.target.checked)}/>
+                Drills
             </label>
 
             <label>

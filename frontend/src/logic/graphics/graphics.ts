@@ -12,6 +12,7 @@ import {drawBoard} from "./board.ts";
 import {Trace} from "../types/gcode.ts";
 import {ColorRepresentation} from "three/src/math/Color";
 import {getProjectDimensions} from "../processors/project.ts";
+import {Drill} from "../types/cam.ts";
 
 export namespace Graphics {
     type RenderConfig = {
@@ -19,6 +20,7 @@ export namespace Graphics {
         showTraces: boolean,
         showSilkscreen: boolean,
         showSoldermask: boolean,
+        showDrills: boolean,
         showGrid: boolean,
     };
 
@@ -95,6 +97,9 @@ export namespace Graphics {
             drawDefaultLines(scene, project.soldermask_top, 0x31b079)
             drawDefaultLines(scene, project.soldermask_bottom, 0x31b079)
         }
+        if (config.showDrills) {
+            project.drills.forEach(it => scene.add(drawDrill(it, 0xff00ff)))
+        }
 
         drawBoard(scene, project.board, config.boardOpacity)
     }
@@ -132,4 +137,17 @@ export namespace Graphics {
         return new Line(geometry, material)
     };
 
+    const drawDrill = (drill: Drill, color: ColorRepresentation) => {
+        const shape = new Shape();
+        const radius = drill.size / 2 * Math.sin(0.25 * Math.PI);
+        shape.moveTo(drill.x - radius, drill.y - radius)
+        shape.lineTo(drill.x + radius, drill.y + radius)
+        shape.moveTo(drill.x, drill.y)
+        shape.lineTo(drill.x - radius, drill.y + radius)
+        shape.lineTo(drill.x + radius, drill.y - radius)
+
+        const geometry = new BufferGeometry().setFromPoints(shape.getPoints())
+        const material = new LineBasicMaterial({color: color});
+        return new Line(geometry, material)
+    }
 }
