@@ -102,7 +102,7 @@ export namespace Graphics {
         }
         if (config.showDrills) {
             project.drills.forEach(it => scene.add(drawDrill(it, 0xaa00aa)))
-            getProjectAlignmentDrills(project).forEach(it => scene.add(drawDrill(it, 0xff55cc)))
+            getProjectAlignmentDrills(project).forEach(it => scene.add(drawDrill(it, 0x88aaff)))
         }
 
         drawBoard(scene, project.board, config.boardOpacity)
