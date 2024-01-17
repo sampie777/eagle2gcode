@@ -4,6 +4,7 @@ import Row from "./Row.tsx";
 import {Upload} from "../../logic/upload.ts";
 import {ScreenProps} from "../../logic/screens.ts";
 import {emptyProject, useProject} from "../ProjectContext.ts";
+import {getCookie} from "../../logic/cookies.tsx";
 
 type Props = ScreenProps
 
@@ -12,6 +13,7 @@ const ImportRoot: Component<Props> = (props) => {
     const [uploads, setUploads] = createSignal<Upload.Type[]>([]);
 
     createEffect(() => {
+        project.path = getCookie("project.camDirectory") ?? undefined;
         project.isLoaded = false;
         project.profile = [];
         project.traces_top = [];

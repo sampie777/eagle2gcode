@@ -17,10 +17,17 @@ const ViewerRoot: Component<Props> = (props) => {
 
     const dimensions = getProjectDimensions(project);
 
+    const projectName = () => {
+        if (project.path == undefined) return "Unknown project";
+        const projectPathSegments = project.path.split("/");
+        return projectPathSegments[projectPathSegments.length - 1]
+            .replace(/[_.\-]/g, " ")
+    }
     return <div class={"Viewer"}>
+        <h3>{projectName()}</h3>
         <small>{dimensions.width.toFixed(1)} x {dimensions.height.toFixed(1)} mm</small>
 
-        <div style={{display: "flex", "flex-direction": 'row', "align-items": "center"}}>
+        <div class={"container"}>
             <Canvas showProfile={showProfile}/>
 
             {/*<div>*/}

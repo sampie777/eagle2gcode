@@ -4,6 +4,7 @@ import {Trace} from "./gcode.ts";
 
 
 export type Project = {
+    path?: string,
     isLoaded: boolean,
     profile: Trace[],
     traces_top: Trace[],

@@ -1,35 +1,42 @@
 import {Dimension, Project} from "../types/project.ts";
-import {Trace} from "../types/gcode.ts";
+import {Trace, Location} from "../types/gcode.ts";
 import {Drill} from "../types/cam.ts";
 
 export const getProjectDimensions = (project: Project): Dimension => {
-    let minX = 10000;
-    let maxX = -10000;
-    let minY = 10000;
-    let maxY = -10000;
+    let minX: number | undefined;
+    let maxX: number | undefined;
+    let minY: number | undefined;
+    let maxY: number | undefined;
 
-    const checkForBoundaries = (trace: Trace) => {
-        trace.forEach(it => {
-            if (it.x < minX) minX = it.x;
-            if (it.x > maxX) maxX = it.x;
-            if (it.y < minY) minY = it.y;
-            if (it.y > maxY) maxY = it.y;
-        });
+    const checkForBoundaries = (it: Location) => {
+        if (minX == undefined || it.x < minX) minX = it.x;
+        if (maxX == undefined || it.x > maxX) maxX = it.x;
+        if (minY == undefined || it.y < minY) minY = it.y;
+        if (maxY == undefined || it.y > maxY) maxY = it.y;
     }
 
-    project.profile.forEach(trace => checkForBoundaries(trace))
-    project.traces_top.forEach(trace => checkForBoundaries(trace))
-    project.traces_bottom.forEach(trace => checkForBoundaries(trace))
-    project.silkscreen_top.forEach(trace => checkForBoundaries(trace))
-    project.silkscreen_bottom.forEach(trace => checkForBoundaries(trace))
-    project.soldermask_top.forEach(trace => checkForBoundaries(trace))
-    project.soldermask_bottom.forEach(trace => checkForBoundaries(trace))
+    const checkTracesForBoundaries = (trace: Trace) =>
+        trace.forEach(it => {
+            checkForBoundaries(it);
+        });
+
+    project.profile.forEach(trace => checkTracesForBoundaries(trace))
+    project.traces_top.forEach(trace => checkTracesForBoundaries(trace))
+    project.traces_bottom.forEach(trace => checkTracesForBoundaries(trace))
+    project.silkscreen_top.forEach(trace => checkTracesForBoundaries(trace))
+    project.silkscreen_bottom.forEach(trace => checkTracesForBoundaries(trace))
+    project.soldermask_top.forEach(trace => checkTracesForBoundaries(trace))
+    project.soldermask_bottom.forEach(trace => checkTracesForBoundaries(trace))
+
+    if (minX == undefined && minY == undefined) {
+        project.drills.forEach(drill => checkForBoundaries(drill))
+    }
 
     return {
-        x: minX,
-        y: minY,
-        width: maxX - minX,
-        height: maxY - minY
+        x: minX ?? 0,
+        y: minY ?? 0,
+        width: maxX != undefined ? maxX - minX : 0,
+        height: maxY != undefined ? maxY - minY : 0
     }
 }
 

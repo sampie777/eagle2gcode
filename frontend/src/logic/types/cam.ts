@@ -1,13 +1,13 @@
+import {Location} from "./gcode.ts";
+
 export type Point = {
     x: number,
     y: number,
 }
 
 export type Drill = {
-    x: number,
-    y: number,
     size: number,
-}
+} & Location
 
 export type Job = {
     title: string
