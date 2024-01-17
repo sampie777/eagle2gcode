@@ -1,8 +1,9 @@
 import {Component} from "solid-js";
-import {AiFillCheckCircle, AiOutlineCheckCircle, AiOutlineLoading} from "solid-icons/ai";
+import {AiFillCheckCircle, AiOutlineCheckCircle} from "solid-icons/ai";
 import {capitalize} from "../../logic/utils/utils.ts";
 import {Upload} from "../../logic/upload.ts";
 import LoadingIcon from "../components/LoadingIcon.tsx";
+import {useProject} from "../ProjectContext.ts";
 
 type Props = {
     type: string
@@ -10,15 +11,25 @@ type Props = {
 }
 
 const Row: Component<Props> = (props) => {
+    const {project} = useProject();
     const upload = props.upload;
+
+    const getStatusMark = () => {
+        if (upload && (upload.status == "waiting" || upload.status == "reading")) return <LoadingIcon/>;
+
+        if (project[props.type] && project[props.type].length > 0) return <AiFillCheckCircle/>;
+        if (props.type == "drill" && project.drills.length > 0) return <AiFillCheckCircle/>;
+        if (props.type == "board" && Upload.isBoardAvailable(project.board)) return <AiFillCheckCircle/>;
+
+        if (!upload) return <AiOutlineCheckCircle/>;
+        if (upload.status == "done") return <AiFillCheckCircle/>
+        return <LoadingIcon/>
+    }
 
     return <div class={`Row ${upload ? "completed" : "missing"}`}
                 title={upload ? upload.file.name : ""}>
         <span class={"mark"}>
-            {upload ? (upload.status == "done"
-                    ? <AiFillCheckCircle/>
-                    : <LoadingIcon/>)
-                : <AiOutlineCheckCircle/>}
+            {getStatusMark()}
         </span>
 
         <span class={"type"}>{capitalize(props.type.replace(/_/gi, " "))}</span>

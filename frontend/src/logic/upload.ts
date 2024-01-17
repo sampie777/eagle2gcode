@@ -1,11 +1,9 @@
 import {processDrillFile} from "./processors/drill.ts";
-import {processJobFile} from "./processors/job.ts";
-import {processGerberFile} from "./processors/gerber.ts";
-import {useProject} from "../gui/ProjectContext.ts";
 import {processBoardFile} from "./processors/board.ts";
 import {Flatcam} from "./flatcam.ts";
 import {processTraces} from "./processors/traces.ts";
 import {Project} from "./types/project.ts";
+import {Eagle} from "./types/eagle.ts";
 
 export namespace Upload {
     export type Type = {
@@ -26,8 +24,27 @@ export namespace Upload {
         board: /^.+\.brd/,
     }
 
-    export const allFilesUploaded = (uploads: Type[]) => Object.values(fileMatchers)
-        .every(matcher => uploads.some(it => it.file.name.match(matcher)))
+    export const isProjectAvailable = (project: Project): boolean => {
+        if (project.profile.length > 0) return true;
+        if (project.traces_top.length > 0) return true;
+        if (project.traces_bottom.length > 0) return true;
+        if (project.silkscreen_top.length > 0) return true;
+        if (project.silkscreen_bottom.length > 0) return true;
+        if (project.soldermask_top.length > 0) return true;
+        if (project.soldermask_bottom.length > 0) return true;
+        if (project.drills.length > 0) return true;
+        if (isBoardAvailable(project.board)) return true;
+        return false;
+    }
+
+    export const isBoardAvailable = (board: Eagle.Board): boolean => {
+        if (board.layers.length > 0) return true;
+        if (board.libraries.length > 0) return true;
+        if (board.plain.length > 0) return true;
+        if (board.components.length > 0) return true;
+        if (board.signals.length > 0) return true;
+        return false;
+    }
 
     export const processFile = (project: Project, name: string, content: string) => {
         if (name.match(fileMatchers.board)) return project.board = processBoardFile(content)

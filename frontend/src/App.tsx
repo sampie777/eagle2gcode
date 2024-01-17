@@ -2,16 +2,21 @@ import {createSignal, ErrorBoundary} from 'solid-js'
 import './App.css'
 import ErrorBoundaryFallback from "./gui/components/ErrorBoundaryFallback.tsx";
 import ViewerRoot from "./gui/viewer/ViewerRoot.tsx";
-import {emptyProject, exampleProject, ProjectContext} from "./gui/ProjectContext.ts";
+import {useProject} from "./gui/ProjectContext.ts";
 import FlatcamRoot from "./gui/flatcamgenerator/FlatcamRoot.tsx";
 import ImportRoot from "./gui/import/ImportRoot.tsx";
 import {Screens} from "./logic/screens.ts";
 import './gui/default.less';
+import {useConfig} from "./gui/ConfigContext.ts";
+import Header from "./gui/components/Header.tsx";
 
 function App() {
-    // const initialProject = emptyProject;
-    const initialProject = exampleProject;
-    const [screen, setScreen] = createSignal(initialProject.isLoaded ? Screens.Viewer : Screens.FlatcamCommandGeneration);
+    const {loadConfig} = useConfig()
+    const {project, loadProject} = useProject()
+    loadConfig();
+    loadProject();
+
+    const [screen, setScreen] = createSignal(project.isLoaded ? Screens.Viewer : Screens.FlatcamCommandGeneration);
 
     const getScreenForState = () => {
         switch (screen()) {
@@ -28,9 +33,8 @@ function App() {
 
     return <div id={"main"}>
         <ErrorBoundary fallback={(err, reset) => <ErrorBoundaryFallback error={err} reset={reset}/>}>
-            <ProjectContext.Provider value={initialProject}>
-                {getScreenForState()}
-            </ProjectContext.Provider>
+            <Header onResetProject={() => setScreen(Screens.FlatcamCommandGeneration)}/>
+            {getScreenForState()}
         </ErrorBoundary>
     </div>
 }

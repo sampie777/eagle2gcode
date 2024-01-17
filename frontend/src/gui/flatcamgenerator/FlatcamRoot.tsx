@@ -5,7 +5,7 @@ import {Flatcam} from "../../logic/flatcam.ts";
 import SettingString from "../components/settings/SettingString.tsx";
 import './style.less';
 import {ScreenProps} from "../../logic/screens.ts";
-import {getCookie, setCookie} from "../../logic/cookies.tsx";
+import {getCookie, setCookie} from "../../logic/cookies.ts";
 
 type Props = ScreenProps
 

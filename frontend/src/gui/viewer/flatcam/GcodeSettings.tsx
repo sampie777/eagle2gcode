@@ -4,11 +4,11 @@ import SettingCheck from "./../../components/settings/SettingCheck.tsx";
 import SettingNumber from "./../../components/settings/SettingNumber.tsx";
 import './style.less';
 import {useProject} from "../../ProjectContext.ts";
-import {GcodeConfig} from "../../../logic/types/gcode.ts";
 import {Gcode} from "../../../logic/generators/gcode.ts";
 import DownloadButton from "./DownloadButton.tsx";
 import {generateDrillAlignmentFile, generateDrillFile} from "../../../logic/generators/drills.ts";
 import {Accessor, Setter} from "solid-js/types/reactive/signal";
+import {emptyConfig, useConfig} from "../../ConfigContext.ts";
 
 type Props = {
     onBack?: () => void
@@ -17,30 +17,19 @@ type Props = {
 }
 
 const GcodeSettings: Component<Props> = (props) => {
-    const project = useProject();
-
-    const config: GcodeConfig = {
-        traces: {
-            cutoutProfile: props.showProfile(),
-            offsetX: 34,
-            offsetY: 26,
-            feedRate: 1400,
-            iterations: 40,
-        },
-        drills: {
-            offsetX: 12,
-            offsetY: 27.5,
-            feedRateMove: 1400,
-            feedRateDrill: 10,
-            feedRateUp: 50,
-        }
-    }
+    const {config, loadConfig} = useConfig()
+    const {project} = useProject();
 
     const onChange = (key: string, value: any) => {
         const path = key.split(".");
         config[path[0]][path[1]] = value;
 
         props.setShowProfile(config.traces.cutoutProfile)
+    }
+
+    const resetConfig = () => {
+        loadConfig(emptyConfig())
+        alert("Please go to the previous page using the Back button and come back for the changes to be visible.");
     }
 
     return <div class={"FlatcamSettings"}>
@@ -72,16 +61,23 @@ const GcodeSettings: Component<Props> = (props) => {
 
         <div class={"files"}>
             <h4>Download the gCode files:</h4>
-            <DownloadButton content={() => Gcode.generateCopperFile(project, "top", config.traces)} fileName={"1_etching_top.gcode"} text={"Traces top"} />
-            <DownloadButton content={() => Gcode.generateCopperFile(project, "bottom", config.traces)} fileName={"1_etching_bottom.gcode"} text={"Traces bottom"} />
-            <DownloadButton content={() => generateDrillAlignmentFile(project, config.drills)} fileName={"2_drill_alignment_bottom.gcode"} text={"Drill alignment bottom"} />
-            <DownloadButton content={() => Gcode.generateSilkscreenFile(project, "top", config.traces)} fileName={"3_silkscreen_top.gcode"} text={"Silkcreen top"} />
-            <DownloadButton content={() => Gcode.generateSilkscreenFile(project, "bottom", config.traces)} fileName={"3_silkscreen_bottom.gcode"} text={"Silkscreen bottom"} />
-            <DownloadButton content={() => generateDrillFile(project, config.drills)} fileName={"4_drills_top.gcode"} text={"Drills top"} />
+            <DownloadButton content={() => Gcode.generateCopperFile(project, "top", config.traces)}
+                            fileName={"1_etching_top.gcode"} text={"Traces top"}/>
+            <DownloadButton content={() => Gcode.generateCopperFile(project, "bottom", config.traces)}
+                            fileName={"1_etching_bottom.gcode"} text={"Traces bottom"}/>
+            <DownloadButton content={() => generateDrillAlignmentFile(project, config.drills)}
+                            fileName={"2_drill_alignment_bottom.gcode"} text={"Drill alignment bottom"}/>
+            <DownloadButton content={() => Gcode.generateSilkscreenFile(project, "top", config.traces)}
+                            fileName={"3_silkscreen_top.gcode"} text={"Silkcreen top"}/>
+            <DownloadButton content={() => Gcode.generateSilkscreenFile(project, "bottom", config.traces)}
+                            fileName={"3_silkscreen_bottom.gcode"} text={"Silkscreen bottom"}/>
+            <DownloadButton content={() => generateDrillFile(project, config.drills)} fileName={"4_drills_top.gcode"}
+                            text={"Drills top"}/>
         </div>
 
         <div class={"actions"}>
             <button onClick={props.onBack}>Back</button>
+            <button onClick={resetConfig}>Reset</button>
         </div>
     </div>;
 }

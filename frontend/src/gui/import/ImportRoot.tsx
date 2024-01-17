@@ -3,32 +3,18 @@ import './style.less';
 import Row from "./Row.tsx";
 import {Upload} from "../../logic/upload.ts";
 import {ScreenProps} from "../../logic/screens.ts";
-import {emptyProject, useProject} from "../ProjectContext.ts";
-import {getCookie} from "../../logic/cookies.tsx";
+import {useProject} from "../ProjectContext.ts";
+import {getCookie} from "../../logic/cookies.ts";
 
 type Props = ScreenProps
 
 const ImportRoot: Component<Props> = (props) => {
-    const project = useProject();
+    const {project} = useProject();
     const [uploads, setUploads] = createSignal<Upload.Type[]>([]);
 
     createEffect(() => {
-        project.path = getCookie("project.camDirectory") ?? undefined;
-        project.isLoaded = false;
-        project.profile = [];
-        project.traces_top = [];
-        project.traces_bottom = [];
-        project.silkscreen_top = [];
-        project.silkscreen_bottom = [];
-        project.soldermask_top = [];
-        project.soldermask_bottom = [];
-        project.drills = [];
-        project.board = {
-            layers: [],
-            libraries: [],
-            plain: [],
-            components: [],
-            signals: [],
+        if (!project.path) {
+            project.path = getCookie("project.camDirectory") ?? undefined;
         }
     })
 
@@ -80,7 +66,7 @@ const ImportRoot: Component<Props> = (props) => {
             <button onClick={props.onBack}>
                 Back
             </button>
-            <button disabled={uploads().length == 0}
+            <button disabled={!Upload.isProjectAvailable(project)}
                     onClick={props.onNext}>
                 Next
             </button>
