@@ -1,8 +1,10 @@
 import {Component, createEffect, createSignal} from "solid-js";
 import {useProject} from "../ProjectContext.ts";
 import {Graphics} from "../../logic/graphics/graphics.ts";
+import {Accessor} from "solid-js/types/reactive/signal";
 
 type Props = {
+    showProfile: Accessor<boolean>
 }
 
 const Canvas: Component<Props> = (props) => {
@@ -18,6 +20,7 @@ const Canvas: Component<Props> = (props) => {
     createEffect(() => {
         update(project, {
             boardOpacity: boardOpacity(),
+            showProfile: props.showProfile(),
             showTraces: showTraces(),
             showSilkscreen: showSilkscreen(),
             showSoldermask: showSoldermask(),

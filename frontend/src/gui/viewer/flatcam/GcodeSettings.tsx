@@ -8,9 +8,12 @@ import {GcodeConfig} from "../../../logic/types/gcode.ts";
 import {Gcode} from "../../../logic/generators/gcode.ts";
 import DownloadButton from "./DownloadButton.tsx";
 import {generateDrillAlignmentFile, generateDrillFile} from "../../../logic/generators/drills.ts";
+import {Accessor, Setter} from "solid-js/types/reactive/signal";
 
 type Props = {
     onBack?: () => void
+    showProfile: Accessor<boolean>
+    setShowProfile: Setter<boolean>
 }
 
 const GcodeSettings: Component<Props> = (props) => {
@@ -18,7 +21,7 @@ const GcodeSettings: Component<Props> = (props) => {
 
     const config: GcodeConfig = {
         traces: {
-            cutoutProfile: true,
+            cutoutProfile: props.showProfile(),
             offsetX: 34,
             offsetY: 26,
             feedRate: 1400,
@@ -36,6 +39,8 @@ const GcodeSettings: Component<Props> = (props) => {
     const onChange = (key: string, value: any) => {
         const path = key.split(".");
         config[path[0]][path[1]] = value;
+
+        props.setShowProfile(config.traces.cutoutProfile)
     }
 
     return <div class={"FlatcamSettings"}>

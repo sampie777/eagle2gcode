@@ -17,6 +17,7 @@ import {Drill} from "../types/cam.ts";
 export namespace Graphics {
     type RenderConfig = {
         boardOpacity: number,
+        showProfile: boolean,
         showTraces: boolean,
         showSilkscreen: boolean,
         showSoldermask: boolean,
@@ -84,7 +85,9 @@ export namespace Graphics {
             drawGrid(dimensions, scene);
         }
 
-        drawDefaultLines(scene, project.profile, 0x88763e)
+        if (config.showProfile) {
+            drawDefaultLines(scene, project.profile, 0x88763e)
+        }
         if (config.showTraces) {
             drawDefaultLines(scene, project.traces_top, 0xa00909)
             drawDefaultLines(scene, project.traces_bottom, 0xa00909)
