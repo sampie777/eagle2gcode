@@ -5,21 +5,12 @@ export type Location = {
 
 export type Trace = Location[]
 
-export enum GcodeCopperLayer {
-    Top = "Top",
-    Bottom = "Bottom",
-}
-
 export type TracesConfig = {
-    copperLayer: GcodeCopperLayer
-    mirror: boolean
     cutoutProfile: boolean
     offsetX: number
     offsetY: number
     feedRate: number
     iterations: number
-    removeGndPads: boolean
-    usePrinterBedMesh: boolean
 };
 
 export type DrillConfig = {
@@ -32,10 +23,5 @@ export type DrillConfig = {
 
 export type GcodeConfig = {
     traces: TracesConfig,
-    silkscreen: {
-        top: boolean
-        bottom: boolean
-        mirror: boolean
-    },
     drills: DrillConfig
 }

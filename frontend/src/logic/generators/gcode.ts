@@ -73,7 +73,7 @@ export namespace Gcode {
             "M03",
             "G28",
             "G4 P1",
-            generateBackAndForthTraces(project.profile, traceConfig),
+            config.cutoutProfile ? generateBackAndForthTraces(project.profile, traceConfig) : "; No profile cutout",
             generateContinuousTraces(side == "top" ? project.traces_top : project.traces_bottom, traceConfig),
             "G00 X0.0000Y0.0000Z3.0000",
             "M300 S2000 P500 ; Beep end",
@@ -105,16 +105,5 @@ export namespace Gcode {
             "M300 S2000 P500 ; Beep end",
             "M05",
         ].join("\n");
-    }
-
-    export const generateFiles = (project: Project, config: GcodeConfig) => {
-        return {
-            "1_etching_top.gcode": generateCopperFile(project, "top", config.traces),
-            "1_etching_bottom.gcode": generateCopperFile(project, "bottom", config.traces),
-            "2_drill_alignment_bottom.gcode": generateDrillAlignmentFile(project, config.drills),
-            "3_silkscreen_top.gcode": generateSilkscreenFile(project, "top", config.traces),
-            "3_silkscreen_bottom.gcode": generateSilkscreenFile(project, "bottom", config.traces),
-            "4_drills_top.gcode": generateDrillFile(project, config.drills),
-        }
     }
 }
