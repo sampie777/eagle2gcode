@@ -13,7 +13,7 @@ type Props = {
     onBack?: () => void
 }
 
-const GcodeSettigns: Component<Props> = (props) => {
+const GcodeSettings: Component<Props> = (props) => {
     const project = useProject();
 
     const config: GcodeConfig = {
@@ -81,4 +81,4 @@ const GcodeSettigns: Component<Props> = (props) => {
     </div>;
 }
 
-export default GcodeSettigns;
+export default GcodeSettings;

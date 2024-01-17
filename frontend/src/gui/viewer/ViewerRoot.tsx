@@ -2,7 +2,7 @@ import {Component} from "solid-js";
 import {useProject} from "../ProjectContext.ts";
 import Canvas from "./Canvas.tsx";
 import './style.less'
-import GcodeSettigns from "./flatcam/GcodeSettigns.tsx";
+import GcodeSettings from "./flatcam/GcodeSettings.tsx";
 import {ScreenProps} from "../../logic/screens.ts";
 import {getProjectDimensions} from "../../logic/processors/project.ts";
 
@@ -25,7 +25,7 @@ const ViewerRoot: Component<Props> = (props) => {
             {/*<div>*/}
             {/*    <img src={example_board} />*/}
             {/*</div>*/}
-            <GcodeSettigns onBack={props.onBack}/>
+            <GcodeSettings onBack={props.onBack}/>
         </div>
     </div>;
 }
