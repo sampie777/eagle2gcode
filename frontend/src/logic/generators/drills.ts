@@ -3,9 +3,14 @@ import {Drill} from "../types/cam.ts";
 import {DrillConfig} from "../types/gcode.ts";
 import {getProjectAlignmentDrills, getProjectDimensions} from "../processors/project.ts";
 
-const drillAlignmentToGcode = (dimensions: Dimension, drill: Drill, config: DrillConfig): string => {
+export const getLocationForAlignmentDrill = (config: DrillConfig, dimensions: Dimension, drill: Drill) => {
     const x = config.offsetX + ((dimensions.x + dimensions.width) - (drill.x - dimensions.x));
     const y = config.offsetY + drill.y;
+    return {x, y};
+}
+
+const drillAlignmentToGcode = (dimensions: Dimension, drill: Drill, config: DrillConfig): string => {
+    const {x, y} = getLocationForAlignmentDrill(config, dimensions, drill);
     return [
         `G00 X${x.toFixed(4)}Y${y.toFixed(4)}`,
         "G01 Z3.2000",

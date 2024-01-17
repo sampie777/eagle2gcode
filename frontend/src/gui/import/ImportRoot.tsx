@@ -66,7 +66,7 @@ const ImportRoot: Component<Props> = (props) => {
             <button onClick={props.onBack}>
                 Back
             </button>
-            <button disabled={!Upload.isProjectAvailable(project)}
+            <button disabled={!(Upload.isProjectAvailable(project) || uploads().length > 0 /* to trigger the project */)}
                     onClick={props.onNext}>
                 Next
             </button>

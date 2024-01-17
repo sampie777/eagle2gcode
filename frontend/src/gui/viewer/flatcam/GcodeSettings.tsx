@@ -6,9 +6,14 @@ import './style.less';
 import {useProject} from "../../ProjectContext.ts";
 import {Gcode} from "../../../logic/generators/gcode.ts";
 import DownloadButton from "./DownloadButton.tsx";
-import {generateDrillAlignmentFile, generateDrillFile} from "../../../logic/generators/drills.ts";
+import {
+    generateDrillAlignmentFile,
+    generateDrillFile,
+    getLocationForAlignmentDrill
+} from "../../../logic/generators/drills.ts";
 import {Accessor, Setter} from "solid-js/types/reactive/signal";
 import {emptyConfig, useConfig} from "../../ConfigContext.ts";
+import {getProjectAlignmentDrills, getProjectDimensions} from "../../../logic/processors/project.ts";
 
 type Props = {
     onBack?: () => void
@@ -67,6 +72,15 @@ const GcodeSettings: Component<Props> = (props) => {
                             fileName={"1_etching_bottom.gcode"} text={"Traces bottom"}/>
             <DownloadButton content={() => generateDrillAlignmentFile(project, config.drills)}
                             fileName={"2_drill_alignment_bottom.gcode"} text={"Drill alignment bottom"}/>
+            <ol class={"alignment-drills"}>
+                {getProjectAlignmentDrills(project).map((it, i) => {
+                    const {x, y} = getLocationForAlignmentDrill(config.drills, getProjectDimensions(project), it)
+                    return <li title={`Alignment hole #${i + 1}, mirrored and with drill offset`}>
+                        <code>{x.toFixed(2)}, {y.toFixed(2)}</code>
+                    </li>
+                })}
+            </ol>
+
             <DownloadButton content={() => Gcode.generateSilkscreenFile(project, "top", config.traces)}
                             fileName={"3_silkscreen_top.gcode"} text={"Silkcreen top"}/>
             <DownloadButton content={() => Gcode.generateSilkscreenFile(project, "bottom", config.traces)}

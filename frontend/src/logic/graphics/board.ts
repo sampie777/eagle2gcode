@@ -14,6 +14,7 @@ import {Eagle} from "../types/eagle.ts";
 const pcbThickness = 1;
 
 export const drawBoard = (scene: Scene, board: Eagle.Board, opacity: number) => {
+    if (opacity == 0) return;
     drawOutline(board, scene, opacity);
     drawSignals(board, scene, opacity);
     drawComponents(board, scene, opacity);
