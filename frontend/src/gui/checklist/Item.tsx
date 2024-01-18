@@ -7,7 +7,7 @@ type Props = {
 }
 
 const Item: Component<Props> = (props) => {
-    const [checked, setChecked] = createSignal(props.item.checked)
+    const [checked, setChecked] = createSignal(props.item.checked == true)
 
     createEffect(() => props.item.checked = checked())
 
@@ -15,7 +15,7 @@ const Item: Component<Props> = (props) => {
         <div class={`counter ${checked() ? "checked" : ""}`}>
             {!checked() ? null : <AiOutlineCheck/>}
         </div>
-        {props.item.text}
+        {props.item.text.split("\n").map(it => <>{it}<br/></>)}
     </div>;
 }
 

@@ -7,13 +7,12 @@ import {useProject} from "../../ProjectContext.ts";
 import {Gcode} from "../../../logic/generators/gcode.ts";
 import DownloadButton from "./DownloadButton.tsx";
 import {
-    generateDrillAlignmentFile,
     generateDrillFile,
-    getLocationForAlignmentDrill
+    getLocationForDrill
 } from "../../../logic/generators/drills.ts";
 import {Accessor, Setter} from "solid-js/types/reactive/signal";
 import {emptyConfig, useConfig} from "../../ConfigContext.ts";
-import {getProjectAlignmentDrills, getProjectDimensions} from "../../../logic/processors/project.ts";
+import {getProjectAlignmentDrills} from "../../../logic/processors/project.ts";
 
 type Props = {
     onBack?: () => void
@@ -69,28 +68,30 @@ const GcodeSettings: Component<Props> = (props) => {
                            onChange={(value) => onChange("drills.feedRateUp", value)}/>
         </SettingsContainer>
 
-        <div class={"files"}>
-            <small>Drill alignment hole locations:</small>
-            <ol class={"alignment-drills"}>
+        <div class={"alignment-drills"}>
+            Drill alignment holes (after manual drilling) should match these locations. If not, adjust Drilling -> Offset, adjust the endstops, or move the board.
+            <ol>
                 {getProjectAlignmentDrills(project).map((it, i) => {
-                    const {x, y} = getLocationForAlignmentDrill(config.drills, getProjectDimensions(project), it)
+                    const {x, y} = getLocationForDrill(config.drills, it)
                     return <li title={`Alignment hole #${i + 1}, mirrored and with drill offset`}>
                         <code>{x.toFixed(2)}, {y.toFixed(2)}</code>
                     </li>
                 })}
             </ol>
+        </div>
 
+        <div class={"files"}>
             <h4>Download the gCode files:</h4>
             <DownloadButton content={() => Gcode.generateCopperFile(project, "top", config.traces)}
-                            fileName={"1_etching_top.gcode"} text={"Traces top"}/>
+                            fileName={Gcode.outputFileNames.etching_top} text={"Traces top"}/>
             <DownloadButton content={() => Gcode.generateCopperFile(project, "bottom", config.traces)}
-                            fileName={"1_etching_bottom.gcode"} text={"Traces bottom"}/>
-            <DownloadButton content={() => generateDrillFile(project, config.drills)} fileName={"2_drills_top.gcode"}
-                            text={"Drills top"}/>
+                            fileName={Gcode.outputFileNames.etching_bottom} text={"Traces bottom"}/>
+            <DownloadButton content={() => generateDrillFile(project, config.drills)}
+                            fileName={Gcode.outputFileNames.drills_top} text={"Drills top"}/>
             <DownloadButton content={() => Gcode.generateSilkscreenFile(project, "top", config.traces)}
-                            fileName={"3_silkscreen_top.gcode"} text={"Silkcreen top"}/>
+                            fileName={Gcode.outputFileNames.silkscreen_top} text={"Silkcreen top"}/>
             <DownloadButton content={() => Gcode.generateSilkscreenFile(project, "bottom", config.traces)}
-                            fileName={"3_silkscreen_bottom.gcode"} text={"Silkscreen bottom"}/>
+                            fileName={Gcode.outputFileNames.silkscreen_bottom} text={"Silkscreen bottom"}/>
         </div>
 
         <div class={"actions"}>

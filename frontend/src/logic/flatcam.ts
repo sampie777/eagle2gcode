@@ -11,18 +11,18 @@ export namespace Flatcam {
         `open_gerber "${camDirectory}/GerberFiles/${inputFile}" -outname ${inputFile}\n`
         + `isolate ${inputFile} -dia ${diaWidth} -passes 1 -overlap 1 -combine 1 -outname ${inputFile}.iso\n`
         + `cncjob ${inputFile}.iso -z_cut 0.0 -z_move 2.0 -tooldia 0.2032\n`
-        + `write_gcode ${inputFile}.iso_cnc "${camDirectory}/flatCAM/${outputFile}"\n\n`;
+        + `write_gcode ${inputFile}.iso_cnc "${camDirectory}/${outputFile}"\n\n`;
 
     const generateSilkscreenCommands = (camDirectory: string, diaWidth: number): string => {
         return `open_gerber "${camDirectory}/GerberFiles/silkscreen_top.gbr" -follow 1 -outname silkscreen_top\n`
             + `follow silkscreen_top -outname silkscreen_top.follow\n`
             + `cncjob silkscreen_top.follow -z_cut 0.0 -z_move 2.0 -tooldia 0.2032\n`
-            + `write_gcode silkscreen_top.follow_cnc "${camDirectory}/flatCAM/${SILKSCREEN_TOP_OUTPUT_FILE}"\n\n`
+            + `write_gcode silkscreen_top.follow_cnc "${camDirectory}/${SILKSCREEN_TOP_OUTPUT_FILE}"\n\n`
 
             + `open_gerber "${camDirectory}/GerberFiles/silkscreen_bottom.gbr" -follow 1 -outname silkscreen_bottom\n`
             + `follow silkscreen_bottom -outname silkscreen_bottom.follow\n`
             + `cncjob silkscreen_bottom.follow -z_cut 0.0 -z_move 2.0 -tooldia 0.2032\n`
-            + `write_gcode silkscreen_bottom.follow_cnc "${camDirectory}/flatCAM/${SILKSCREEN_BOTTOM_OUTPUT_FILE}"\n\n`;
+            + `write_gcode silkscreen_bottom.follow_cnc "${camDirectory}/${SILKSCREEN_BOTTOM_OUTPUT_FILE}"\n\n`;
     };
 
     const generateSoldermaskCommands = (camDirectory: string, diaWidth: number): string => {
@@ -34,7 +34,6 @@ export namespace Flatcam {
         const camDirectory = projectDirectory
             .replace(/\\/g, "/")
             .replace(/\/+$/g, "")
-            .replace(/\/flatCAM$/gi, "")
             .replace(/CAMOutputs$/gi, "")
             + "/CAMOutputs";
         const silkscreenCommands = generateSilkscreenCommands(camDirectory, diaWidth);
@@ -43,7 +42,7 @@ export namespace Flatcam {
         return `open_gerber "${camDirectory}/GerberFiles/profile.gbr" -outname profile\n`
             + "cutout profile -dia 0.1 -margin -0.2 -gapsize 0.0 -gaps tb\n"
             + `cncjob profile_cutout -z_cut 0.0 -z_move 2.0 -tooldia 0.2032\n`
-            + `write_gcode profile_cutout_cnc "${camDirectory}/flatCAM/${TRACES_PROFILE_OUTPUT_FILE}"\n`
+            + `write_gcode profile_cutout_cnc "${camDirectory}/${TRACES_PROFILE_OUTPUT_FILE}"\n`
             + "\n"
             + generateCncJob(camDirectory, diaWidth, "copper_top.gbr", TRACES_TOP_OUTPUT_FILE)
             + generateCncJob(camDirectory, diaWidth, "copper_bottom.gbr", TRACES_BOTTOM_OUTPUT_FILE)

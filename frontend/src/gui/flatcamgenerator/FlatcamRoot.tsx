@@ -44,13 +44,12 @@ const FlatcamRoot: Component<Props> = (props) => {
     return <div class={"FlatcamRoot"}>
         <h1>FlatCAM command generation</h1>
         <ol style={{"text-align": "left"}}>
-            <li>Create a folder <code>flatCAM/</code> in your project's <code>CAMOutputs/</code> directory.</li>
             <li>Edit the configuration below and copy the generated commands.</li>
             <li>Open a new <a href="http://flatcam.org/" target={"_blank"}>FlatCAM</a> project and paste these commands
                 in the command window.
             </li>
             <li>Upload the generated files in the next screen. The generated files can be found in the specified project
-                folder under <code>FlatCAM/</code>.
+                folder under <code>CAMOutputs/</code> as <code>*.gcode</code> files.
             </li>
         </ol>
 

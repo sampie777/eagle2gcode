@@ -9,6 +9,12 @@ export const getLocationForAlignmentDrill = (config: DrillConfig, dimensions: Di
     return {x, y};
 }
 
+export const getLocationForDrill = (config: DrillConfig, drill: Drill) => {
+    const x = config.offsetX + drill.x;
+    const y = config.offsetY + drill.y;
+    return {x, y};
+}
+
 const drillAlignmentToGcode = (dimensions: Dimension, drill: Drill, config: DrillConfig): string => {
     const {x, y} = getLocationForAlignmentDrill(config, dimensions, drill);
     return [
@@ -23,8 +29,7 @@ const drillAlignmentToGcode = (dimensions: Dimension, drill: Drill, config: Dril
 }
 
 const drillToGcode = (drill: Drill, config: DrillConfig): string => {
-    const x = config.offsetX + drill.x;
-    const y = config.offsetY + drill.y;
+    const {x, y} = getLocationForDrill(config, drill);
     return [
         `G00 X${x.toFixed(4)}Y${y.toFixed(4)}`,
         "G01 Z3.2000",

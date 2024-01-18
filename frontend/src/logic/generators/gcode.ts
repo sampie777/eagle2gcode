@@ -1,6 +1,5 @@
 import {Dimension, Project} from "../types/project.ts";
-import {GcodeConfig, Trace, TracesConfig, Location} from "../types/gcode.ts";
-import {generateDrillAlignmentFile, generateDrillFile} from "./drills.ts";
+import {Trace, TracesConfig, Location} from "../types/gcode.ts";
 import {getProjectDimensions} from "../processors/project.ts";
 
 export namespace Gcode {
@@ -10,6 +9,15 @@ export namespace Gcode {
         offsetX: number
         offsetY: number
         iterations: number
+    }
+
+    export const outputFileNames = {
+        etching_top: "1_etching_top.gcode",
+        etching_bottom: "1_etching_bottom.gcode",
+        drills_alignment_top: "2_drills_alignment_top.gcode",
+        drills_top: "3_drills_top.gcode",
+        silkscreen_top: "34silkscreen_top.gcode",
+        silkscreen_bottom: "4_silkscreen_bottom.gcode",
     }
 
     function gcodeMoveCommand(location: Location, config: TraceConfig, linear: boolean = true) {

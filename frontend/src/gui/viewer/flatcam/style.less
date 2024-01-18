@@ -5,18 +5,24 @@
   }
 
   .alignment-drills {
-    font-size: 0.8em;
-    opacity: 0.6;
-    padding: 0;
-    margin: 0;
-    align-self: center;
+    display: flex;
+    flex-direction: column;
+    margin: 15px 0;
+    font-size: 0.9em;
 
-    &:hover {
-      opacity: 1;
-    }
+    ol {
+      opacity: 0.6;
+      padding: 0;
+      margin: 0;
+      align-self: center;
 
-    li {
-      padding-left: 10px;
+      &:hover {
+        opacity: 1;
+      }
+
+      li {
+        padding-left: 10px;
+      }
     }
   }
 }

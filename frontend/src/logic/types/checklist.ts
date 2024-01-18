@@ -1,6 +1,6 @@
 export type CheckItem = {
     text: string,
-    checked: boolean
+    checked?: boolean
 }
 
 export type CheckGroup = {
