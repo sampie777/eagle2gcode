@@ -14,8 +14,12 @@ export type TracesConfig = {
 };
 
 export type DrillConfig = {
-    offsetX: number,
-    offsetY: number,
+    offset: {
+        original: Location,
+        actual: Location
+    }[],
+    rotationPoint: Location,
+    rotationAngle: number,
     feedRateMove: number,
     feedRateDrill: number,
     feedRateUp: number,

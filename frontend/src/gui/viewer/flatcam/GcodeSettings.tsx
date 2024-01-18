@@ -8,7 +8,6 @@ import {Gcode} from "../../../logic/generators/gcode.ts";
 import DownloadButton from "./DownloadButton.tsx";
 import {
     generateDrillFile,
-    getLocationForDrill
 } from "../../../logic/generators/drills.ts";
 import {Accessor, Setter} from "solid-js/types/reactive/signal";
 import {emptyConfig, useConfig} from "../../ConfigContext.ts";
@@ -25,11 +24,27 @@ const GcodeSettings: Component<Props> = (props) => {
     const {config, loadConfig} = useConfig()
     const {project} = useProject();
 
+    const alignmentHoles = getProjectAlignmentDrills(project)
+    if (config.drills.offset.length != alignmentHoles.length) {
+        config.drills.offset = alignmentHoles.map(it => ({
+            original: it,
+            actual: {x: it.x, y: it.y},
+        }));
+    }
+
     const onChange = (key: string, value: any) => {
         const path = key.split(".");
         config[path[0]][path[1]] = value;
 
         props.setShowProfile(config.traces.cutoutProfile)
+    }
+
+    const onAlignmentHoleOffsetChangeX = (index: number, value: number) => {
+        config.drills.offset[index].actual.x = value
+    }
+
+    const onAlignmentHoleOffsetChangeY = (index: number, value: number) => {
+        config.drills.offset[index].actual.y = value
     }
 
     const resetConfig = () => {
@@ -56,10 +71,17 @@ const GcodeSettings: Component<Props> = (props) => {
         </SettingsContainer>
 
         <SettingsContainer name={"Drills"}>
-            <SettingNumber label={"Offset X"} defaultValue={config.drills.offsetX}
-                           onChange={(value) => onChange("drills.offsetX", value)}/>
-            <SettingNumber label={"Offset Y"} defaultValue={config.drills.offsetY}
-                           onChange={(value) => onChange("drills.offsetY", value)}/>
+            <SettingsContainer name={"Offset calculation"} visible={true}>
+                <p>Insert the actual location of the alignment holes, according to your printer.</p>
+                {config.drills.offset.map((it, i) => <>
+                    <strong>Hole #{i + 1}</strong>
+                    <SettingNumber label={"Offset X"} defaultValue={it.actual.x} step={0.1}
+                                   onChange={(value) => onAlignmentHoleOffsetChangeX(i, value)}/>
+                    <SettingNumber label={"Offset Y"} defaultValue={it.actual.y} step={0.1}
+                                   onChange={(value) => onAlignmentHoleOffsetChangeY(i, value)}/>
+                </>)}
+            </SettingsContainer>
+
             <SettingNumber label={"Feed rate Move"} defaultValue={config.drills.feedRateMove}
                            onChange={(value) => onChange("drills.feedRateMove", value)}/>
             <SettingNumber label={"Feed rate Drill"} defaultValue={config.drills.feedRateDrill}
@@ -67,18 +89,6 @@ const GcodeSettings: Component<Props> = (props) => {
             <SettingNumber label={"Feed rate Up"} defaultValue={config.drills.feedRateUp}
                            onChange={(value) => onChange("drills.feedRateUp", value)}/>
         </SettingsContainer>
-
-        <div class={"alignment-drills"}>
-            Drill alignment holes (after manual drilling) should match these locations. If not, adjust Drilling -> Offset, adjust the endstops, or move the board.
-            <ol>
-                {getProjectAlignmentDrills(project).map((it, i) => {
-                    const {x, y} = getLocationForDrill(config.drills, it)
-                    return <li title={`Alignment hole #${i + 1}, mirrored and with drill offset`}>
-                        <code>{x.toFixed(2)}, {y.toFixed(2)}</code>
-                    </li>
-                })}
-            </ol>
-        </div>
 
         <div class={"files"}>
             <h4>Download the gCode files:</h4>

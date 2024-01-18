@@ -15,7 +15,7 @@ const Canvas: Component<Props> = (props) => {
     const [showDrills, setShowDrills] = createSignal(true);
     const [showGrid, setShowGrid] = createSignal(true);
     const {project} = useProject();
-    const {canvas, update} = Graphics.start();
+    const {canvas, update} = Graphics.start({width: 1000, height: 600});
 
     createEffect(() => {
         update(project, {

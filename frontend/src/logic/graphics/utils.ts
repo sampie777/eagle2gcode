@@ -1,5 +1,6 @@
 import {BufferGeometry, CircleGeometry, Line, LineBasicMaterial, MeshBasicMaterial, Scene, Vector3} from "three";
-import {Drill, Point} from "../types/cam.ts";
+import {Drill} from "../types/cam.ts";
+import {Location} from "../types/gcode.ts";
 
 export const drawDefaultCircle = (scene: Scene, inputs: Drill[]) => {
     inputs.forEach(it => {
@@ -7,7 +8,7 @@ export const drawDefaultCircle = (scene: Scene, inputs: Drill[]) => {
     })
 }
 
-export const defaultLine = (from: Point, to: Point, color = 0x0000ffff) => {
+export const defaultLine = (from: Location, to: Location, color = 0x0000ffff) => {
     const material = new LineBasicMaterial({color: color, linewidth: 20});
     const geometry = new BufferGeometry().setFromPoints([
         pointToVector(from),
@@ -16,7 +17,7 @@ export const defaultLine = (from: Point, to: Point, color = 0x0000ffff) => {
     return new Line(geometry, material)
 }
 
-export const defaultCircle = (from: Point, size: number, color = 0x000000ff) => {
+export const defaultCircle = (from: Location, size: number, color = 0x000000ff) => {
     const material = new MeshBasicMaterial({color: color});
     const geometry = new CircleGeometry(size / 2, 32)
     const line = new Line(geometry, material);
@@ -25,4 +26,4 @@ export const defaultCircle = (from: Point, size: number, color = 0x000000ff) => 
     return line
 }
 
-export const pointToVector = (input: Point, zoffset = 0): Vector3 => new Vector3(input.x, input.y, zoffset);
+export const pointToVector = (input: Location, zoffset = 0): Vector3 => new Vector3(input.x, input.y, zoffset);
