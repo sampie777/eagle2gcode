@@ -14,7 +14,7 @@ export const emptyConfig = (): GcodeConfig => ({
         offset: [],
         rotationPoint: {x: 0, y: 0},
         rotationAngle: 0,
-        feedRateMove: 1400,
+        feedRateMove: 2000,
         feedRateDrill: 10,
         feedRateUp: 50,
     }
