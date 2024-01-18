@@ -11,8 +11,8 @@ export const emptyConfig = (): GcodeConfig => ({
         iterations: 40,
     },
     drills: {
-        offsetX: 12,
-        offsetY: 27.5,
+        offsetX: 12.6,
+        offsetY: 6.9,
         feedRateMove: 1400,
         feedRateDrill: 10,
         feedRateUp: 50,

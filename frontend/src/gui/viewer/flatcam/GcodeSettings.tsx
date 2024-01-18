@@ -70,13 +70,7 @@ const GcodeSettings: Component<Props> = (props) => {
         </SettingsContainer>
 
         <div class={"files"}>
-            <h4>Download the gCode files:</h4>
-            <DownloadButton content={() => Gcode.generateCopperFile(project, "top", config.traces)}
-                            fileName={"1_etching_top.gcode"} text={"Traces top"}/>
-            <DownloadButton content={() => Gcode.generateCopperFile(project, "bottom", config.traces)}
-                            fileName={"1_etching_bottom.gcode"} text={"Traces bottom"}/>
-            <DownloadButton content={() => generateDrillAlignmentFile(project, config.drills)}
-                            fileName={"2_drill_alignment_bottom.gcode"} text={"Drill alignment bottom"}/>
+            <small>Drill alignment hole locations:</small>
             <ol class={"alignment-drills"}>
                 {getProjectAlignmentDrills(project).map((it, i) => {
                     const {x, y} = getLocationForAlignmentDrill(config.drills, getProjectDimensions(project), it)
@@ -86,12 +80,17 @@ const GcodeSettings: Component<Props> = (props) => {
                 })}
             </ol>
 
+            <h4>Download the gCode files:</h4>
+            <DownloadButton content={() => Gcode.generateCopperFile(project, "top", config.traces)}
+                            fileName={"1_etching_top.gcode"} text={"Traces top"}/>
+            <DownloadButton content={() => Gcode.generateCopperFile(project, "bottom", config.traces)}
+                            fileName={"1_etching_bottom.gcode"} text={"Traces bottom"}/>
+            <DownloadButton content={() => generateDrillFile(project, config.drills)} fileName={"2_drills_top.gcode"}
+                            text={"Drills top"}/>
             <DownloadButton content={() => Gcode.generateSilkscreenFile(project, "top", config.traces)}
                             fileName={"3_silkscreen_top.gcode"} text={"Silkcreen top"}/>
             <DownloadButton content={() => Gcode.generateSilkscreenFile(project, "bottom", config.traces)}
                             fileName={"3_silkscreen_bottom.gcode"} text={"Silkscreen bottom"}/>
-            <DownloadButton content={() => generateDrillFile(project, config.drills)} fileName={"4_drills_top.gcode"}
-                            text={"Drills top"}/>
         </div>
 
         <div class={"actions"}>
