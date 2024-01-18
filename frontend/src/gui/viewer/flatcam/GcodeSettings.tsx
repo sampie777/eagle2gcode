@@ -25,12 +25,10 @@ const GcodeSettings: Component<Props> = (props) => {
     const {project} = useProject();
 
     const alignmentHoles = getProjectAlignmentDrills(project)
-    if (config.drills.offset.length != alignmentHoles.length) {
-        config.drills.offset = alignmentHoles.map(it => ({
-            original: it,
-            actual: {x: it.x, y: it.y},
-        }));
-    }
+    config.drills.offset = alignmentHoles.map((it, i) => ({
+        original: it,
+        actual: (config.drills?.offset[i]) ? config.drills.offset[i].actual :  {x: it.x, y: it.y},
+    }));
 
     const onChange = (key: string, value: any) => {
         const path = key.split(".");

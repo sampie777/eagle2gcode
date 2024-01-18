@@ -19,6 +19,9 @@ import {Trace} from "../types/gcode.ts";
 import {ColorRepresentation} from "three/src/math/Color";
 import {getProjectAlignmentDrills, getProjectDimensions} from "../processors/project.ts";
 import {Drill} from "../types/cam.ts";
+import {defaultCircle} from "./utils.ts";
+import {getLocationForDrill, precalculateRotation} from "../generators/drills.ts";
+import {useConfig} from "../../gui/ConfigContext.ts";
 
 export namespace Graphics {
     type RenderConfig = {
@@ -29,6 +32,7 @@ export namespace Graphics {
         showSoldermask: boolean,
         showDrills: boolean,
         showGrid: boolean,
+        showAlignmentHolesDebug: boolean,
     };
 
     const requestRender = (renderer: WebGLRenderer, scene: Scene, camera: PerspectiveCamera, controls?: OrbitControls) =>
@@ -56,12 +60,12 @@ export namespace Graphics {
             requestRender(renderer, scene, camera, controls);
         })
 
-        requestRender(renderer, scene, camera);
+        requestRender(renderer, scene, camera, controls);
         return {
             canvas: renderer.domElement,
             update: (project, config) => {
                 update(scene, camera, project, config, controls)
-                requestRender(renderer, scene, camera);
+                requestRender(renderer, scene, camera, controls);
             }
         };
     }
@@ -72,6 +76,17 @@ export namespace Graphics {
                     controls?: OrbitControls,) => {
         controls?.update();
         renderer.render(scene, camera);
+    }
+
+    function drawAlignmentHoles(scene: Scene, project: Project) {
+        const {config} = useConfig()
+        precalculateRotation(config.drills)
+
+        config.drills.offset.forEach(it => scene.add(defaultCircle(it.original, 2, 0xffff00)))
+        config.drills.offset.forEach(it => scene.add(defaultCircle(it.actual, 3, 0xff00ff)))
+        getProjectAlignmentDrills(project)
+            .map(it => getLocationForDrill(config.drills, it))
+            .forEach(it => scene.add(defaultCircle(it, 4, 0xffffff)))
     }
 
     const update = (scene: Scene,
@@ -85,7 +100,7 @@ export namespace Graphics {
         camera.position.x = dimensions.width / 2
         camera.position.y = dimensions.height / 2
         // Auto zoom based on board dimensions (notice we're working with perspectives here)
-        const heightFactor = dimensions.height / dimensions.width;
+        const heightFactor = (37/28) * dimensions.height / dimensions.width;
         camera.position.z = heightFactor * Math.max(dimensions.width, dimensions.height) / 2 / Math.tan(camera.fov / 2 / 180 * Math.PI)
         camera.lookAt(camera.position.x, camera.position.y + 1, 0)  // Look straight down
         if (controls) {
@@ -118,6 +133,10 @@ export namespace Graphics {
         }
 
         drawBoard(scene, project.board, config.boardOpacity)
+
+        if (config.showAlignmentHolesDebug) {
+            drawAlignmentHoles(scene, project);
+        }
     }
 
     const drawGrid = (dimensions: { x: number; y: number; width: number; height: number }, scene: Scene) => {

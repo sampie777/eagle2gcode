@@ -2,6 +2,7 @@ import {Component, createEffect, createSignal} from "solid-js";
 import {useProject} from "../ProjectContext.ts";
 import {Graphics} from "../../logic/graphics/graphics.ts";
 import {Accessor} from "solid-js/types/reactive/signal";
+import {AiOutlineReload} from "solid-icons/ai";
 
 type Props = {
     showProfile: Accessor<boolean>
@@ -14,10 +15,15 @@ const Canvas: Component<Props> = (props) => {
     const [showSoldermask, setShowSoldermask] = createSignal(true);
     const [showDrills, setShowDrills] = createSignal(true);
     const [showGrid, setShowGrid] = createSignal(true);
+    const [showAlignmentHolesDebug, setShowAlignmentHolesDebug] = createSignal(false);
     const {project} = useProject();
-    const {canvas, update} = Graphics.start({width: 1000, height: 600});
+    const {canvas, update} = Graphics.start({width: 1300, height: 600});
 
     createEffect(() => {
+        renderProject();
+    })
+
+    const renderProject = () => {
         update(project, {
             boardOpacity: boardOpacity(),
             showProfile: props.showProfile(),
@@ -26,13 +32,16 @@ const Canvas: Component<Props> = (props) => {
             showSoldermask: showSoldermask(),
             showDrills: showDrills(),
             showGrid: showGrid(),
+            showAlignmentHolesDebug: showAlignmentHolesDebug(),
         })
-    })
+    }
 
     return <div class={"Canvas"}>
         {canvas}
 
         <div class={"canvas-control"}>
+            <button onClick={renderProject}><AiOutlineReload/></button>
+
             <label for={"boardOpacity"}>Board opacity</label>
             <input type="range"
                    min={0} max={100} value={boardOpacity() * 100}
@@ -72,6 +81,13 @@ const Canvas: Component<Props> = (props) => {
                        checked={showGrid()}
                        onChange={e => setShowGrid(e.target.checked)}/>
                 Grid
+            </label>
+
+            <label>
+                <input type="checkbox"
+                       checked={showAlignmentHolesDebug()}
+                       onChange={e => setShowAlignmentHolesDebug(e.target.checked)}/>
+                Debug alignment holes
             </label>
         </div>
     </div>;

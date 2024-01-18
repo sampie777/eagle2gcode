@@ -17,11 +17,15 @@ const calculateRotation = (config: DrillConfig): { rotationPoint: Location, rota
     const b1 = config.offset[1].original;
     const b2 = config.offset[1].actual;
 
-    const slopeA = (a2.y - a1.y) / (a2.x - a1.x);
-    const offsetA = a1.y - slopeA * a1.x;
+    if (a1.x == a2.x && a1.y == a2.y && b1.x == b2.x && b1.y == b2.y) {
+        return {
+            rotationPoint: {x: 0, y: 0},
+            rotationAngle: 0,
+        };
+    }
 
+    const slopeA = (a2.y - a1.y) / (a2.x - a1.x);
     const slopeB = (b2.y - b1.y) / (b2.x - b1.x);
-    const offsetB = b1.y - slopeB * b1.x;
 
     // Calculate orthogonal lines of the transformations
     const middleA1A2 = {
@@ -29,20 +33,20 @@ const calculateRotation = (config: DrillConfig): { rotationPoint: Location, rota
         y: a1.y + (a2.y - a1.y) / 2,
     }
     const slopeOrthA = -1 / slopeA;
-    const offsetOrthA = middleA1A2.y - slopeOrthA * middleA1A2.x;
+    const offsetOrthA = !isFinite(slopeOrthA) ? 0 : middleA1A2.y - slopeOrthA * middleA1A2.x;
 
     const middleB1B2 = {
         x: b1.x + (b2.x - b1.x) / 2,
         y: b1.y + (b2.y - b1.y) / 2,
     }
     const slopeOrthB = -1 / slopeB;
-    const offsetOrthB = middleB1B2.y - slopeOrthB * middleB1B2.x;
+    const offsetOrthB = !isFinite(slopeOrthB) ? 0 : middleB1B2.y - slopeOrthB * middleB1B2.x;
 
     // Calculate rotation point
-    const rotationPointX = (offsetOrthB - offsetOrthA) / (slopeOrthA - slopeOrthB);
+    const rotationPointX = isNaN(slopeOrthA - slopeOrthB) ? 0 : (offsetOrthB - offsetOrthA) / (slopeOrthA - slopeOrthB);
     const rotationPoint = {
         x: rotationPointX,
-        y: slopeOrthA * rotationPointX + offsetOrthA,
+        y: (!isFinite(slopeOrthA) ? 0 : slopeOrthA) * rotationPointX + offsetOrthA,
     }
 
     // Calculate rotation angle
@@ -50,10 +54,79 @@ const calculateRotation = (config: DrillConfig): { rotationPoint: Location, rota
     const slopeA2toRotationPoint = (rotationPoint.y - a2.y) / (rotationPoint.x - a2.x);
     const rotationAngle = Math.atan(slopeA2toRotationPoint) - Math.atan(slopeA1toRotationPoint)
 
+    // console.dir({
+    //     a1: a1,
+    //     a2: a2,
+    //     b1: b1,
+    //     b2: b2,
+    //     slopeA: slopeA,
+    //     slopeB: slopeB,
+    //     middleA1A2: middleA1A2,
+    //     slopeOrthA: slopeOrthA,
+    //     offsetOrthA: offsetOrthA,
+    //     middleB1B2: middleB1B2,
+    //     slopeOrthB: slopeOrthB,
+    //     offsetOrthB: offsetOrthB,
+    //     rotationPointX: rotationPointX,
+    //     rotationPoint: rotationPoint,
+    //     slopeA1toRotationPoint: slopeA1toRotationPoint,
+    //     slopeA2toRotationPoint: slopeA2toRotationPoint,
+    //     rotationAngle: rotationAngle,
+    // })
+
     return {
         rotationPoint: rotationPoint,
         rotationAngle: rotationAngle,
     };
+}
+
+function length(offsetPoint: { x: number; y: number }) {
+    return Math.sqrt(Math.pow(offsetPoint.x, 2) + Math.pow(offsetPoint.y, 2));
+}
+
+const applyScaling = (config: DrillConfig, point: Location): Location => {
+    const a1 = config.offset[0].original;
+    const a2 = config.offset[0].actual;
+    const b1 = config.offset[1].original;
+    const b2 = config.offset[1].actual;
+
+    const offsetPoint = {
+        x: point.x - a2.x,
+        y: point.y - a2.y,
+    }
+    if (offsetPoint.x == 0) return point;
+
+    const vector = {
+        length: length(offsetPoint),
+        angle: Math.atan(offsetPoint.y / offsetPoint.x),
+    }
+
+    const scalingFactor = length({x: b2.x - a2.x, y: b2.y - a2.y}) / length({x: b1.x - a1.x, y: b1.y - a1.y})
+    const scaledVector = {
+        length: vector.length * scalingFactor,
+        angle: vector.angle,
+    }
+
+    const scaledOffsetPoint = {
+        x: scaledVector.length * Math.cos(scaledVector.angle),
+        y: scaledVector.length * Math.sin(scaledVector.angle),
+    }
+
+    const scaledPoint = {
+        x: scaledOffsetPoint.x + a2.x,
+        y: scaledOffsetPoint.y + a2.y,
+    }
+
+    // console.dir({
+    //     offsetPoint: offsetPoint,
+    //     vector: vector,
+    //     scalingFactor: scalingFactor,
+    //     scaledVector: scaledVector,
+    //     scaledOffsetPoint: scaledOffsetPoint,
+    //     scaledPoint: scaledPoint,
+    // })
+
+    return scaledPoint
 }
 
 export const calculateOffsetForPoint = (config: DrillConfig, point: Location): Location => {
@@ -76,14 +149,10 @@ export const calculateOffsetForPoint = (config: DrillConfig, point: Location): L
 }
 
 export const getLocationForDrill = (config: DrillConfig, drill: Drill) => {
-    return calculateOffsetForPoint(config, drill);
+    return applyScaling(config, calculateOffsetForPoint(config, drill))
 }
 
 const drillToGcode = (drill: Drill, config: DrillConfig): string => {
-    const {rotationPoint, rotationAngle} = calculateRotation(config);
-    config.rotationPoint = rotationPoint
-    config.rotationAngle = rotationAngle
-
     const {x, y} = getLocationForDrill(config, drill);
     return [
         `G00 X${x.toFixed(4)}Y${y.toFixed(4)}`,
@@ -94,8 +163,16 @@ const drillToGcode = (drill: Drill, config: DrillConfig): string => {
     ].join("\n")
 }
 
+export const precalculateRotation = (config: DrillConfig) => {
+    const {rotationPoint, rotationAngle} = calculateRotation(config);
+    config.rotationPoint = rotationPoint
+    config.rotationAngle = rotationAngle
+}
+
 export const generateDrillFile = (project: Project, config: DrillConfig): string => {
     if (project.drills.length == 0) return "";
+
+    precalculateRotation(config);
 
     const alignmentDrills = getProjectAlignmentDrills(project);
     return [
