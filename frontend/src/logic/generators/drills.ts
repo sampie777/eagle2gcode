@@ -1,6 +1,7 @@
 import {Project} from "../types/project.ts";
 import {Drill} from "../types/cam.ts";
 import {DrillConfig, Location} from "../types/gcode.ts";
+import {getProjectAlignmentDrills} from "../processors/project.ts";
 
 const calculateRotation = (config: DrillConfig): { rotationPoint: Location, rotationAngle: number } => {
     if (config.offset.length < 2) {
@@ -96,6 +97,7 @@ const drillToGcode = (drill: Drill, config: DrillConfig): string => {
 export const generateDrillFile = (project: Project, config: DrillConfig): string => {
     if (project.drills.length == 0) return "";
 
+    const alignmentDrills = getProjectAlignmentDrills(project);
     return [
         "G21",
         "G90",
@@ -115,9 +117,12 @@ export const generateDrillFile = (project: Project, config: DrillConfig): string
         "M117 Remove Z-stop!",
         "M300 S500 P500 ; Beep",
         "G4 P1",
-        project.drills
-            .sort((a, b) => a.x - b.x)
+        ...alignmentDrills
+            .map(it => drillToGcode(it, config)),
+        ...project.drills
+            .filter(it => !alignmentDrills.includes(it))
             .sort((a, b) => a.y - b.y)
+            .sort((a, b) => a.x - b.x)
             .map(it => drillToGcode(it, config)),
         "G00 X0.0000Y0.0000",
         "M300 S2000 P500 ; Beep end",

@@ -58,8 +58,9 @@ const checklist = (): Checklist => [
             {text: "Remove board from clamp."},
             {text: "(Optional for better drill alignment:) Put tape on top of the board top flat surface (not the sides!)."},
             {text: "Secure the board in the clamp with normal side up."},
-            {text: `Home printer.`},
-            {text: `Make sure the alignment holes are in the correct location (see GUI for expected coordinates).`},
+            {text: "Home printer."},
+            {text: "Get the locations of the drill for the alignment holes."},
+            {text: "Insert these locations into the GUI (Drills > Offset calculation)."},
         ]
     },
     {
@@ -67,10 +68,11 @@ const checklist = (): Checklist => [
         items: [
             {text: "Align print head Z-axis with board surface by adjusting the Z end-stop."},
             {
-                text: `Start the '${Gcode.outputFileNames.drills_top}' print.`
-                    + "During the start of this print, set Z-offset to -3.0."
-                    + "\nIMPORTANT: And remove Z-stop after homing."
+                text: `Start the '${Gcode.outputFileNames.drills_top}' print.\n`
+                    + "IMPORTANT: Remove Z-stop after homing."
+                    + "During the start of this print (after homing), set Z-offset to -3.0.\n"
             },
+            {text: "Check the first few holes, they should match the alignment hole locations."},
             {text: "After print, reset Z-offset to 0.0."},
             {text: "Turn off Dremel tool."},
             {text: "Secure Z-stop back in place."},
