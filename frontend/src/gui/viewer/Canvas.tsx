@@ -8,7 +8,7 @@ type Props = {
 }
 
 const Canvas: Component<Props> = (props) => {
-    const [boardOpacity, setBoardOpacity] = createSignal(0.1);
+    const [boardOpacity, setBoardOpacity] = createSignal(0);
     const [showTraces, setShowTraces] = createSignal(true);
     const [showSilkscreen, setShowSilkscreen] = createSignal(true);
     const [showSoldermask, setShowSoldermask] = createSignal(true);
