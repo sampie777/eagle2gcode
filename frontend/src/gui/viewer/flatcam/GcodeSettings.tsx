@@ -19,6 +19,7 @@ type Props = {
     onBack?: () => void
     showProfile: Accessor<boolean>
     setShowProfile: Setter<boolean>
+    showChecklist: () => void
 }
 
 const GcodeSettings: Component<Props> = (props) => {
@@ -38,6 +39,10 @@ const GcodeSettings: Component<Props> = (props) => {
     }
 
     return <div class={"FlatcamSettings"}>
+        <button onClick={props.showChecklist}>Checklist</button>
+        <br/>
+        <br/>
+
         <SettingsContainer name={"Traces"} visible={true}>
             <SettingCheck label={"Cutout profile"} defaultValue={config.traces.cutoutProfile}
                           onChange={(value) => onChange("traces.cutoutProfile", value)}/>

@@ -4,6 +4,7 @@ import {useConfig} from "../ConfigContext.ts";
 import {Persistency} from "../../logic/utils/persistency.ts";
 import './Header.less';
 import {AiOutlineReload, AiOutlineSave} from "solid-icons/ai";
+import {useChecklist} from "../ChecklistContext.ts";
 
 type Props = {
     onResetProject: () => void
@@ -12,6 +13,7 @@ type Props = {
 const Header: Component<Props> = (props) => {
     const {project, loadProject} = useProject();
     const {config} = useConfig();
+    const {resetChecklist} = useChecklist()
 
     const resetProject = () => {
         if (!confirm("Are you sure you want to delete this project?")) return;
@@ -23,6 +25,8 @@ const Header: Component<Props> = (props) => {
         } else {
             console.log("Not saving to localstorage in development")
         }
+
+        resetChecklist();
 
         props.onResetProject();
     };

@@ -1,0 +1,64 @@
+.Checklist {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  left: 0;
+  top: 0;
+  padding-top: 100px;
+  padding-bottom: 100px;
+  background-color: #0005;
+  z-index: 100;
+  counter-reset: group;
+
+  .content {
+    background-color: #242424;
+    border-radius: 15px;
+    border: 1px solid #fff5;
+    box-shadow: 0 10px 30px #0008, 0 10px 200px #0008;
+    padding: 30px;
+  }
+
+  h3::before {
+    display: inline-block;
+    content: counter(group) ".";
+    counter-increment: group;
+    width: 2em;
+    margin-left: -2em;
+    opacity: 0.5;
+  }
+
+  ol {
+    text-align: left;
+    max-width: 500px;
+    counter-reset: item;
+  }
+
+  li {
+    padding-bottom: 5px;
+    padding-left: 5px;
+  }
+
+  .Item {
+    cursor: default;
+    &.checked {
+      color: #50b050;
+      opacity: 0.9;
+    }
+
+    .counter {
+      display: inline-block;
+      width: 2em;
+      margin-left: -2em;
+      counter-increment: item;
+
+      &::before {
+        content: counter(item) ".";
+      }
+
+      &.checked::before {
+        content: "";
+      }
+    }
+  }
+}

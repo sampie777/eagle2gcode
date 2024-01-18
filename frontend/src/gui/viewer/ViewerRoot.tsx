@@ -6,6 +6,7 @@ import GcodeSettings from "./flatcam/GcodeSettings.tsx";
 import {ScreenProps} from "../../logic/screens.ts";
 import {getProjectDimensions} from "../../logic/processors/project.ts";
 import {useConfig} from "../ConfigContext.ts";
+import Checklist from "../checklist/Checklist.tsx";
 
 type Props = ScreenProps
 
@@ -13,6 +14,7 @@ const ViewerRoot: Component<Props> = (props) => {
     const {config} = useConfig()
     const {project} = useProject();
     const [showProfile, setShowProfile] = createSignal(config.traces.cutoutProfile);
+    const [showChecklist, setShowChecklist] = createSignal(false);
     project.isLoaded = true;
 
     console.log(project)
@@ -27,18 +29,18 @@ const ViewerRoot: Component<Props> = (props) => {
     }
 
     return <div class={"Viewer"}>
+        {!showChecklist() ? null : <Checklist close={() => setShowChecklist(false)}/>}
+
         <h2>{projectName()}</h2>
         <small>{dimensions.width.toFixed(1)} x {dimensions.height.toFixed(1)} mm</small>
 
         <div class={"container"}>
             <Canvas showProfile={showProfile}/>
 
-            {/*<div>*/}
-            {/*    <img src={example_board} />*/}
-            {/*</div>*/}
             <GcodeSettings showProfile={showProfile}
                            setShowProfile={setShowProfile}
-                           onBack={props.onBack}/>
+                           onBack={props.onBack}
+                           showChecklist={() => setShowChecklist(true)}/>
         </div>
     </div>;
 }
