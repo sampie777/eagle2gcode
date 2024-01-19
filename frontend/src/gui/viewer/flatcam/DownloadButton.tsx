@@ -9,13 +9,19 @@ type Props = {
 const DownloadButton: Component<Props> = (props) => {
     const [content, setContent] = createSignal("");
 
-    const onClick = () => {
-        setContent(`data:text/plain;charset=utf-8,${encodeURIComponent(props.content())}`)
+    const onClick = (e) => {
+        const generatedContent = props.content();
+        if (generatedContent.length == 0) {
+            e.preventDefault();
+            setContent("");
+        } else {
+            setContent(`data:text/plain;charset=utf-8,${encodeURIComponent(generatedContent)}`)
+        }
     }
 
     return <a href={content()}
               onClick={onClick}
-              download={props.fileName}>
+              download={content().length == 0 ? undefined : props.fileName}>
         {props.text}
     </a>;
 }
