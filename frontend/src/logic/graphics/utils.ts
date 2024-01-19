@@ -17,9 +17,9 @@ export const defaultLine = (from: Location, to: Location, color = 0x0000ffff) =>
     return new Line(geometry, material)
 }
 
-export const defaultCircle = (from: Location, size: number, color = 0x000000ff) => {
+export const defaultCircle = (from: Location, size: number, color = 0x000000ff, segments = 32) => {
     const material = new MeshBasicMaterial({color: color});
-    const geometry = new CircleGeometry(size / 2, 32)
+    const geometry = new CircleGeometry(size / 2, segments)
     const line = new Line(geometry, material);
     line.position.x = from.x;
     line.position.y = from.y;

@@ -82,11 +82,11 @@ export namespace Graphics {
         const {config} = useConfig()
         precalculateRotation(config.drills)
 
-        config.drills.offset.forEach(it => scene.add(defaultCircle(it.original, 2, 0xffff00)))
-        config.drills.offset.forEach(it => scene.add(defaultCircle(it.actual, 3, 0xff00ff)))
         getProjectAlignmentDrills(project)
             .map(it => getLocationForDrill(config.drills, it))
-            .forEach(it => scene.add(defaultCircle(it, 4, 0xffffff)))
+            .forEach(it => scene.add(defaultCircle(it, 4, 0xffffff, 4)))
+        config.drills.offset.forEach(it => scene.add(defaultCircle(it.actual, 3, 0xff00ff, 4)))
+        config.drills.offset.forEach(it => scene.add(defaultCircle(it.original, 2, 0xffff00, 4)))
     }
 
     const update = (scene: Scene,

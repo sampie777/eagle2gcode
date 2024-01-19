@@ -40,7 +40,9 @@ const Canvas: Component<Props> = (props) => {
         {canvas}
 
         <div class={"canvas-control"}>
-            <button onClick={renderProject}><AiOutlineReload/></button>
+            <button onClick={renderProject} title={"Rerender"}>
+                <AiOutlineReload/>
+            </button>
 
             <label for={"boardOpacity"}>Board opacity</label>
             <input type="range"
@@ -83,7 +85,7 @@ const Canvas: Component<Props> = (props) => {
                 Grid
             </label>
 
-            <label>
+            <label title={"Yellow will be the alignment hole itself, pink will be the actual location, white will be the calculated location"}>
                 <input type="checkbox"
                        checked={showAlignmentHolesDebug()}
                        onChange={e => setShowAlignmentHolesDebug(e.target.checked)}/>
