@@ -12,7 +12,7 @@ export const emptyConfig = (): GcodeConfig => ({
     },
     drills: {
         offset: [],
-        rotationPoint: {x: 0, y: 0},
+        scalingFactor: 1,
         rotationAngle: 0,
         feedRateMove: 2000,
         feedRateDrill: 10,
@@ -28,7 +28,7 @@ const loadConfig = (to: GcodeConfig, from: GcodeConfig | null | undefined) => {
     to.traces.feedRate = from.traces.feedRate
     to.traces.iterations = from.traces.iterations
     to.drills.offset = [...from.drills.offset]
-    to.drills.rotationPoint = {...from.drills.rotationPoint}
+    to.drills.scalingFactor = from.drills.scalingFactor
     to.drills.rotationAngle = from.drills.rotationAngle
     to.drills.feedRateMove = from.drills.feedRateMove
     to.drills.feedRateDrill = from.drills.feedRateDrill

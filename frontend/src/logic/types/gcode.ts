@@ -18,7 +18,7 @@ export type DrillConfig = {
         original: Location,
         actual: Location
     }[],
-    rotationPoint: Location,
+    scalingFactor: number,
     rotationAngle: number,
     feedRateMove: number,
     feedRateDrill: number,
