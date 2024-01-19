@@ -129,7 +129,7 @@ export const generateDrillFile = (project: Project, config: DrillConfig): string
         "M03",
         "M03",
         "M03",
-        "G00 Z4.5000",
+        "G00 Z10.0000",
         "M117 Remove Z-stop!",
         "M300 S500 P500 ; Beep",
         "G4 P1",
@@ -140,6 +140,7 @@ export const generateDrillFile = (project: Project, config: DrillConfig): string
             .sort((a, b) => a.y - b.y)
             .sort((a, b) => a.x - b.x)
             .map(it => drillToGcode(it, config)),
+        `G00 Z10.0000 F${config.feedRateMove}`,
         "G00 X0.0000Y0.0000",
         "M300 S2000 P500 ; Beep end",
         "M05",

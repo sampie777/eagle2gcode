@@ -7,13 +7,13 @@ type Props = {
 }
 
 const DownloadButton: Component<Props> = (props) => {
-    const [content, setContent] = createSignal("");
+    const [content, setContent] = createSignal("#");
 
     const onClick = (e) => {
         const generatedContent = props.content();
         if (generatedContent.length == 0) {
             e.preventDefault();
-            setContent("");
+            setContent("#");
         } else {
             setContent(`data:text/plain;charset=utf-8,${encodeURIComponent(generatedContent)}`)
         }
