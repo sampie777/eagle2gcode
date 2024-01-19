@@ -17,6 +17,13 @@ export const emptyConfig = (): GcodeConfig => ({
         feedRateMove: 2000,
         feedRateDrill: 10,
         feedRateUp: 50,
+    },
+    silkscreen: {
+        offset: [],
+        scalingFactor: 1,
+        rotationAngle: 0,
+        feedRate: 1400,
+        iterations: 40,
     }
 });
 
@@ -27,12 +34,19 @@ const loadConfig = (to: GcodeConfig, from: GcodeConfig | null | undefined) => {
     to.traces.offsetY = from.traces.offsetY
     to.traces.feedRate = from.traces.feedRate
     to.traces.iterations = from.traces.iterations
+
     to.drills.offset = [...from.drills.offset]
     to.drills.scalingFactor = from.drills.scalingFactor
     to.drills.rotationAngle = from.drills.rotationAngle
     to.drills.feedRateMove = from.drills.feedRateMove
     to.drills.feedRateDrill = from.drills.feedRateDrill
     to.drills.feedRateUp = from.drills.feedRateUp
+
+    to.silkscreen.offset = [...from.silkscreen.offset]
+    to.silkscreen.scalingFactor = from.silkscreen.scalingFactor
+    to.silkscreen.rotationAngle = from.silkscreen.rotationAngle
+    to.silkscreen.feedRate = from.silkscreen.feedRate
+    to.silkscreen.iterations = from.silkscreen.iterations
 }
 
 const defaultValue = emptyConfig();

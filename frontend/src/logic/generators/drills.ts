@@ -1,76 +1,8 @@
 import {Project} from "../types/project.ts";
 import {Drill} from "../types/cam.ts";
-import {DrillConfig, Location} from "../types/gcode.ts";
+import {DrillConfig} from "../types/gcode.ts";
 import {getProjectAlignmentDrills} from "../processors/project.ts";
-import {length} from "../utils/math.ts";
-
-const calculateRotation = (config: DrillConfig): { scalingFactor: number, rotationAngle: number } => {
-    if (config.offset.length < 2) {
-        console.error("Need at least two alignment points");
-        return {
-            scalingFactor: 1,
-            rotationAngle: 0,
-        };
-    }
-
-    const a1 = config.offset[0].original;
-    const a2 = config.offset[0].actual;
-    const b1 = config.offset[1].original;
-    const b2 = config.offset[1].actual;
-
-    // Calculate rotation angle
-    // Math.atan2(slopeABActual)- Math.atan2(slopeABOriginal)
-    const rotationAngle = Math.atan2(b2.y - a2.y, b2.x - a2.x) - Math.atan2(b1.y - a1.y, b1.x - a1.x)
-
-    const scalingFactor = length({x: b2.x - a2.x, y: b2.y - a2.y}) / length({x: b1.x - a1.x, y: b1.y - a1.y})
-
-    return {
-        scalingFactor: scalingFactor,
-        rotationAngle: rotationAngle,
-    };
-}
-
-/**
- * We will rotate the whole thing about A original, and then move it to A actual
- * @param config
- * @param point
- */
-export const calculateOffsetForPoint = (config: DrillConfig, point: Location): Location => {
-    const a1 = config.offset[0].original;
-    const a2 = config.offset[0].actual;
-
-    // Calculate offset point at the origin
-    const offsetPoint = {
-        x: point.x - a1.x,
-        y: point.y - a1.y,
-    }
-
-    const offsetVector = {
-        length: length(offsetPoint),
-        angle: Math.atan2(offsetPoint.y, offsetPoint.x),
-    }
-
-    // Calculate rotated offset point
-    const offsetRotatedVector = {
-        length: offsetVector.length,
-        angle: offsetVector.angle + config.rotationAngle,
-    }
-
-    const scaledOffsetRotatedVector = {
-        length: offsetRotatedVector.length * config.scalingFactor,
-        angle: offsetRotatedVector.angle,
-    }
-
-    const scaledOffsetPoint = {
-        x: scaledOffsetRotatedVector.length * Math.cos(scaledOffsetRotatedVector.angle),
-        y: scaledOffsetRotatedVector.length * Math.sin(scaledOffsetRotatedVector.angle),
-    }
-
-    return {
-        x: scaledOffsetPoint.x + a2.x,
-        y: scaledOffsetPoint.y + a2.y,
-    }
-}
+import {calculateOffsetForPoint, calculateRotation} from "../utils/gcode.ts";
 
 export const getLocationForDrill = (config: DrillConfig, drill: Drill) => {
     return calculateOffsetForPoint(config, drill)
@@ -88,7 +20,7 @@ const drillToGcode = (drill: Drill, config: DrillConfig): string => {
 }
 
 export const precalculateRotation = (config: DrillConfig) => {
-    const {scalingFactor, rotationAngle} = calculateRotation(config);
+    const {scalingFactor, rotationAngle} = calculateRotation(config.offset);
     config.scalingFactor = scalingFactor
     config.rotationAngle = rotationAngle
 }

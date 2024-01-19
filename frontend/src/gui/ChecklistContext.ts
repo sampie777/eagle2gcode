@@ -44,7 +44,7 @@ const checklist = (): Checklist => [
             {text: "Put the board in an etching solution."},
             {text: "Remove board from etching solution after it looks good."},
             {text: "Wash the board with water to remove the solution."},
-            {text: "Remove the ink from the board."}
+            {text: "Remove the ink from the board."},
         ]
     },
     {
@@ -76,23 +76,21 @@ const checklist = (): Checklist => [
             {text: "After print, reset Z-offset to 0.0."},
             {text: "Turn off Dremel tool."},
             {text: "Secure Z-stop back in place."},
-            {text: "Remove tape from board."}
+            {text: "Remove tape from board."},
         ]
     },
     {
         title: "Silkscreen (WIP)",
         items: [
-            {text: "Measure distance from clamp left side to left side of profile."},
-            {text: "Make sure this distance is available on the right side of the board."},
-            {text: "Flip over board and make sure the correct distance is maintained between the clamp and the profile."},
-            {text: "Start 2_check_holes_cnc print if silkscreen is on copper side."},
-            {text: "Start 4_check_mirrored_holes_cnc print if silkscreen is on non-copper side."},
-            {text: "Adjust X axis screw for the holes."},
-            {text: "Restart X_check_holes print and repeat as needed."},
             {text: "Reset Z-offset to 0.0."},
-            {text: "Turn on Dremel to 14000 RPM."},
-            {text: "Start 5_draw_silkscreen print."},
-            {text: "Turn off printer and Dremel tool."}
+            {text: "Mount scratcher tool on printer."},
+            {text: "Secure the board in the clamp with normal side up."},
+            {text: "Home printer."},
+            {text: "Get the locations of the drill for the alignment holes."},
+            {text: "Insert these locations into the GUI (Silkscreen > Offset calculation)."},
+            {text: `Start the '${Gcode.outputFileNames.silkscreen_top}' print.`},
+            {text: "Check the first few holes, they should match the alignment hole locations."},
+            {text: "Turn off printer."},
         ]
     },
     {
@@ -111,7 +109,7 @@ const checklist = (): Checklist => [
             {text: "After print: remove cutout tape from the pads."},
             {text: "Wipe board with alcohol to remove paint from pads."},
             {text: "Turn off printer and Dremel tool."},
-            {text: "Remove board from clamp."}
+            {text: "Remove board from clamp."},
         ]
     }
 ]

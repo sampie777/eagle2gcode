@@ -12,6 +12,7 @@ import {
 import {Accessor, Setter} from "solid-js/types/reactive/signal";
 import {emptyConfig, useConfig} from "../../ConfigContext.ts";
 import {getProjectAlignmentDrills} from "../../../logic/processors/project.ts";
+import {generateCopperFile, generateSilkscreenFile} from "../../../logic/generators/traces.ts";
 
 type Props = {
     onBack?: () => void
@@ -27,7 +28,11 @@ const GcodeSettings: Component<Props> = (props) => {
     const alignmentHoles = getProjectAlignmentDrills(project)
     config.drills.offset = alignmentHoles.map((it, i) => ({
         original: it,
-        actual: (config.drills?.offset[i]) ? config.drills.offset[i].actual :  {x: it.x, y: it.y},
+        actual: (config.drills?.offset[i]) ? config.drills.offset[i].actual : {x: it.x, y: it.y},
+    }));
+    config.silkscreen.offset = alignmentHoles.map((it, i) => ({
+        original: it,
+        actual: (config.silkscreen?.offset[i]) ? config.silkscreen.offset[i].actual : {x: it.x, y: it.y},
     }));
 
     const onChange = (key: string, value: any) => {
@@ -35,14 +40,6 @@ const GcodeSettings: Component<Props> = (props) => {
         config[path[0]][path[1]] = value;
 
         props.setShowProfile(config.traces.cutoutProfile)
-    }
-
-    const onAlignmentHoleOffsetChangeX = (index: number, value: number) => {
-        config.drills.offset[index].actual.x = value
-    }
-
-    const onAlignmentHoleOffsetChangeY = (index: number, value: number) => {
-        config.drills.offset[index].actual.y = value
     }
 
     const resetConfig = () => {
@@ -74,9 +71,9 @@ const GcodeSettings: Component<Props> = (props) => {
                 {config.drills.offset.map((it, i) => <>
                     <strong>Hole #{i + 1}</strong>
                     <SettingNumber label={"Offset X"} defaultValue={it.actual.x} step={0.1}
-                                   onChange={(value) => onAlignmentHoleOffsetChangeX(i, value)}/>
+                                   onChange={(value) => config.drills.offset[i].actual.x = value}/>
                     <SettingNumber label={"Offset Y"} defaultValue={it.actual.y} step={0.1}
-                                   onChange={(value) => onAlignmentHoleOffsetChangeY(i, value)}/>
+                                   onChange={(value) => config.drills.offset[i].actual.y = value}/>
                 </>)}
             </SettingsContainer>
 
@@ -88,17 +85,35 @@ const GcodeSettings: Component<Props> = (props) => {
                            onChange={(value) => onChange("drills.feedRateUp", value)}/>
         </SettingsContainer>
 
+        <SettingsContainer name={"Silkscreen"}>
+            <SettingsContainer name={"Offset calculation"} visible={true}>
+                <p>Insert the actual location of the alignment holes, according to your printer.</p>
+                {config.silkscreen.offset.map((it, i) => <>
+                    <strong>Hole #{i + 1}</strong>
+                    <SettingNumber label={"Offset X"} defaultValue={it.actual.x} step={0.1}
+                                   onChange={(value) => config.silkscreen.offset[i].actual.x = value}/>
+                    <SettingNumber label={"Offset Y"} defaultValue={it.actual.y} step={0.1}
+                                   onChange={(value) => config.silkscreen.offset[i].actual.y = value}/>
+                </>)}
+            </SettingsContainer>
+
+            <SettingNumber label={"Feed rate"} defaultValue={config.silkscreen.feedRate}
+                           onChange={(value) => onChange("silkscreen.feedRate", value)}/>
+            <SettingNumber label={"Iterations"} defaultValue={config.silkscreen.iterations}
+                           onChange={(value) => onChange("silkscreen.iterations", value)}/>
+        </SettingsContainer>
+
         <div class={"files"}>
             <h4>Download the gCode files:</h4>
-            <DownloadButton content={() => Gcode.generateCopperFile(project, "top", config.traces)}
+            <DownloadButton content={() => generateCopperFile(project, "top", config.traces)}
                             fileName={Gcode.outputFileNames.etching_top} text={"Traces top"}/>
-            <DownloadButton content={() => Gcode.generateCopperFile(project, "bottom", config.traces)}
+            <DownloadButton content={() => generateCopperFile(project, "bottom", config.traces)}
                             fileName={Gcode.outputFileNames.etching_bottom} text={"Traces bottom"}/>
             <DownloadButton content={() => generateDrillFile(project, config.drills)}
                             fileName={Gcode.outputFileNames.drills_top} text={"Drills top"}/>
-            <DownloadButton content={() => Gcode.generateSilkscreenFile(project, "top", config.traces)}
+            <DownloadButton content={() => generateSilkscreenFile(project, "top", config.silkscreen)}
                             fileName={Gcode.outputFileNames.silkscreen_top} text={"Silkcreen top"}/>
-            <DownloadButton content={() => Gcode.generateSilkscreenFile(project, "bottom", config.traces)}
+            <DownloadButton content={() => generateSilkscreenFile(project, "bottom", config.silkscreen)}
                             fileName={Gcode.outputFileNames.silkscreen_bottom} text={"Silkscreen bottom"}/>
         </div>
 

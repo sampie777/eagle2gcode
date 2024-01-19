@@ -5,6 +5,15 @@ export type Location = {
 
 export type Trace = Location[]
 
+export type Alignment = {
+    offset: {
+        original: Location,
+        actual: Location
+    }[],
+    scalingFactor: number,
+    rotationAngle: number,
+}
+
 export type TracesConfig = {
     cutoutProfile: boolean
     offsetX: number
@@ -14,18 +23,18 @@ export type TracesConfig = {
 };
 
 export type DrillConfig = {
-    offset: {
-        original: Location,
-        actual: Location
-    }[],
-    scalingFactor: number,
-    rotationAngle: number,
     feedRateMove: number,
     feedRateDrill: number,
     feedRateUp: number,
-}
+} & Alignment;
+
+export type SilkscreenConfig = {
+    feedRate: number,
+    iterations: number,
+} & Alignment;
 
 export type GcodeConfig = {
-    traces: TracesConfig,
+    traces: TracesConfig
     drills: DrillConfig
+    silkscreen: SilkscreenConfig
 }
