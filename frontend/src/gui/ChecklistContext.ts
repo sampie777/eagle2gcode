@@ -80,10 +80,11 @@ const checklist = (): Checklist => [
         ]
     },
     {
-        title: "Silkscreen (WIP)",
+        title: "Silkscreen",
         items: [
             {text: "Reset Z-offset to 0.0."},
             {text: "Mount scratcher tool on printer."},
+            {text: "Put some extra weight on the scratcher."},
             {text: "Secure the board in the clamp with normal side up."},
             {text: "Home printer."},
             {text: "Get the locations of the drill for the alignment holes."},

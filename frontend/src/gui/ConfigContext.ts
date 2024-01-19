@@ -22,8 +22,8 @@ export const emptyConfig = (): GcodeConfig => ({
         offset: [],
         scalingFactor: 1,
         rotationAngle: 0,
-        feedRate: 1400,
-        iterations: 40,
+        feedRate: 2000,
+        iterations: 50,
     }
 });
 
