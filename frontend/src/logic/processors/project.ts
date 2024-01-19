@@ -1,6 +1,7 @@
 import {Dimension, Project} from "../types/project.ts";
 import {Trace, Location} from "../types/gcode.ts";
 import {Drill} from "../types/cam.ts";
+import {length} from "../utils/math.ts";
 
 export const getProjectDimensions = (project: Project): Dimension => {
     let minX: number | undefined;
@@ -43,30 +44,20 @@ export const getProjectDimensions = (project: Project): Dimension => {
 export const getProjectAlignmentDrills = (project: Project): Drill[] => {
     let leftMostHole: Drill | undefined;
     let rightMostHole: Drill | undefined;
-    project.drills
-        .filter(it => it.size < 1.5)
-        .sort((a, b) => a.x - b.x)
-        .sort((a, b) => a.y - b.y)
-        .forEach(it => {
-            if (leftMostHole == undefined || it.x < leftMostHole.x) leftMostHole = it;
-        })
 
     project.drills
         .filter(it => it.size < 1.5)
-        .sort((a, b) => a.x - b.x)
-        .sort((a, b) => b.y - a.y)
         .forEach(it => {
-            if (rightMostHole == undefined || it.x > rightMostHole.x) rightMostHole = it;
+            if (leftMostHole == undefined || length(it) < length(leftMostHole)) leftMostHole = it;
+            if (rightMostHole == undefined || length(it) > length(rightMostHole)) rightMostHole = it;
         })
 
     if (leftMostHole == undefined || rightMostHole == undefined) {
         // If there are no small drills, then ignore the size constraint
         project.drills
-            .sort((a, b) => a.y - b.y)
-            .sort((a, b) => a.x - b.x)
             .forEach(it => {
-                if (leftMostHole == undefined || it.x < leftMostHole.x) leftMostHole = it;
-                if (rightMostHole == undefined || it.x > rightMostHole.x) rightMostHole = it;
+                if (leftMostHole == undefined || length(it) < length(leftMostHole)) leftMostHole = it;
+                if (rightMostHole == undefined || length(it) > length(rightMostHole)) rightMostHole = it;
             })
     }
 
