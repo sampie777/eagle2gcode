@@ -153,7 +153,7 @@ export namespace Graphics {
     }
 
     const drawGrid = (dimensions: { x: number; y: number; width: number; height: number }, scene: Scene) => {
-        const gridSize = 2 * Math.ceil(Math.max(dimensions.x + dimensions.width, dimensions.y + dimensions.height) / 10) * 10;
+        const gridSize = Math.max(100, 2 * Math.ceil(Math.max(dimensions.x + dimensions.width, dimensions.y + dimensions.height) / 10) * 10);
         const gridHelper = new GridHelper(gridSize, gridSize, 0xffffff);
         gridHelper.rotateX(0.5 * Math.PI)
         gridHelper.material.transparent = true;

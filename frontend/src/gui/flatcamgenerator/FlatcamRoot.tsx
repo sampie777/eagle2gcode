@@ -6,11 +6,14 @@ import SettingString from "../components/settings/SettingString.tsx";
 import './style.less';
 import {ScreenProps} from "../../logic/screens.ts";
 import {getCookie, setCookie} from "../../logic/cookies.ts";
+import {useProject} from "../ProjectContext.ts";
+import {exampleProject} from "../../logic/example/project.ts";
 
 type Props = ScreenProps
 
 const FlatcamRoot: Component<Props> = (props) => {
     const [commands, setCommands] = createSignal<string>("");
+    const {loadProject} = useProject();
 
     const config = {
         project: {
@@ -41,6 +44,11 @@ const FlatcamRoot: Component<Props> = (props) => {
         props.onNext?.();
     };
 
+    const loadExampleProject = () => {
+        loadProject(exampleProject);
+        nextScreen();
+    }
+
     return <div class={"FlatcamRoot"}>
         <h1>FlatCAM command generation</h1>
         <ol style={{"text-align": "left"}}>
@@ -70,6 +78,9 @@ const FlatcamRoot: Component<Props> = (props) => {
         <div class={"actions"}>
             <button onClick={copy}>Copy</button>
             <button onClick={nextScreen}>Next</button>
+        </div>
+        <div class={"actions"}>
+            <button onClick={loadExampleProject}>Example project</button>
         </div>
     </div>;
 }
