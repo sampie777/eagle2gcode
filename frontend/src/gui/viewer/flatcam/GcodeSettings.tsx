@@ -19,6 +19,7 @@ type Props = {
     showProfile: Accessor<boolean>
     setShowProfile: Setter<boolean>
     showChecklist: () => void
+    requestRender: () => void
 }
 
 const GcodeSettings: Component<Props> = (props) => {
@@ -71,9 +72,15 @@ const GcodeSettings: Component<Props> = (props) => {
                 {config.drills.offset.map((it, i) => <>
                     <strong>Hole #{i + 1}</strong>
                     <SettingNumber label={"Offset X"} defaultValue={it.actual.x} step={0.1}
-                                   onChange={(value) => config.drills.offset[i].actual.x = value}/>
+                                   onChange={(value) => {
+                                       config.drills.offset[i].actual.x = value;
+                                       props.requestRender();
+                                   }}/>
                     <SettingNumber label={"Offset Y"} defaultValue={it.actual.y} step={0.1}
-                                   onChange={(value) => config.drills.offset[i].actual.y = value}/>
+                                   onChange={(value) => {
+                                       config.drills.offset[i].actual.y = value;
+                                       props.requestRender();
+                                   }}/>
                 </>)}
             </SettingsContainer>
 
@@ -91,9 +98,15 @@ const GcodeSettings: Component<Props> = (props) => {
                 {config.silkscreen.offset.map((it, i) => <>
                     <strong>Hole #{i + 1}</strong>
                     <SettingNumber label={"Offset X"} defaultValue={it.actual.x} step={0.1}
-                                   onChange={(value) => config.silkscreen.offset[i].actual.x = value}/>
+                                   onChange={(value) => {
+                                       config.silkscreen.offset[i].actual.x = value;
+                                       props.requestRender();
+                                   }}/>
                     <SettingNumber label={"Offset Y"} defaultValue={it.actual.y} step={0.1}
-                                   onChange={(value) => config.silkscreen.offset[i].actual.y = value}/>
+                                   onChange={(value) => {
+                                       config.silkscreen.offset[i].actual.y = value;
+                                       props.requestRender();
+                                   }}/>
                 </>)}
             </SettingsContainer>
 

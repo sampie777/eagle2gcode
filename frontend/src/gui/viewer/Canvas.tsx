@@ -8,7 +8,7 @@ type Props = {
     showProfile: Accessor<boolean>
 }
 
-const Canvas: Component<Props> = (props) => {
+const createCanvas = (props: Props) => {
     const [boardOpacity, setBoardOpacity] = createSignal(0);
     const [showTraces, setShowTraces] = createSignal(true);
     const [showSilkscreen, setShowSilkscreen] = createSignal(true);
@@ -36,63 +36,67 @@ const Canvas: Component<Props> = (props) => {
         })
     }
 
-    return <div class={"Canvas"}>
-        {canvas}
+    return {
+        rerender: renderProject,
+        Canvas: () => (<div class={"Canvas"}>
+            {canvas}
 
-        <div class={"canvas-control"}>
-            <button onClick={renderProject} title={"Rerender"}>
-                <AiOutlineReload/>
-            </button>
+            <div class={"canvas-control"}>
+                <button onClick={renderProject} title={"Rerender"}>
+                    <AiOutlineReload/>
+                </button>
 
-            <label for={"boardOpacity"}>Board opacity</label>
-            <input type="range"
-                   min={0} max={100} value={boardOpacity() * 100}
-                   onInput={e => setBoardOpacity(+e.target.value / 100)}
-                   id="boardOpacity"/>
+                <label for={"boardOpacity"}>Board opacity</label>
+                <input type="range"
+                       min={0} max={100} value={boardOpacity() * 100}
+                       onInput={e => setBoardOpacity(+e.target.value / 100)}
+                       id="boardOpacity"/>
 
-            <label>
-                <input type="checkbox"
-                       checked={showTraces()}
-                       onChange={e => setShowTraces(e.target.checked)}/>
-                Traces
-            </label>
+                <label>
+                    <input type="checkbox"
+                           checked={showTraces()}
+                           onChange={e => setShowTraces(e.target.checked)}/>
+                    Traces
+                </label>
 
-            <label>
-                <input type="checkbox"
-                       checked={showSilkscreen()}
-                       onChange={e => setShowSilkscreen(e.target.checked)}/>
-                Silkscreen
-            </label>
+                <label>
+                    <input type="checkbox"
+                           checked={showSilkscreen()}
+                           onChange={e => setShowSilkscreen(e.target.checked)}/>
+                    Silkscreen
+                </label>
 
-            <label>
-                <input type="checkbox"
-                       checked={showSoldermask()}
-                       onChange={e => setShowSoldermask(e.target.checked)}/>
-                Soldermask
-            </label>
+                <label>
+                    <input type="checkbox"
+                           checked={showSoldermask()}
+                           onChange={e => setShowSoldermask(e.target.checked)}/>
+                    Soldermask
+                </label>
 
-            <label>
-                <input type="checkbox"
-                       checked={showDrills()}
-                       onChange={e => setShowDrills(e.target.checked)}/>
-                Drills
-            </label>
+                <label>
+                    <input type="checkbox"
+                           checked={showDrills()}
+                           onChange={e => setShowDrills(e.target.checked)}/>
+                    Drills
+                </label>
 
-            <label>
-                <input type="checkbox"
-                       checked={showGrid()}
-                       onChange={e => setShowGrid(e.target.checked)}/>
-                Grid
-            </label>
+                <label>
+                    <input type="checkbox"
+                           checked={showGrid()}
+                           onChange={e => setShowGrid(e.target.checked)}/>
+                    Grid
+                </label>
 
-            <label title={"Yellow will be the alignment hole itself, pink will be the actual location, white will be the calculated location"}>
-                <input type="checkbox"
-                       checked={showAlignmentHolesDebug()}
-                       onChange={e => setShowAlignmentHolesDebug(e.target.checked)}/>
-                Debug alignment holes
-            </label>
-        </div>
-    </div>;
+                <label
+                    title={"Yellow will be the alignment hole itself, pink will be the actual location, white will be the calculated location"}>
+                    <input type="checkbox"
+                           checked={showAlignmentHolesDebug()}
+                           onChange={e => setShowAlignmentHolesDebug(e.target.checked)}/>
+                    Debug alignment holes
+                </label>
+            </div>
+        </div>)
+    }
 }
 
-export default Canvas;
+export default createCanvas;

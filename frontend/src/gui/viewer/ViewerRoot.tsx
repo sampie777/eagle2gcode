@@ -1,6 +1,6 @@
 import {Component, createSignal} from "solid-js";
 import {useProject} from "../ProjectContext.ts";
-import Canvas from "./Canvas.tsx";
+import createCanvas from "./Canvas.tsx";
 import './style.less'
 import GcodeSettings from "./flatcam/GcodeSettings.tsx";
 import {ScreenProps} from "../../logic/screens.ts";
@@ -28,6 +28,8 @@ const ViewerRoot: Component<Props> = (props) => {
             .replace(/[_.\-]/g, " ")
     }
 
+    const {rerender, Canvas} = createCanvas({showProfile: showProfile});
+
     return <div class={"Viewer"}>
         {!showChecklist() ? null : <Checklist close={() => setShowChecklist(false)}/>}
 
@@ -35,11 +37,12 @@ const ViewerRoot: Component<Props> = (props) => {
         <small>{dimensions.width.toFixed(1)} x {dimensions.height.toFixed(1)} mm</small>
 
         <div class={"container"}>
-            <Canvas showProfile={showProfile}/>
+            <Canvas />
 
             <GcodeSettings showProfile={showProfile}
                            setShowProfile={setShowProfile}
                            onBack={props.onBack}
+                           requestRender={rerender}
                            showChecklist={() => setShowChecklist(true)}/>
         </div>
     </div>;
