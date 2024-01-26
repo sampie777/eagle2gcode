@@ -33,6 +33,7 @@ export namespace Graphics {
         showDrills: boolean,
         showGrid: boolean,
         showAlignmentHolesDebug: boolean,
+        showOffsetDrillHolesDebug: boolean,
     };
 
     const requestRender = (renderer: WebGLRenderer, scene: Scene, camera: PerspectiveCamera, controls?: OrbitControls) =>
@@ -89,6 +90,15 @@ export namespace Graphics {
         config.drills.offset.forEach(it => scene.add(defaultCircle(it.original, 2, 0xffff00, 4)))
     }
 
+    function drawOffsetDrillHoles(scene: Scene, project: Project) {
+        const {config} = useConfig()
+        precalculateRotation(config.drills)
+
+        project.drills
+            .map(it => getLocationForDrill(config.drills, it))
+            .forEach(it => scene.add(defaultCircle(it, 1, 0x777777, 4)))
+    }
+
     const update = (scene: Scene,
                     camera: PerspectiveCamera,
                     project: Project,
@@ -134,6 +144,9 @@ export namespace Graphics {
 
         drawBoard(scene, project.board, config.boardOpacity)
 
+        if (config.showOffsetDrillHolesDebug) {
+            drawOffsetDrillHoles(scene, project);
+        }
         if (config.showAlignmentHolesDebug) {
             drawAlignmentHoles(scene, project);
         }

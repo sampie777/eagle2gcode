@@ -16,6 +16,7 @@ const createCanvas = (props: Props) => {
     const [showDrills, setShowDrills] = createSignal(true);
     const [showGrid, setShowGrid] = createSignal(true);
     const [showAlignmentHolesDebug, setShowAlignmentHolesDebug] = createSignal(false);
+    const [showOffsetDrillHolesDebug, setShowOffsetDrillHolesDebug] = createSignal(false);
     const {project} = useProject();
     const {canvas, update} = Graphics.start({width: 1300, height: 600});
 
@@ -33,6 +34,7 @@ const createCanvas = (props: Props) => {
             showDrills: showDrills(),
             showGrid: showGrid(),
             showAlignmentHolesDebug: showAlignmentHolesDebug(),
+            showOffsetDrillHolesDebug: showOffsetDrillHolesDebug(),
         })
     }
 
@@ -93,6 +95,13 @@ const createCanvas = (props: Props) => {
                            checked={showAlignmentHolesDebug()}
                            onChange={e => setShowAlignmentHolesDebug(e.target.checked)}/>
                     Debug alignment holes
+                </label>
+
+                <label>
+                    <input type="checkbox"
+                           checked={showOffsetDrillHolesDebug()}
+                           onChange={e => setShowOffsetDrillHolesDebug(e.target.checked)}/>
+                    Debug offset drill holes
                 </label>
             </div>
         </div>)
