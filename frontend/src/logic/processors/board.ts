@@ -14,7 +14,11 @@ Element.prototype.getAttributeInt = function (name: string): number | null {
 
 const rotationToNumber = (value: string | null): number | null => {
     if (value == null) return null;
-    const [_, direction, amount] = value.match(/^([LR])(\d+)$/)
+
+    const match = value.match(/^([LR])(\d+)$/)
+    if (match == null) return null;
+
+    const [_, direction, amount] = match;
     return +amount / 360 * (direction == "R" ? 1 : -1);
 }
 
