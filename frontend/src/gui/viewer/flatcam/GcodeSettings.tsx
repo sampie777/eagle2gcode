@@ -71,12 +71,12 @@ const GcodeSettings: Component<Props> = (props) => {
                 <p>Insert the actual location of the alignment holes, according to your printer.</p>
                 {config.drills.offset.map((it, i) => <>
                     <strong>Hole #{i + 1}</strong>
-                    <SettingNumber label={"Offset X"} defaultValue={it.actual.x} step={0.1}
+                    <SettingNumber label={"Offset X"} defaultValue={+it.actual.x.toFixed(3)} step={0.1}
                                    onChange={(value) => {
                                        config.drills.offset[i].actual.x = value;
                                        props.requestRender();
                                    }}/>
-                    <SettingNumber label={"Offset Y"} defaultValue={it.actual.y} step={0.1}
+                    <SettingNumber label={"Offset Y"} defaultValue={+it.actual.y.toFixed(3)} step={0.1}
                                    onChange={(value) => {
                                        config.drills.offset[i].actual.y = value;
                                        props.requestRender();
@@ -97,12 +97,12 @@ const GcodeSettings: Component<Props> = (props) => {
                 <p>Insert the actual location of the alignment holes, according to your printer.</p>
                 {config.silkscreen.offset.map((it, i) => <>
                     <strong>Hole #{i + 1}</strong>
-                    <SettingNumber label={"Offset X"} defaultValue={it.actual.x} step={0.1}
+                    <SettingNumber label={"Offset X"} defaultValue={+it.actual.x.toFixed(3)} step={0.1}
                                    onChange={(value) => {
                                        config.silkscreen.offset[i].actual.x = value;
                                        props.requestRender();
                                    }}/>
-                    <SettingNumber label={"Offset Y"} defaultValue={it.actual.y} step={0.1}
+                    <SettingNumber label={"Offset Y"} defaultValue={+it.actual.y.toFixed(3)} step={0.1}
                                    onChange={(value) => {
                                        config.silkscreen.offset[i].actual.y = value;
                                        props.requestRender();
