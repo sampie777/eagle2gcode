@@ -1,4 +1,4 @@
-import {Component, createEffect, createSignal} from "solid-js";
+import {createEffect, createSignal} from "solid-js";
 import {useProject} from "../ProjectContext.ts";
 import {Graphics} from "../../logic/graphics/graphics.ts";
 import {Accessor} from "solid-js/types/reactive/signal";
@@ -10,7 +10,8 @@ type Props = {
 
 const createCanvas = (props: Props) => {
     const [boardOpacity, setBoardOpacity] = createSignal(0);
-    const [showTraces, setShowTraces] = createSignal(true);
+    const [showTopTraces, setShowTopTraces] = createSignal(true);
+    const [showBottomTraces, setShowBottomTraces] = createSignal(true);
     const [showSilkscreen, setShowSilkscreen] = createSignal(true);
     const [showSoldermask, setShowSoldermask] = createSignal(true);
     const [showDrills, setShowDrills] = createSignal(true);
@@ -28,7 +29,8 @@ const createCanvas = (props: Props) => {
         update(project, {
             boardOpacity: boardOpacity(),
             showProfile: props.showProfile(),
-            showTraces: showTraces(),
+            showTopTraces: showTopTraces(),
+            showBottomTraces: showBottomTraces(),
             showSilkscreen: showSilkscreen(),
             showSoldermask: showSoldermask(),
             showDrills: showDrills(),
@@ -56,9 +58,16 @@ const createCanvas = (props: Props) => {
 
                 <label>
                     <input type="checkbox"
-                           checked={showTraces()}
-                           onChange={e => setShowTraces(e.target.checked)}/>
-                    Traces
+                           checked={showTopTraces()}
+                           onChange={e => setShowTopTraces(e.target.checked)}/>
+                    Traces (top)
+                </label>
+
+                <label>
+                    <input type="checkbox"
+                           checked={showBottomTraces()}
+                           onChange={e => setShowBottomTraces(e.target.checked)}/>
+                    Traces (bottom)
                 </label>
 
                 <label>

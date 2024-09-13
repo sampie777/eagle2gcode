@@ -27,7 +27,8 @@ export namespace Graphics {
     type RenderConfig = {
         boardOpacity: number,
         showProfile: boolean,
-        showTraces: boolean,
+        showTopTraces: boolean,
+        showBottomTraces: boolean,
         showSilkscreen: boolean,
         showSoldermask: boolean,
         showDrills: boolean,
@@ -125,9 +126,11 @@ export namespace Graphics {
         if (config.showProfile) {
             drawDefaultLines(scene, project.profile, 0x88763e)
         }
-        if (config.showTraces) {
-            drawDefaultLines(scene, project.traces_top, 0xa00909)
+        if (config.showBottomTraces) {
             drawDefaultLines(scene, project.traces_bottom, 0xa00909)
+        }
+        if (config.showTopTraces) {
+            drawDefaultLines(scene, project.traces_top, 0xa04909)
         }
         if (config.showSilkscreen) {
             drawDefaultLines(scene, project.silkscreen_top, 0x9f9f9f)
