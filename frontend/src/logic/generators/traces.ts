@@ -51,7 +51,8 @@ const generateContinuousTrace = (trace: Trace, config: TraceConfig) => {
 
 const generateTraces = (traces: Trace[], config: TraceConfig) => {
     return traces
-        .filter(it => it.length > 0)
+        .map(trace => trace.filter(it => it.enabled))
+        .filter(it => it.length > 1)
         .map(trace => {
             const canBeContinuous = trace[0].x == trace[trace.length - 1].x && trace[0].y == trace[trace.length - 1].y;
             const gcode = canBeContinuous

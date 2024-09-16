@@ -1,4 +1,4 @@
-import {Location, Trace} from "../types/gcode.ts";
+import { Location, Trace } from "../types/gcode.ts";
 
 export const processTraces = (content: string): Trace[] => {
     const result: Trace[] = [];
@@ -15,6 +15,7 @@ export const processTraces = (content: string): Trace[] => {
 
         result.pop();
         result[result.length - 1].push({
+            enabled: true,
             x: lastLocation.x,
             y: lastLocation.y,
         })
@@ -23,6 +24,7 @@ export const processTraces = (content: string): Trace[] => {
     const processMoveCommand = (line: string) => {
         if (result.length > 0 && lastLocation != undefined) {
             result[result.length - 1].push({
+                enabled: true,
                 x: lastLocation.x,
                 y: lastLocation.y,
             })
@@ -30,8 +32,11 @@ export const processTraces = (content: string): Trace[] => {
             mergeTracesIfPossible();
         }
 
-        const [_, x, y] = line.match(/^G0[01] X([0-9.]+)Y([0-9.]+)$/)
-        lastLocation = {x: +x, y: +y};
+        const match = line.match(/^G0[01] X(-?[0-9.]+)Y(-?[0-9.]+)$/)
+        if (match == null) throw new Error(`Could not process line due to unknown structure: '${line}'`)
+
+        const [_, x, y] = match;
+        lastLocation = { x: +x, y: +y };
     }
 
     const useNewTrace = (line: string) => {

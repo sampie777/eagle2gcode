@@ -11,8 +11,10 @@ import {
 } from "../../../logic/generators/drills.ts";
 import {Accessor, Setter} from "solid-js/types/reactive/signal";
 import {emptyConfig, useConfig} from "../../ConfigContext.ts";
-import {getProjectAlignmentDrills} from "../../../logic/processors/project.ts";
+import { getProjectAlignmentDrills, setTracesVisibility } from "../../../logic/processors/project.ts";
 import {generateCopperFile, generateSilkscreenFile} from "../../../logic/generators/traces.ts";
+import SettingCombo from "../../components/settings/SettingCombo.tsx";
+import { OutOfBoundsOption } from "../../../logic/types/gcode.ts";
 
 type Props = {
     onBack?: () => void
@@ -93,6 +95,15 @@ const GcodeSettings: Component<Props> = (props) => {
         </SettingsContainer>
 
         <SettingsContainer name={"Silkscreen"}>
+            <SettingCombo label={"Out of bounds"}
+                          values={Object.values(OutOfBoundsOption)}
+                          defaultValue={config.silkscreen.outOfBounds}
+                          onChange={(value) => {
+                              onChange("silkscreen.outOfBounds", value)
+                              setTracesVisibility(project, config)
+                              props.requestRender()
+                          }}/>
+
             <SettingsContainer name={"Offset calculation"} visible={true}>
                 <p>Insert the actual location of the alignment holes, according to your printer.</p>
                 {config.silkscreen.offset.map((it, i) => <>

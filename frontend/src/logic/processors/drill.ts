@@ -8,7 +8,10 @@ export const processDrillFile = (content: string): Drill[] => {
     let lastTool = "";
 
     const storeFactor = (line: string) => {
-        const [_, unit, tz, factor] = line.match(/^(.+),(.+),(.+)$/)
+        const match = line.match(/^(.+),(.+),(.+)$/)
+        if (match == null) throw new Error(`Could not process line due to unknown structure: '${line}'`)
+
+        const [_, unit, tz, factor] = match;
         unitFactor = 1 / Math.pow(10, factor.split(".")[1].length);
         if (unit.toLowerCase() != "metric") {
             unitFactor /= 39.3701;  // mil to mm
@@ -16,12 +19,18 @@ export const processDrillFile = (content: string): Drill[] => {
     }
 
     const storeNewTool = (line: string) => {
-        const [_, tool, size] = line.match(/^T(\d+)C(.*?)$/)
+        const match = line.match(/^T(\d+)C(.*?)$/)
+        if (match == null) throw new Error(`Could not process line due to unknown structure: '${line}'`)
+
+        const [_, tool, size] = match;
         toolSizes[tool] = +size;
     }
 
     const useNewLocation = (line: string) => {
-        const [_, x, y] = line.match(/^X(\d+)Y(\d+)$/)
+        const match = line.match(/^X(-?\d+)Y(-?\d+)$/)
+        if (match == null) throw new Error(`Could not process line due to unknown structure: '${line}'`)
+
+        const [_, x, y] = match;
         lastLocation = {x: +x * unitFactor, y: +y * unitFactor};
 
         result.push({
@@ -32,7 +41,10 @@ export const processDrillFile = (content: string): Drill[] => {
     }
 
     const useNewTool = (line: string) => {
-        const [_, tool] = line.match(/^T(\d+)$/)
+        const match = line.match(/^T(\d+)$/)
+        if (match == null) throw new Error(`Could not process line due to unknown structure: '${line}'`)
+
+        const [_, tool] = match;
         lastTool = tool;
     }
 

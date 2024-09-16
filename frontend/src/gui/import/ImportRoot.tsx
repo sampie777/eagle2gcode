@@ -35,8 +35,18 @@ const ImportRoot: Component<Props> = (props) => {
             upload.status = "reading";
             setUploads(prev => [...prev])
 
-            upload.content = (await upload.file.text()).replace(/\r/g, "")
-            console.log("result", upload.file.name, Upload.processFile(project, upload.file.name, upload.content))
+            try {
+                upload.content = (await upload.file.text()).replace(/\r/g, "")
+
+                try {
+                    const result = Upload.processFile(project, upload.file.name, upload.content);
+                    console.log("result", upload.file.name, result)
+                } catch (error) {
+                    alert(`Error during processing of file '${upload.file.name}':\n\n${error}`)
+                }
+            } catch (error) {
+                alert(`Error during reading of file '${upload.file.name}':\n\n${error}`)
+            }
 
             upload.status = "done"
             setUploads(prev => [...prev])

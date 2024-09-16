@@ -1,5 +1,5 @@
 import {createContext, useContext} from "solid-js";
-import {GcodeConfig} from "../logic/types/gcode.ts";
+import { GcodeConfig, OutOfBoundsOption } from "../logic/types/gcode.ts";
 import {Persistency} from "../logic/utils/persistency.ts";
 
 export const emptyConfig = (): GcodeConfig => ({
@@ -19,6 +19,7 @@ export const emptyConfig = (): GcodeConfig => ({
         feedRateUp: 50,
     },
     silkscreen: {
+        outOfBounds: OutOfBoundsOption.Hide,
         offset: [],
         scalingFactor: 1,
         rotationAngle: 0,
@@ -42,6 +43,7 @@ const loadConfig = (to: GcodeConfig, from: GcodeConfig | null | undefined) => {
     to.drills.feedRateDrill = from.drills.feedRateDrill
     to.drills.feedRateUp = from.drills.feedRateUp
 
+    to.silkscreen.outOfBounds = from.silkscreen.outOfBounds
     to.silkscreen.offset = [...from.silkscreen.offset]
     to.silkscreen.scalingFactor = from.silkscreen.scalingFactor
     to.silkscreen.rotationAngle = from.silkscreen.rotationAngle

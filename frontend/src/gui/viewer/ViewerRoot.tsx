@@ -4,7 +4,7 @@ import createCanvas from "./Canvas.tsx";
 import './style.less'
 import GcodeSettings from "./flatcam/GcodeSettings.tsx";
 import {ScreenProps} from "../../logic/screens.ts";
-import {getProjectDimensions} from "../../logic/processors/project.ts";
+import { getProjectDimensions, setTracesVisibility } from "../../logic/processors/project.ts";
 import {useConfig} from "../ConfigContext.ts";
 import Checklist from "../checklist/Checklist.tsx";
 
@@ -15,6 +15,8 @@ const ViewerRoot: Component<Props> = (props) => {
     const {project} = useProject();
     const [showProfile, setShowProfile] = createSignal(config.traces.cutoutProfile);
     const [showChecklist, setShowChecklist] = createSignal(false);
+
+    setTracesVisibility(project, config)
     project.isLoaded = true;
 
     console.log(project)

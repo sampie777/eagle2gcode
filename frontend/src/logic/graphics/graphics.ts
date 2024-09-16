@@ -171,17 +171,19 @@ export namespace Graphics {
     }
 
     const drawDefaultLines = (scene: Scene, traces: Trace[], color: ColorRepresentation) => {
-        traces.forEach(it => scene.add(drawTrace(it, color)))
+        traces.forEach(trace => {
+          const lines = drawTrace(trace.filter(it => it.enabled), color);
+          if (!lines) return
+          return scene.add(lines);
+        })
     }
 
     const drawTrace = (trace: Trace, color: ColorRepresentation) => {
-        if (trace.length == 0) return;
+        if (trace.length < 2) return;
 
         const shape = new Shape();
         shape.moveTo(trace[0].x, trace[0].y)
-        trace.forEach(wire => {
-            shape.lineTo(wire.x, wire.y);
-        })
+        trace.forEach(wire => shape.lineTo(wire.x, wire.y))
 
         const geometry = new BufferGeometry().setFromPoints(shape.getPoints())
         const material = new LineBasicMaterial({color: color, linewidth: 20});

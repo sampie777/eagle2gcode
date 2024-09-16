@@ -1,5 +1,5 @@
 import {Dimension, Project} from "../types/project.ts";
-import {Trace, Location} from "../types/gcode.ts";
+import { Trace, Location, OutOfBoundsOption, GcodeConfig } from "../types/gcode.ts";
 import {Drill} from "../types/cam.ts";
 import {length} from "../utils/math.ts";
 
@@ -66,4 +66,20 @@ export const getProjectAlignmentDrills = (project: Project): Drill[] => {
     if (leftMostHole == undefined || rightMostHole == undefined) return [];
 
     return [leftMostHole, rightMostHole];
+}
+
+export const setTracesVisibility = (project: Project, config: GcodeConfig) => {
+    const process = (traces: Trace[]) => traces.forEach(trace => {
+        if (config.silkscreen.outOfBounds == OutOfBoundsOption.Ignore) {
+            trace.forEach(it => it.enabled = true)
+        } else if (config.silkscreen.outOfBounds == OutOfBoundsOption.Hide) {
+            const isOutOfBounds = trace.some(it => it.x < 0 || it.y < 0)
+            trace.forEach(it => it.enabled = !isOutOfBounds)
+        } else if (config.silkscreen.outOfBounds == OutOfBoundsOption.Crop) {
+            trace.forEach(it => it.enabled = it.x >= 0 && it.y >= 0)
+        }
+    })
+
+    process(project.silkscreen_top)
+    process(project.silkscreen_bottom)
 }

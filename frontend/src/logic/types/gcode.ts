@@ -3,7 +3,13 @@ export type Location = {
     y: number,
 }
 
-export type Trace = Location[]
+export type Trace = ({ enabled: boolean } & Location)[]
+
+export enum OutOfBoundsOption {
+    Ignore = "Ignore",
+    Hide = "Hide",
+    Crop = "Crop",
+}
 
 export type Alignment = {
     offset: {
@@ -29,6 +35,7 @@ export type DrillConfig = {
 } & Alignment;
 
 export type SilkscreenConfig = {
+    outOfBounds: OutOfBoundsOption,
     feedRate: number,
     iterations: number,
 } & Alignment;

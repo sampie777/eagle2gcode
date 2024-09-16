@@ -9,12 +9,18 @@ export const processGerberFile = (content: string): GerberCommand[] => {
     let lastAperture: Aperture | undefined;
 
     const useNewAperture = (line: string) => {
-        const [_, id] = line.match(/^D(\d+)\*/);
+        const match = line.match(/^D(\d+)\*/);
+        if (match == null) throw new Error(`Could not process line due to unknown structure: '${line}'`)
+
+        const [_, id] = match;
         lastAperture = config.apertures[id];
     }
 
     const useNewLocation = (line: string) => {
-        const [_, x, y, operation] = line.match(/^X(\d+)Y(\d+)D(\d+)\*/)
+        const match = line.match(/^X(-?\d+)Y(-?\d+)D(\d+)\*/)
+        if (match == null) throw new Error(`Could not process line due to unknown structure: '${line}'`)
+
+        const [_, x, y, operation] = match;
         const lastLocation = {x: +x * config.unitFactor, y: +y * config.unitFactor};
 
         if (lastAperture === undefined) {

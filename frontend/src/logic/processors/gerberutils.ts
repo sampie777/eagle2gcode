@@ -52,7 +52,10 @@ export namespace Gerber {
         let unitDecimalFactor = 1 / 1000;
 
         const storeUnit = (line: string) => {
-            const [_, unit] = line.match(/^MO(.*)\*/)
+            const match = line.match(/^MO(.*)\*/)
+            if (match == null) throw new Error(`Could not process line due to unknown structure: '${line}'`)
+
+            const [_, unit] = match;
             if (unit.toLowerCase() == "mm") {
                 unitFactor = 1;
             } else {
@@ -61,12 +64,18 @@ export namespace Gerber {
         }
 
         const storeFactor = (line: string) => {
-            const [_, factor] = line.match(/^FS..X\d(\d)/)
+            const match = line.match(/^FS..X\d(\d)/)
+            if (match == null) throw new Error(`Could not process line due to unknown structure: '${line}'`)
+
+            const [_, factor] = match;
             unitDecimalFactor = 1 / Math.pow(10, +factor)
         }
 
         const storeAperture = (line: string) => {
-            const [_, id, shape, _dimensions] = line.match(/^ADD(\d+)([A-Z]),(.*)\*/)
+            const match = line.match(/^ADD(\d+)([A-Z]),(.*)\*/)
+            if (match == null) throw new Error(`Could not process line due to unknown structure: '${line}'`)
+
+            const [_, id, shape, _dimensions] = match;
             const dimensions = _dimensions.split("X");
 
             apertures[id] = apertureToAperture(shape, dimensions);
