@@ -22,10 +22,10 @@ const createCanvas = () => {
         // Trigger on change of one of the following:
         [
             config.traces.cutoutProfile,
-            config.drills.offset[0].actual.x,
-            config.drills.offset[0].actual.y,
-            config.silkscreen.offset[0].actual.x,
-            config.silkscreen.offset[0].actual.y,
+            ...config.drills.offset.map(it => it.actual.x),
+            ...config.drills.offset.map(it => it.actual.y),
+            ...config.silkscreen.offset.map(it => it.actual.x),
+            ...config.silkscreen.offset.map(it => it.actual.y),
             config.silkscreen.outOfBounds,
         ].forEach(() => null)
         renderProject();
