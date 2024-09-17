@@ -82,7 +82,8 @@ export const getDurationForTraces = (traces: Trace[], config: {
   iterations: number,
 }) => {
   // Constant calculated based on real data (41 minutes for 40 iterations of a 1026.8 mm length project) with a feed rate of 1400
-  const SECONDS_PER_MM = (41 * 60) / 40 / 1026.8;
+  const SECONDS_PER_MM = (41 * 60) / (40 * 1026.8 + 183.0);
+  // const SECONDS_PER_MM = (62 * 60) / (40 * 1743.5 + 263.1);
   const FEED_RATE_FACTOR = 1400 / Math.max(1, config.feedRate);
 
   const tracesLength = traces.reduce((tracesTotal, currentTrace) =>
@@ -93,8 +94,22 @@ export const getDurationForTraces = (traces: Trace[], config: {
       return total + length;
     }, 0), 0);
 
-  const durationPerIteration = SECONDS_PER_MM * FEED_RATE_FACTOR * tracesLength;
-  const totalDuration = durationPerIteration * config.iterations;
+  const travelLength = traces
+    .filter(it => it.length > 0)
+    .reduce((total, current, index) => {
+      const currentLocation = current[0];
+
+      let lastLocation: Location = {x: 0, y: 0}
+      if (index > 0) {
+        const previous = traces[index - 1];
+        lastLocation = previous[previous.length - 1]
+      }
+
+      const length = Math.sqrt(Math.pow(currentLocation.x - lastLocation.x, 2) + Math.pow(currentLocation.y - lastLocation.y, 2))
+      return total + length;
+    }, 0);
+
+  const totalDuration = SECONDS_PER_MM * FEED_RATE_FACTOR * (tracesLength * config.iterations + travelLength);
 
   const hours = Math.floor(totalDuration / 3600)
   const minutes = Math.ceil((totalDuration - hours * 3600) / 60)
