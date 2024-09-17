@@ -123,19 +123,23 @@ const GcodeSettings: Component<Props> = (props) => {
                      onChange={(value) => onChangeSilkscreen({ iterations: value })} />
     </SettingsContainer>
 
-        <div class={"files"}>
-            <h4>Download the gCode files:</h4>
-            <DownloadButton content={() => generateCopperFile(project, "top", config.traces)}
-                            fileName={Gcode.outputFileNames.etching_top} text={"Traces top"}/>
-            <DownloadButton content={() => generateCopperFile(project, "bottom", config.traces)}
-                            fileName={Gcode.outputFileNames.etching_bottom} text={"Traces bottom"}/>
-            <DownloadButton content={() => generateDrillFile(project, config.drills)}
-                            fileName={Gcode.outputFileNames.drills_top} text={"Drills top"}/>
-            <DownloadButton content={() => generateSilkscreenFile(project, "top", config.silkscreen)}
-                            fileName={Gcode.outputFileNames.silkscreen_top} text={"Silkcreen top"}/>
-            <DownloadButton content={() => generateSilkscreenFile(project, "bottom", config.silkscreen)}
-                            fileName={Gcode.outputFileNames.silkscreen_bottom} text={"Silkscreen bottom"}/>
-        </div>
+    <div class={"files"}>
+      <h4>Download the gCode files:</h4>
+      <DownloadButton content={() => generateCopperFile(project, "top", config.traces)}
+                      fileName={Gcode.outputFileNames.etching_top}
+                      text={`Traces top (${getDurationForTraces([...(config.traces.cutoutProfile ? project.profile : []), ...project.traces_top], config.traces)})`} />
+      <DownloadButton content={() => generateCopperFile(project, "bottom", config.traces)}
+                      fileName={Gcode.outputFileNames.etching_bottom}
+                      text={`Traces bottom (${getDurationForTraces([...(config.traces.cutoutProfile ? project.profile : []), ...project.traces_bottom], config.traces)})`} />
+      <DownloadButton content={() => generateDrillFile(project, config.drills)}
+                      fileName={Gcode.outputFileNames.drills_top} text={"Drills top"} />
+      <DownloadButton content={() => generateSilkscreenFile(project, "top", config.silkscreen)}
+                      fileName={Gcode.outputFileNames.silkscreen_top}
+                      text={`Silkcreen top (${getDurationForTraces(project.silkscreen_top, config.silkscreen)})`} />
+      <DownloadButton content={() => generateSilkscreenFile(project, "bottom", config.silkscreen)}
+                      fileName={Gcode.outputFileNames.silkscreen_bottom}
+                      text={`Silkscreen bottom (${getDurationForTraces(project.silkscreen_bottom, config.silkscreen)})`} />
+    </div>
 
     <div class={"actions"}>
       <button onClick={props.onBack}>Back</button>

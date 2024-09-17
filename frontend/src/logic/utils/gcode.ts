@@ -76,3 +76,28 @@ export const calculateOffsetForPoint = (alignment: Alignment, point: Location): 
     y: scaledOffsetPoint.y + a2.y,
   }
 }
+
+export const getDurationForTraces = (traces: Trace[], config: {
+  feedRate: number,
+  iterations: number,
+}) => {
+  // Constant calculated based on real data (41 minutes for 40 iterations of a 1026.8 mm length project) with a feed rate of 1400
+  const SECONDS_PER_MM = (41 * 60) / 40 / 1026.8;
+  const FEED_RATE_FACTOR = 1400 / Math.max(1, config.feedRate);
+
+  const tracesLength = traces.reduce((tracesTotal, currentTrace) =>
+    tracesTotal + currentTrace.reduce((total, current, index) => {
+      if (index == 0) return 0;
+      const previous = currentTrace[index - 1];
+      const length = Math.sqrt(Math.pow(current.x - previous.x, 2) + Math.pow(current.y - previous.y, 2))
+      return total + length;
+    }, 0), 0);
+
+  const durationPerIteration = SECONDS_PER_MM * FEED_RATE_FACTOR * tracesLength;
+  const totalDuration = durationPerIteration * config.iterations;
+
+  const hours = Math.floor(totalDuration / 3600)
+  const minutes = Math.ceil((totalDuration - hours * 3600) / 60)
+
+  return `${hours}:${minutes.toString().padStart(2, "0")}`;
+};
