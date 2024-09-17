@@ -21,6 +21,7 @@ const checklist = (): Checklist => [
         title: "Etch preparation",
         items: [
             {text: "Saw the board. Leave an extra 1 mm spacing on each side."},
+            {text: "With a permanent marker, put a small marking on the non copper side of the board in the corner so you will remember it's alignment when inserting it into the clamp of the printer."},
             {text: "Clean the board with alcohol."},
             {text: "Cover the board with ink from a permanent marker."},
             {text: "Mount scratcher tool on printer."},
@@ -48,7 +49,7 @@ const checklist = (): Checklist => [
         ]
     },
     {
-        title: "Drilling preparation",
+        title: "[AUTO] Drilling preparation (see manual method below)",
         items: [
             {text: "Fit Dremel drill on the printer."},
             {text: "Secure the board in the clamp with copper side up."},
@@ -64,7 +65,7 @@ const checklist = (): Checklist => [
         ]
     },
     {
-        title: "Drilling",
+        title: "[AUTO] Drilling",
         items: [
             {text: "Align print head Z-axis with board surface by adjusting the Z end-stop."},
             {
@@ -77,6 +78,19 @@ const checklist = (): Checklist => [
             {text: "Turn off Dremel tool."},
             {text: "Secure Z-stop back in place."},
             {text: "Remove tape from board."},
+        ]
+    },
+    {
+        title: "[MANUAL] Drilling",
+        items: [
+            {text: "First, punch small holes in the center of each pad where it must be drilled. This will help align the drill bit during drilling."},
+            {text: "Mount the Dremel tool in your column drill."},
+            {text: "Set the Dremel tool speed to 10."},
+            {text: "Mount the correct size drill bit in the tool."},
+            {text: "Manually drill each hole."},
+            {text: "Turn off Dremel tool."},
+            {text: "Remove drill bit."},
+            {text: "Repeat process for each drill size."},
         ]
     },
     {
