@@ -1,3 +1,6 @@
+import { calculateRotation } from "./gcode";
+import { Alignment } from "../types/gcode";
+
 export const delay = async (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const getFileExtension = (file: string) => {
@@ -20,4 +23,13 @@ export const capitalize = (word: string) => {
     }
 
     return word.charAt(0).toUpperCase() + word.substring(1);
+}
+
+export const getConfigWithRotation = <T>(config: T & Alignment): T & Alignment=> {
+    const { scalingFactor, rotationAngle } = calculateRotation(config.offset)
+    return {
+        ...config,
+        scalingFactor: scalingFactor,
+        rotationAngle: rotationAngle
+    };
 }

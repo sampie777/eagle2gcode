@@ -1,14 +1,10 @@
 import {createEffect, createSignal} from "solid-js";
-import {useProject} from "../ProjectContext.ts";
-import {Graphics} from "../../logic/graphics/graphics.ts";
-import {Accessor} from "solid-js/types/reactive/signal";
+import {useProject} from "../ProjectContext";
+import {Graphics} from "../../logic/graphics/graphics";
 import {AiOutlineReload} from "solid-icons/ai";
+import { useConfig } from "../ConfigContext";
 
-type Props = {
-    showProfile: Accessor<boolean>
-}
-
-const createCanvas = (props: Props) => {
+const createCanvas = () => {
     const [boardOpacity, setBoardOpacity] = createSignal(0);
     const [showTopTraces, setShowTopTraces] = createSignal(true);
     const [showBottomTraces, setShowBottomTraces] = createSignal(true);
@@ -19,16 +15,26 @@ const createCanvas = (props: Props) => {
     const [showAlignmentHolesDebug, setShowAlignmentHolesDebug] = createSignal(false);
     const [showOffsetDrillHolesDebug, setShowOffsetDrillHolesDebug] = createSignal(false);
     const {project} = useProject();
+    const {config} = useConfig();
     const {canvas, update} = Graphics.start({width: 1300, height: 600});
 
     createEffect(() => {
+        // Trigger on change of one of the following:
+        [
+            config.traces.cutoutProfile,
+            config.drills.offset[0].actual.x,
+            config.drills.offset[0].actual.y,
+            config.silkscreen.offset[0].actual.x,
+            config.silkscreen.offset[0].actual.y,
+            config.silkscreen.outOfBounds,
+        ].forEach(() => null)
         renderProject();
     })
 
     const renderProject = () => {
         update(project, {
             boardOpacity: boardOpacity(),
-            showProfile: props.showProfile(),
+            showProfile: true,
             showTopTraces: showTopTraces(),
             showBottomTraces: showBottomTraces(),
             showSilkscreen: showSilkscreen(),
@@ -37,7 +43,7 @@ const createCanvas = (props: Props) => {
             showGrid: showGrid(),
             showAlignmentHolesDebug: showAlignmentHolesDebug(),
             showOffsetDrillHolesDebug: showOffsetDrillHolesDebug(),
-        })
+        }, config)
     }
 
     return {

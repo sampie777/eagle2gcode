@@ -1,5 +1,5 @@
-import {Project} from "../types/project.ts";
-import {GcodeConfig} from "../types/gcode.ts";
+import {Project} from "../types/project";
+import {GcodeConfig} from "../types/gcode";
 
 export namespace Persistency {
     type All = {

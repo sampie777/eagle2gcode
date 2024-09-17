@@ -1,4 +1,4 @@
-import {Location} from "./gcode.ts";
+import {Location} from "./gcode";
 
 export type Point = {
     x: number,

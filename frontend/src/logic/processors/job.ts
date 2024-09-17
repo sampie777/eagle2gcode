@@ -1,4 +1,4 @@
-import {Job} from "../types/cam.ts";
+import {Job} from "../types/cam";
 
 type GerberJob = {
     Header: {

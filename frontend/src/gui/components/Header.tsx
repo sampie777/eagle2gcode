@@ -1,10 +1,10 @@
 import {Component} from "solid-js";
-import {emptyProject, useProject} from "../ProjectContext.ts";
-import {useConfig} from "../ConfigContext.ts";
-import {Persistency} from "../../logic/utils/persistency.ts";
+import {emptyProject, useProject} from "../ProjectContext";
+import {useConfig} from "../ConfigContext";
+import {Persistency} from "../../logic/utils/persistency";
 import './Header.less';
 import {AiOutlineReload, AiOutlineSave} from "solid-icons/ai";
-import {useChecklist} from "../ChecklistContext.ts";
+import {useChecklist} from "../ChecklistContext";
 
 type Props = {
     onResetProject: () => void

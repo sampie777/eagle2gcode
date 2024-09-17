@@ -1,9 +1,10 @@
-import {Component, createSignal} from "solid-js";
+import { Component, createSignal, JSX } from "solid-js";
 import './style.less'
 
 type Props = {
     name: string
     visible?: boolean
+    children?: JSX.Element
 }
 
 const SettingsContainer: Component<Props> = (props) => {

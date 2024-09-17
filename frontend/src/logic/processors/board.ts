@@ -1,4 +1,4 @@
-import {Eagle} from "../types/eagle.ts";
+import {Eagle} from "../types/eagle";
 
 declare global {
     interface Element {

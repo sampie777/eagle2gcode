@@ -1,8 +1,9 @@
-import {Project} from "../types/project.ts";
-import {Drill} from "../types/cam.ts";
-import {DrillConfig} from "../types/gcode.ts";
-import {getProjectAlignmentDrills} from "../processors/project.ts";
-import {calculateOffsetForPoint, calculateRotation} from "../utils/gcode.ts";
+import {Project} from "../types/project";
+import {Drill} from "../types/cam";
+import {DrillConfig} from "../types/gcode";
+import {getProjectAlignmentDrills} from "../processors/project";
+import {calculateOffsetForPoint} from "../utils/gcode";
+import { getConfigWithRotation } from "../utils/utils";
 
 export const getLocationForDrill = (config: DrillConfig, drill: Drill) => {
     return calculateOffsetForPoint(config, drill)
@@ -19,23 +20,17 @@ const drillToGcode = (drill: Drill, config: DrillConfig): string => {
     ].join("\n")
 }
 
-export const precalculateRotation = (config: DrillConfig) => {
-    const {scalingFactor, rotationAngle} = calculateRotation(config.offset);
-    config.scalingFactor = scalingFactor
-    config.rotationAngle = rotationAngle
-}
-
 export const generateDrillFile = (project: Project, config: DrillConfig): string => {
     if (project.drills.length == 0) return "";
 
-    precalculateRotation(config);
+    const configWithRotation = getConfigWithRotation(config);
 
     const alignmentDrills = getProjectAlignmentDrills(project);
     return [
         "G21",
         "G90",
         "G94",
-        `G00 Z4.5000 F${config.feedRateMove}`,
+        `G00 Z4.5000 F${configWithRotation.feedRateMove}`,
         "G28",
         "G00 Z0.0000",
         "M300 S500 P500 ; Beep",
@@ -66,13 +61,13 @@ export const generateDrillFile = (project: Project, config: DrillConfig): string
         "M300 S500 P500 ; Beep",
         "G4 P1",
         ...alignmentDrills
-            .map(it => drillToGcode(it, config)),
+            .map(it => drillToGcode(it, configWithRotation)),
         ...project.drills
             .filter(it => !alignmentDrills.includes(it))
             .sort((a, b) => a.y - b.y)
             .sort((a, b) => a.x - b.x)
-            .map(it => drillToGcode(it, config)),
-        `G00 Z10.0000 F${config.feedRateMove}`,
+            .map(it => drillToGcode(it, configWithRotation)),
+        `G00 Z10.0000 F${configWithRotation.feedRateMove}`,
         "G00 X0.0000Y0.0000",
         "M300 S2000 P500 ; Beep end",
         "M05",

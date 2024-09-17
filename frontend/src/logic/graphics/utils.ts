@@ -1,6 +1,6 @@
 import {BufferGeometry, CircleGeometry, Line, LineBasicMaterial, MeshBasicMaterial, Scene, Vector3} from "three";
-import {Drill} from "../types/cam.ts";
-import {Location} from "../types/gcode.ts";
+import {Drill} from "../types/cam";
+import {Location} from "../types/gcode";
 
 export const drawDefaultCircle = (scene: Scene, inputs: Drill[]) => {
     inputs.forEach(it => {

@@ -1,4 +1,4 @@
-import { Location, Trace } from "../types/gcode.ts";
+import { Location, Trace } from "../types/gcode";
 
 export const processTraces = (content: string): Trace[] => {
     const result: Trace[] = [];

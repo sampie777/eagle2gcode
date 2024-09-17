@@ -1,13 +1,13 @@
 import {Component, createEffect, createSignal} from "solid-js";
-import SettingsContainer from "../components/settings/SettingsContainer.tsx";
-import SettingNumber from "../components/settings/SettingNumber.tsx";
-import {Flatcam} from "../../logic/flatcam.ts";
-import SettingString from "../components/settings/SettingString.tsx";
+import SettingsContainer from "../components/settings/SettingsContainer";
+import SettingNumber from "../components/settings/SettingNumber";
+import {Flatcam} from "../../logic/flatcam";
+import SettingString from "../components/settings/SettingString";
 import './style.less';
-import {ScreenProps} from "../../logic/screens.ts";
-import {getCookie, setCookie} from "../../logic/cookies.ts";
-import {useProject} from "../ProjectContext.ts";
-import {exampleProject} from "../../logic/example/project.ts";
+import {ScreenProps} from "../../logic/screens";
+import {getCookie, setCookie} from "../../logic/cookies";
+import {useProject} from "../ProjectContext";
+import {exampleProject} from "../../logic/example/project";
 
 type Props = ScreenProps
 

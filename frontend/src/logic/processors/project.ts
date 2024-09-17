@@ -1,7 +1,7 @@
-import {Dimension, Project} from "../types/project.ts";
-import { Trace, Location, OutOfBoundsOption, GcodeConfig } from "../types/gcode.ts";
-import {Drill} from "../types/cam.ts";
-import {length} from "../utils/math.ts";
+import {Dimension, Project} from "../types/project";
+import { Trace, Location, OutOfBoundsOption, GcodeConfig } from "../types/gcode";
+import {Drill} from "../types/cam";
+import {length} from "../utils/math";
 
 export const getProjectDimensions = (project: Project): Dimension => {
     let minX: number | undefined;
@@ -36,8 +36,8 @@ export const getProjectDimensions = (project: Project): Dimension => {
     return {
         x: minX ?? 0,
         y: minY ?? 0,
-        width: maxX != undefined ? maxX - minX : 0,
-        height: maxY != undefined ? maxY - minY : 0
+        width: maxX != undefined ? maxX - (minX ?? 0) : 0,
+        height: maxY != undefined ? maxY - (minY ?? 0) : 0
     }
 }
 

@@ -1,6 +1,6 @@
 import {Component, createEffect, createSignal} from "solid-js";
 import {AiOutlineCheck} from "solid-icons/ai";
-import {CheckItem} from "../../logic/types/checklist.ts";
+import {CheckItem} from "../../logic/types/checklist";
 
 type Props = {
     item: CheckItem

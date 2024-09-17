@@ -1,5 +1,5 @@
-import {Aperture, GerberCommand} from "../types/cam.ts";
-import {Gerber} from "./gerberutils.ts";
+import {Aperture, GerberCommand} from "../types/cam";
+import {Gerber} from "./gerberutils";
 
 
 export const processGerberFile = (content: string): GerberCommand[] => {

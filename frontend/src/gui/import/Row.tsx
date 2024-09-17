@@ -1,9 +1,9 @@
 import {Component} from "solid-js";
 import {AiFillCheckCircle, AiOutlineCheckCircle} from "solid-icons/ai";
-import {capitalize} from "../../logic/utils/utils.ts";
-import {Upload} from "../../logic/upload.ts";
-import LoadingIcon from "../components/LoadingIcon.tsx";
-import {useProject} from "../ProjectContext.ts";
+import {capitalize} from "../../logic/utils/utils";
+import {Upload} from "../../logic/upload";
+import LoadingIcon from "../components/LoadingIcon";
+import {useProject} from "../ProjectContext";
 
 type Props = {
     type: string

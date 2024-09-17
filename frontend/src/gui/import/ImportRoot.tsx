@@ -1,10 +1,10 @@
 import {Component, createEffect, createSignal} from "solid-js";
 import './style.less';
-import Row from "./Row.tsx";
-import {Upload} from "../../logic/upload.ts";
-import {ScreenProps} from "../../logic/screens.ts";
-import {useProject} from "../ProjectContext.ts";
-import {getCookie} from "../../logic/cookies.ts";
+import Row from "./Row";
+import {Upload} from "../../logic/upload";
+import {ScreenProps} from "../../logic/screens";
+import {useProject} from "../ProjectContext";
+import {getCookie} from "../../logic/cookies";
 
 type Props = ScreenProps
 
@@ -40,7 +40,7 @@ const ImportRoot: Component<Props> = (props) => {
 
                 try {
                     const result = Upload.processFile(project, upload.file.name, upload.content);
-                    console.log("result", upload.file.name, result)
+                    console.debug("result", upload.file.name, result)
                 } catch (error) {
                     alert(`Error during processing of file '${upload.file.name}':\n\n${error}`)
                 }

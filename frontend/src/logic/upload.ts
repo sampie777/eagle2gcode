@@ -1,9 +1,9 @@
-import {processDrillFile} from "./processors/drill.ts";
-import {processBoardFile} from "./processors/board.ts";
-import {Flatcam} from "./flatcam.ts";
-import {processTraces} from "./processors/traces.ts";
-import {Project} from "./types/project.ts";
-import {Eagle} from "./types/eagle.ts";
+import {processDrillFile} from "./processors/drill";
+import {processBoardFile} from "./processors/board";
+import {Flatcam} from "./flatcam";
+import {processTraces} from "./processors/traces";
+import {Project} from "./types/project";
+import {Eagle} from "./types/eagle";
 
 export namespace Upload {
     export type Type = {

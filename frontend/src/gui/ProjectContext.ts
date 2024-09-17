@@ -1,6 +1,6 @@
 import {createContext, useContext} from "solid-js";
-import {Project} from "../logic/types/project.ts";
-import {Persistency} from "../logic/utils/persistency.ts";
+import {Project} from "../logic/types/project";
+import {Persistency} from "../logic/utils/persistency";
 
 export const emptyProject = (): Project => ({
     isLoaded: false,

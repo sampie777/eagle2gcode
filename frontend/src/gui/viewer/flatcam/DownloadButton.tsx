@@ -9,7 +9,7 @@ type Props = {
 const DownloadButton: Component<Props> = (props) => {
     const [content, setContent] = createSignal("#");
 
-    const onClick = (e) => {
+    const onClick = (e: MouseEvent) => {
         const generatedContent = props.content();
         if (generatedContent.length == 0) {
             e.preventDefault();

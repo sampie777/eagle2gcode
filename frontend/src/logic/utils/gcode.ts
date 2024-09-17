@@ -1,33 +1,33 @@
-import {Alignment, Location} from "../types/gcode.ts";
-import {length} from "./math.ts";
+import { Alignment, Location, Trace } from "../types/gcode";
+import { length } from "./math";
 
 export const calculateRotation = (offset: {
-    original: Location,
-    actual: Location
+  original: Location,
+  actual: Location
 }[]): { scalingFactor: number, rotationAngle: number } => {
-    if (offset.length < 2) {
-        console.error("Need at least two alignment points");
-        return {
-            scalingFactor: 1,
-            rotationAngle: 0,
-        };
-    }
-
-    const a1 = offset[0].original;
-    const a2 = offset[0].actual;
-    const b1 = offset[1].original;
-    const b2 = offset[1].actual;
-
-    // Calculate rotation angle
-    // Math.atan2(slopeABActual)- Math.atan2(slopeABOriginal)
-    const rotationAngle = Math.atan2(b2.y - a2.y, b2.x - a2.x) - Math.atan2(b1.y - a1.y, b1.x - a1.x)
-
-    const scalingFactor = length({x: b2.x - a2.x, y: b2.y - a2.y}) / length({x: b1.x - a1.x, y: b1.y - a1.y})
-
+  if (offset.length < 2) {
+    console.error("Need at least two alignment points");
     return {
-        scalingFactor: scalingFactor,
-        rotationAngle: rotationAngle,
+      scalingFactor: 1,
+      rotationAngle: 0,
     };
+  }
+
+  const a1 = offset[0].original;
+  const a2 = offset[0].actual;
+  const b1 = offset[1].original;
+  const b2 = offset[1].actual;
+
+  // Calculate rotation angle
+  // Math.atan2(slopeABActual)- Math.atan2(slopeABOriginal)
+  const rotationAngle = Math.atan2(b2.y - a2.y, b2.x - a2.x) - Math.atan2(b1.y - a1.y, b1.x - a1.x)
+
+  const scalingFactor = length({ x: b2.x - a2.x, y: b2.y - a2.y }) / length({ x: b1.x - a1.x, y: b1.y - a1.y })
+
+  return {
+    scalingFactor: scalingFactor,
+    rotationAngle: rotationAngle,
+  };
 }
 
 /**
@@ -36,38 +36,43 @@ export const calculateRotation = (offset: {
  * @param point
  */
 export const calculateOffsetForPoint = (alignment: Alignment, point: Location): Location => {
-    const a1 = alignment.offset[0].original;
-    const a2 = alignment.offset[0].actual;
+  if (alignment.offset.length == 0) return {
+    x: point.x,
+    y: point.y,
+  }
 
-    // Calculate offset point at the origin
-    const offsetPoint = {
-        x: point.x - a1.x,
-        y: point.y - a1.y,
-    }
+  const a1 = alignment.offset[0].original;
+  const a2 = alignment.offset[0].actual;
 
-    const offsetVector = {
-        length: length(offsetPoint),
-        angle: Math.atan2(offsetPoint.y, offsetPoint.x),
-    }
+  // Calculate offset point at the origin
+  const offsetPoint = {
+    x: point.x - a1.x,
+    y: point.y - a1.y,
+  }
 
-    // Calculate rotated offset point
-    const offsetRotatedVector = {
-        length: offsetVector.length,
-        angle: offsetVector.angle + alignment.rotationAngle,
-    }
+  const offsetVector = {
+    length: length(offsetPoint),
+    angle: Math.atan2(offsetPoint.y, offsetPoint.x),
+  }
 
-    const scaledOffsetRotatedVector = {
-        length: offsetRotatedVector.length * alignment.scalingFactor,
-        angle: offsetRotatedVector.angle,
-    }
+  // Calculate rotated offset point
+  const offsetRotatedVector = {
+    length: offsetVector.length,
+    angle: offsetVector.angle + alignment.rotationAngle,
+  }
 
-    const scaledOffsetPoint = {
-        x: scaledOffsetRotatedVector.length * Math.cos(scaledOffsetRotatedVector.angle),
-        y: scaledOffsetRotatedVector.length * Math.sin(scaledOffsetRotatedVector.angle),
-    }
+  const scaledOffsetRotatedVector = {
+    length: offsetRotatedVector.length * alignment.scalingFactor,
+    angle: offsetRotatedVector.angle,
+  }
 
-    return {
-        x: scaledOffsetPoint.x + a2.x,
-        y: scaledOffsetPoint.y + a2.y,
-    }
+  const scaledOffsetPoint = {
+    x: scaledOffsetRotatedVector.length * Math.cos(scaledOffsetRotatedVector.angle),
+    y: scaledOffsetRotatedVector.length * Math.sin(scaledOffsetRotatedVector.angle),
+  }
+
+  return {
+    x: scaledOffsetPoint.x + a2.x,
+    y: scaledOffsetPoint.y + a2.y,
+  }
 }

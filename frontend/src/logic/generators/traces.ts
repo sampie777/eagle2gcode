@@ -1,7 +1,8 @@
-import {Dimension, Project} from "../types/project.ts";
-import {Trace, TracesConfig, Location, SilkscreenConfig, Alignment} from "../types/gcode.ts";
-import {getProjectAlignmentDrills, getProjectDimensions} from "../processors/project.ts";
-import {calculateOffsetForPoint, calculateRotation} from "../utils/gcode.ts";
+import {Dimension, Project} from "../types/project";
+import {Trace, TracesConfig, Location, SilkscreenConfig, Alignment} from "../types/gcode";
+import {getProjectAlignmentDrills, getProjectDimensions} from "../processors/project";
+import {calculateOffsetForPoint} from "../utils/gcode";
+import { getConfigWithRotation } from "../utils/utils";
 
 type TraceConfig = {
     iterations: number
@@ -84,28 +85,22 @@ const generateAlignmentDrillsCheckPoints = (project: Project, config: TraceConfi
         .join("\n")
 }
 
-const precalculateRotation = (config: SilkscreenConfig) => {
-    const {scalingFactor, rotationAngle} = calculateRotation(config.offset);
-    config.scalingFactor = scalingFactor
-    config.rotationAngle = rotationAngle
-}
-
 export const generateSilkscreenFile = (project: Project, side: "top" | "bottom", config: SilkscreenConfig): string => {
+    const configWithRotation = getConfigWithRotation(config);
+
     const dimensions = getProjectDimensions(project)
     const traceConfig: TraceConfig = {
         dimensions: dimensions,
-        iterations: config.iterations,
+        iterations: configWithRotation.iterations,
         mirror: side == "bottom",
-        alignment: {...config}
+        alignment: {...configWithRotation}
     }
-
-    precalculateRotation(config);
 
     return [
         "G21",
         "G90",
         "G94",
-        `G0 F${config.feedRate.toFixed(0)}`,
+        `G0 F${configWithRotation.feedRate.toFixed(0)}`,
         "G00 Z2.0000",
         "M03",
         "G28",

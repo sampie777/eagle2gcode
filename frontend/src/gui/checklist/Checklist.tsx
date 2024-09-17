@@ -1,7 +1,7 @@
 import {Component} from "solid-js";
 import './style.less';
-import Item from "./Item.tsx";
-import {useChecklist} from "../ChecklistContext.ts";
+import Item from "./Item";
+import {useChecklist} from "../ChecklistContext";
 
 type Props = {
     close: () => void

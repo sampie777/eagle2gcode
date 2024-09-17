@@ -1,6 +1,6 @@
-import {Drill, GerberCommand, Job} from "./cam.ts";
-import {Eagle} from "./eagle.ts";
-import {Trace} from "./gcode.ts";
+import {Drill} from "./cam";
+import {Eagle} from "./eagle";
+import {Trace} from "./gcode";
 
 
 export type Project = {

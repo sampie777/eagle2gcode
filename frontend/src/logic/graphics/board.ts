@@ -3,13 +3,13 @@ import {
     DoubleSide, ExtrudeGeometry,
     Group,
     Mesh,
-    MeshBasicMaterial, MeshStandardMaterial,
+    MeshBasicMaterial,
     Scene,
     Shape,
     ShapeGeometry,
     Vector2
 } from "three";
-import {Eagle} from "../types/eagle.ts";
+import {Eagle} from "../types/eagle";
 
 const pcbThickness = 1;
 

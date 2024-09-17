@@ -1,4 +1,4 @@
-import {Drill} from "../types/cam.ts";
+import {Drill} from "../types/cam";
 
 export const processDrillFile = (content: string): Drill[] => {
     const result: Drill[] = [];

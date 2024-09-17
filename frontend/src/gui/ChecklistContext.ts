@@ -1,6 +1,6 @@
 import {createContext, useContext} from "solid-js";
-import {Checklist} from "../logic/types/checklist.ts";
-import {Gcode} from "../logic/generators/gcode.ts";
+import {Checklist} from "../logic/types/checklist";
+import {Gcode} from "../logic/generators/gcode";
 
 const checklist = (): Checklist => [
     {
