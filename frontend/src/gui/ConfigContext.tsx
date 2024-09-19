@@ -6,6 +6,7 @@ import { SetStoreFunction } from "solid-js/store/types/store";
 
 export const emptyConfig = (): GcodeConfig => ({
   traces: {
+    outOfBounds: OutOfBoundsOption.Hide,
     cutoutProfile: true,
     offsetX: 34,
     offsetY: 26,

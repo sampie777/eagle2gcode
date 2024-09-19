@@ -22,6 +22,7 @@ export type Alignment = {
 
 export type TracesConfig = {
     cutoutProfile: boolean
+    outOfBounds: OutOfBoundsOption
     offsetX: number
     offsetY: number
     feedRate: number
@@ -35,9 +36,9 @@ export type DrillConfig = {
 } & Alignment;
 
 export type SilkscreenConfig = {
-    outOfBounds: OutOfBoundsOption,
-    feedRate: number,
-    iterations: number,
+    outOfBounds: OutOfBoundsOption
+    feedRate: number
+    iterations: number
 } & Alignment;
 
 export type GcodeConfig = {

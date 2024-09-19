@@ -59,6 +59,12 @@ const GcodeSettings: Component<Props> = (props) => {
     <SettingsContainer name={"Traces"} visible={true}>
       <SettingCheck label={"Cutout profile"} defaultValue={config.traces.cutoutProfile}
                     onChange={(value) => onChangeTraces({ cutoutProfile: value })} />
+      <SettingCombo label={"Out of bounds (profile)"}
+                    values={Object.values(OutOfBoundsOption)}
+                    defaultValue={config.traces.outOfBounds}
+                    onChange={(value) => {
+                      onChangeTraces({ outOfBounds: value })
+                    }} />
       <SettingNumber label={"Offset X"} defaultValue={config.traces.offsetX}
                      onChange={(value) => onChangeTraces({ offsetX: value })} />
       <SettingNumber label={"Offset Y"} defaultValue={config.traces.offsetY}
@@ -96,12 +102,11 @@ const GcodeSettings: Component<Props> = (props) => {
     </SettingsContainer>
 
     <SettingsContainer name={"Silkscreen"}>
-      <SettingCombo label={"Out of bounds"}
+      <SettingCombo label={"Out of bounds (profile)"}
                     values={Object.values(OutOfBoundsOption)}
                     defaultValue={config.silkscreen.outOfBounds}
                     onChange={(value) => {
                       onChangeSilkscreen({ outOfBounds: value })
-                      setTracesVisibility(project, config)
                     }} />
 
       <SettingsContainer name={"Offset calculation"} visible={true}>

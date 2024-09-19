@@ -1,4 +1,4 @@
-import {Component, createSignal} from "solid-js";
+import { Component, createEffect, createSignal } from "solid-js";
 import {useProject} from "../ProjectContext";
 import createCanvas from "./Canvas";
 import './style.less'
@@ -14,11 +14,20 @@ const ViewerRoot: Component<Props> = (props) => {
     const {config} = useConfig()
     const {project} = useProject();
     const [showChecklist, setShowChecklist] = createSignal(false);
+    const [dimensions, setDimensions]= createSignal(getProjectDimensions(project));
 
-    setTracesVisibility(project, config)
     project.isLoaded = true;
 
-    const dimensions = getProjectDimensions(project);
+    createEffect(() => {
+        // Trigger on change of one of the following:
+        [
+            config.traces.outOfBounds,
+            config.silkscreen.outOfBounds,
+        ].forEach(() => null)
+
+        setTracesVisibility(project, config)
+        setDimensions(getProjectDimensions(project));
+    });
 
     const projectName = () => {
         if (project.path == undefined) return "Unknown project";
@@ -33,7 +42,7 @@ const ViewerRoot: Component<Props> = (props) => {
         {!showChecklist() ? null : <Checklist close={() => setShowChecklist(false)}/>}
 
         <h2>{projectName()}</h2>
-        <small>{dimensions.width.toFixed(1)} x {dimensions.height.toFixed(1)} mm</small>
+        <small>{dimensions().width.toFixed(1)} x {dimensions().height.toFixed(1)} mm</small>
 
         <div class={"container"}>
             <Canvas />

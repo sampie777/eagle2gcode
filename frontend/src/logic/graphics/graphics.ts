@@ -156,6 +156,24 @@ export namespace Graphics {
     if (config.showAlignmentHolesDebug) {
       drawAlignmentHoles(scene, project, projectConfig.drills);
     }
+
+    drawDimensions(scene, project, 0x777700)
+  }
+
+  const drawDimensions = (scene: Scene, project: Project, color: ColorRepresentation) => {
+    const dimensions = getProjectDimensions(project)
+
+    const trace: Trace = [
+      { enabled: true, x: dimensions.x, y: dimensions.y },
+      { enabled: true, x: dimensions.x + dimensions.width, y: dimensions.y },
+      { enabled: true, x: dimensions.x + dimensions.width, y: dimensions.y + dimensions.height },
+      { enabled: true, x: dimensions.x, y: dimensions.y + dimensions.height },
+      { enabled: true, x: dimensions.x, y: dimensions.y },
+    ]
+
+    const lines = drawTrace(trace.filter(it => it.enabled), color);
+    if (!lines) return
+    scene.add(lines);
   }
 
   const drawGrid = (dimensions: { x: number; y: number; width: number; height: number }, scene: Scene) => {
@@ -177,7 +195,7 @@ export namespace Graphics {
     traces.forEach(trace => {
       const lines = drawTrace(trace.filter(it => it.enabled), color);
       if (!lines) return
-      return scene.add(lines);
+      scene.add(lines);
     })
   }
 

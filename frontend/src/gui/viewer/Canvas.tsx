@@ -22,6 +22,7 @@ const createCanvas = () => {
         // Trigger on change of one of the following:
         [
             config.traces.cutoutProfile,
+            config.traces.outOfBounds,
             ...config.drills.offset.map(it => it.actual.x),
             ...config.drills.offset.map(it => it.actual.y),
             ...config.silkscreen.offset.map(it => it.actual.x),
