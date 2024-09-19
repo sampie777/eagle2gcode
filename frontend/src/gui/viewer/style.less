@@ -10,4 +10,36 @@
 
 .Canvas {
   margin: 0 10px 40px;
+
+  canvas {
+    border: 1px solid #4a4a4a;
+    border-radius: 10px;
+    box-shadow: 0 0 25px #00000070;
+  }
+}
+
+.canvas-control {
+  .control-checkboxes {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    grid-gap: 10px;
+    padding: 10px;
+  }
+
+  .ControlOption {
+    border-radius: 10px;
+    background-color: #383a57;
+    padding: 2px 16px;
+    cursor: pointer;
+    user-select: none;
+
+    &.checked {
+      background-color: #5259d2;
+    }
+
+    input {
+      display: none;
+    }
+  }
 }
