@@ -5,6 +5,8 @@ import {Persistency} from "../../logic/utils/persistency";
 import './Header.less';
 import {AiOutlineReload, AiOutlineSave} from "solid-icons/ai";
 import {useChecklist} from "../ChecklistContext";
+// @ts-ignore
+import {version} from "../../../package.json";
 
 type Props = {
     onResetProject: () => void
@@ -44,6 +46,8 @@ const Header: Component<Props> = (props) => {
                 title={"Save project and config"}>
             <AiOutlineSave/> Save
         </button>
+
+        <span class={"version"}>v{version} {import.meta.env["DEV"] ? "(development)" : null}</span>
     </div>;
 }
 
