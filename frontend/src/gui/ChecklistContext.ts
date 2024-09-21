@@ -6,6 +6,7 @@ const checklist = (): Checklist => [
     {
         title: "Computer",
         items: [
+            {text: "Use two ground planes in EAGLE. One with the settings width=4, isolate=12. This will make sure the ground plane reaches everywhere. And the other with the settings width=10, isolate=12. The will make sure the ground thermal pads are thick enough.", checked: true},
             {text: "Export EAGLE files using the CAM processor (disable Cutouts in Profile).", checked: true},
             {text: "Generate Flatcam commands using this GUI and paste them into Flatcam.", checked: true},
             {text: "Wait until Flatcam completes running the commands.", checked: true},
