@@ -26,3 +26,46 @@
     }
   }
 }
+
+.DownloadButton {
+  border: 1px solid #383a57;
+  border-radius: 10px;
+  margin: 3px 0;
+  padding: 5px;
+  background-color: rgba(56, 58, 87, 0.34);
+  color: #a4a4ff;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  grid-gap: 7px;
+
+  &:hover {
+    background-color: #383a57;
+    color: #fff;
+
+    .info {
+      color: #bcbfe6
+    }
+  }
+
+  .icon {
+    font-size: 1.3em;
+    margin: 4px 10px;
+  }
+
+  .content {
+    flex: 1;
+    text-align: left;
+  }
+
+  .info {
+    font-size: 0.8em;
+    color: #646cff;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    grid-gap: 5px;
+  }
+}

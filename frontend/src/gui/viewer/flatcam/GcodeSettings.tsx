@@ -14,7 +14,8 @@ import { getProjectAlignmentDrills, setTracesVisibility } from "../../../logic/p
 import { generateCopperFile, generateSilkscreenFile } from "../../../logic/generators/traces";
 import SettingCombo from "../../components/settings/SettingCombo";
 import { OutOfBoundsOption } from "../../../logic/types/gcode";
-import { getDurationForTraces } from "../../../logic/utils/gcode";
+import { getAcidDurationForTraces, getGcodeDurationForTraces } from "../../../logic/utils/gcode";
+import { AiOutlineClockCircle } from "solid-icons/ai";
 
 type Props = {
   onBack?: () => void
@@ -50,6 +51,9 @@ const GcodeSettings: Component<Props> = (props) => {
   }
 
   updateOffsets();
+
+  const allTopTraces = () => [...(config.traces.cutoutProfile ? project.profile : []), ...project.traces_top];
+  const allBottomTraces = () => [...(config.traces.cutoutProfile ? project.profile : []), ...project.traces_bottom];
 
   return <div class={"FlatcamSettings"}>
     <button onClick={props.showChecklist}>Checklist</button>
@@ -132,18 +136,38 @@ const GcodeSettings: Component<Props> = (props) => {
       <h4>Download the gCode files:</h4>
       <DownloadButton content={() => generateCopperFile(project, "top", config.traces)}
                       fileName={Gcode.outputFileNames.etching_top}
-                      text={`Traces top (${getDurationForTraces([...(config.traces.cutoutProfile ? project.profile : []), ...project.traces_top], config.traces)})`} />
+                      text={"Traces top"}>
+        {allTopTraces().length == 0 ? null : <>
+          <span class={"info"}><AiOutlineClockCircle /> Printer: {getGcodeDurationForTraces(allTopTraces(), config.traces)}</span>
+          <span class={"info"}><AiOutlineClockCircle /> Acid: {getAcidDurationForTraces(allTopTraces())}</span>
+        </>}
+      </DownloadButton>
       <DownloadButton content={() => generateCopperFile(project, "bottom", config.traces)}
                       fileName={Gcode.outputFileNames.etching_bottom}
-                      text={`Traces bottom (${getDurationForTraces([...(config.traces.cutoutProfile ? project.profile : []), ...project.traces_bottom], config.traces)})`} />
+                      text={"Traces bottom"}>
+        {allBottomTraces().length == 0 ? null : <>
+          <span class={"info"}><AiOutlineClockCircle /> Printer: {getGcodeDurationForTraces(allBottomTraces(), config.traces)}</span>
+          <span class={"info"}><AiOutlineClockCircle /> Acid: {getAcidDurationForTraces(allBottomTraces())}</span>
+        </>}
+      </DownloadButton>
+
       <DownloadButton content={() => generateDrillFile(project, config.drills)}
                       fileName={Gcode.outputFileNames.drills_top} text={"Drills top"} />
+
       <DownloadButton content={() => generateSilkscreenFile(project, "top", config.silkscreen)}
                       fileName={Gcode.outputFileNames.silkscreen_top}
-                      text={`Silkcreen top (${getDurationForTraces(project.silkscreen_top, config.silkscreen)})`} />
+                      text={`Silkcreen top`}>
+        {project.silkscreen_top.length == 0 ? null : <>
+          <span class={"info"}><AiOutlineClockCircle /> Printer: {getGcodeDurationForTraces(project.silkscreen_top, config.silkscreen)}</span>
+        </>}
+      </DownloadButton>
       <DownloadButton content={() => generateSilkscreenFile(project, "bottom", config.silkscreen)}
                       fileName={Gcode.outputFileNames.silkscreen_bottom}
-                      text={`Silkscreen bottom (${getDurationForTraces(project.silkscreen_bottom, config.silkscreen)})`} />
+                      text={`Silkscreen bottom`}>
+        {project.silkscreen_bottom.length == 0 ? null : <>
+          <span class={"info"}><AiOutlineClockCircle /> Printer: {getGcodeDurationForTraces(project.silkscreen_bottom, config.silkscreen)}</span>
+        </>}
+      </DownloadButton>
     </div>
 
     <div class={"actions"}>

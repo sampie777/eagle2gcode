@@ -77,7 +77,30 @@ export const calculateOffsetForPoint = (alignment: Alignment, point: Location): 
   }
 }
 
-export const getDurationForTraces = (traces: Trace[], config: {
+export const getLength = (traces: Trace[]) => traces.reduce((tracesTotal, currentTrace) =>
+  tracesTotal + currentTrace.reduce((total, current, index) => {
+    if (index == 0) return 0;
+    const previous = currentTrace[index - 1];
+    const length = Math.sqrt(Math.pow(current.x - previous.x, 2) + Math.pow(current.y - previous.y, 2))
+    return total + length;
+  }, 0), 0);
+
+const getTravelLength = (traces: Trace[]) => traces
+  .filter(it => it.length > 0)
+  .reduce((total, current, index) => {
+    const currentLocation = current[0];
+
+    let lastLocation: Location = { x: 0, y: 0 }
+    if (index > 0) {
+      const previous = traces[index - 1];
+      lastLocation = previous[previous.length - 1]
+    }
+
+    const length = Math.sqrt(Math.pow(currentLocation.x - lastLocation.x, 2) + Math.pow(currentLocation.y - lastLocation.y, 2))
+    return total + length;
+  }, 0);
+
+export const getGcodeDurationForTraces = (traces: Trace[], config: {
   feedRate: number,
   iterations: number,
 }) => {
@@ -86,33 +109,28 @@ export const getDurationForTraces = (traces: Trace[], config: {
   // const SECONDS_PER_MM = (62 * 60) / (40 * 1743.5 + 263.1);
   const FEED_RATE_FACTOR = 1400 / Math.max(1, config.feedRate);
 
-  const tracesLength = traces.reduce((tracesTotal, currentTrace) =>
-    tracesTotal + currentTrace.reduce((total, current, index) => {
-      if (index == 0) return 0;
-      const previous = currentTrace[index - 1];
-      const length = Math.sqrt(Math.pow(current.x - previous.x, 2) + Math.pow(current.y - previous.y, 2))
-      return total + length;
-    }, 0), 0);
-
-  const travelLength = traces
-    .filter(it => it.length > 0)
-    .reduce((total, current, index) => {
-      const currentLocation = current[0];
-
-      let lastLocation: Location = {x: 0, y: 0}
-      if (index > 0) {
-        const previous = traces[index - 1];
-        lastLocation = previous[previous.length - 1]
-      }
-
-      const length = Math.sqrt(Math.pow(currentLocation.x - lastLocation.x, 2) + Math.pow(currentLocation.y - lastLocation.y, 2))
-      return total + length;
-    }, 0);
+  const tracesLength = getLength(traces);
+  const travelLength = getTravelLength(traces);
 
   const totalDuration = SECONDS_PER_MM * FEED_RATE_FACTOR * (tracesLength * config.iterations + travelLength);
 
   const hours = Math.floor(totalDuration / 3600)
   const minutes = Math.ceil((totalDuration - hours * 3600) / 60)
 
-  return `${hours}:${minutes.toString().padStart(2, "0")}`;
+  return `${hours}:${minutes.toString().padStart(2, "0")}h`;
+};
+
+export const getAcidDurationForTraces = (traces: Trace[]) => {
+  const BASE_TIME_SECONDS = 3600;
+  // Constant calculated based on real data (2h30 minutes for a 1986.3 mm length project)
+  const SECONDS_PER_MM = (150 * 60 - BASE_TIME_SECONDS) / 1986.3;
+
+  const tracesLength = getLength(traces);
+
+  const totalDuration = BASE_TIME_SECONDS + SECONDS_PER_MM * tracesLength;
+
+  const hours = Math.floor(totalDuration / 3600)
+  const minutes = Math.ceil((totalDuration - hours * 3600) / 60)
+
+  return `${hours}:${minutes.toString().padStart(2, "0")}h`;
 };

@@ -1,11 +1,13 @@
-import { Component, createSignal } from "solid-js";
-import { AiOutlineLoading } from "solid-icons/ai";
+import { Component, createSignal, JSX } from "solid-js";
+import { AiOutlineDownload, AiOutlineLoading } from "solid-icons/ai";
 import { runAsync } from "../../../logic/utils/utils";
+import { TbFileDownload } from "solid-icons/tb";
 
 type Props = {
   content: () => string,
   fileName: string,
-  text: string,
+  text?: string,
+  children?: JSX.Element
 }
 
 const DownloadButton: Component<Props> = (props) => {
@@ -28,9 +30,14 @@ const DownloadButton: Component<Props> = (props) => {
   }
 
   return <a href={content()}
+            class={"DownloadButton"}
             onClick={onClick}
             download={content().length == 0 ? undefined : props.fileName}>
-    {isLoading() ? <AiOutlineLoading class={"spinner"} /> : null} {props.text}
+    <TbFileDownload />
+    <div class={"content"}>
+      <span class={"text"}>{isLoading() ? <AiOutlineLoading class={"spinner"} /> : null} {props.text}</span>
+      {props.children}
+    </div>
   </a>;
 }
 
