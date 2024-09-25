@@ -1,5 +1,5 @@
 import { Component, createSignal, JSX } from "solid-js";
-import { AiOutlineDownload, AiOutlineLoading } from "solid-icons/ai";
+import { AiOutlineLoading } from "solid-icons/ai";
 import { runAsync } from "../../../logic/utils/utils";
 import { TbFileDownload } from "solid-icons/tb";
 
@@ -16,6 +16,11 @@ const DownloadButton: Component<Props> = (props) => {
 
   const onClick = (e: MouseEvent) => {
     setIsLoading(true);
+
+    const downloadTextareaId = "download-textarea";
+    document.getElementById(downloadTextareaId)?.remove();
+    if (e.ctrlKey) e.preventDefault();
+
     runAsync(() => {
       const generatedContent = props.content();
       setTimeout(() => setIsLoading(false), 100);
@@ -23,6 +28,13 @@ const DownloadButton: Component<Props> = (props) => {
       if (generatedContent.length == 0) {
         e.preventDefault();
         setContent("#");
+      } else if (e.ctrlKey) {
+        e.preventDefault();
+        const it = document.createElement("textarea");
+        it.id = downloadTextareaId;
+        it.value = generatedContent;
+
+        setTimeout(() => document.body.appendChild(it), 50);
       } else {
         setContent(`data:text/plain;charset=utf-8,${encodeURIComponent(generatedContent)}`)
       }
@@ -32,7 +44,8 @@ const DownloadButton: Component<Props> = (props) => {
   return <a href={content()}
             class={"DownloadButton"}
             onClick={onClick}
-            download={content().length == 0 ? undefined : props.fileName}>
+            download={content().length == 0 ? undefined : props.fileName}
+            title={"Click to download, or Ctrl+Click to view"}>
     <TbFileDownload />
     <div class={"content"}>
       <span class={"text"}>{isLoading() ? <AiOutlineLoading class={"spinner"} /> : null} {props.text}</span>
