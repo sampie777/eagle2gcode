@@ -14,7 +14,12 @@ import { getProjectAlignmentDrills, setTracesVisibility } from "../../../logic/p
 import { generateCopperFile, generateSilkscreenFile } from "../../../logic/generators/traces";
 import SettingCombo from "../../components/settings/SettingCombo";
 import { OutOfBoundsOption } from "../../../logic/types/gcode";
-import { getAcidDurationForTraces, getGcodeDurationForTraces } from "../../../logic/utils/gcode";
+import {
+  getAcidDurationForTraces,
+  getGcodeDurationForTraces,
+  getLength,
+  getTravelLength
+} from "../../../logic/utils/gcode";
 import { AiOutlineClockCircle } from "solid-icons/ai";
 
 type Props = {
@@ -67,6 +72,10 @@ const GcodeSettings: Component<Props> = (props) => {
                     values={Object.values(OutOfBoundsOption)}
                     defaultValue={config.traces.outOfBounds}
                     onChange={(value) => {
+                      setTracesVisibility(project, {
+                        ...config,
+                        traces: { ...config.traces, outOfBounds: value as OutOfBoundsOption }
+                      })
                       onChangeTraces({ outOfBounds: value })
                     }} />
       <SettingNumber label={"Offset X"} defaultValue={config.traces.offsetX}
@@ -110,6 +119,10 @@ const GcodeSettings: Component<Props> = (props) => {
                     values={Object.values(OutOfBoundsOption)}
                     defaultValue={config.silkscreen.outOfBounds}
                     onChange={(value) => {
+                      setTracesVisibility(project, {
+                        ...config,
+                        silkscreen: { ...config.silkscreen, outOfBounds: value as OutOfBoundsOption }
+                      })
                       onChangeSilkscreen({ outOfBounds: value })
                     }} />
 
@@ -138,16 +151,25 @@ const GcodeSettings: Component<Props> = (props) => {
                       fileName={Gcode.outputFileNames.etching_top}
                       text={"Traces top"}>
         {allTopTraces().length == 0 ? null : <>
-          <span class={"info"}><AiOutlineClockCircle /> Printer: {getGcodeDurationForTraces(allTopTraces(), config.traces)}</span>
-          <span class={"info"}><AiOutlineClockCircle /> Acid: {getAcidDurationForTraces(allTopTraces())}</span>
+          <span class={"info"}>
+            <AiOutlineClockCircle /> Printer: {getGcodeDurationForTraces(allTopTraces(), { ...config.traces } /* Use spread operator to trigger rerender on object update */)}
+          </span>
+          <span class={"info"}>
+            <AiOutlineClockCircle /> Acid: {getAcidDurationForTraces(allTopTraces())}
+          </span>
         </>}
       </DownloadButton>
       <DownloadButton content={() => generateCopperFile(project, "bottom", config.traces)}
                       fileName={Gcode.outputFileNames.etching_bottom}
-                      text={"Traces bottom"}>
+                      text={"Traces bottom"}
+                      title={`Traces: ${getLength(allBottomTraces())}, travel: ${getTravelLength(allBottomTraces())}. Save project & reload page to recalculate.`}>
         {allBottomTraces().length == 0 ? null : <>
-          <span class={"info"}><AiOutlineClockCircle /> Printer: {getGcodeDurationForTraces(allBottomTraces(), config.traces)}</span>
-          <span class={"info"}><AiOutlineClockCircle /> Acid: {getAcidDurationForTraces(allBottomTraces())}</span>
+          <span class={"info"}>
+            <AiOutlineClockCircle /> Printer: {getGcodeDurationForTraces(allBottomTraces(), { ...config.traces })}
+          </span>
+          <span class={"info"}>
+            <AiOutlineClockCircle /> Acid: {getAcidDurationForTraces(allBottomTraces())}
+          </span>
         </>}
       </DownloadButton>
 
@@ -156,16 +178,21 @@ const GcodeSettings: Component<Props> = (props) => {
 
       <DownloadButton content={() => generateSilkscreenFile(project, "top", config.silkscreen)}
                       fileName={Gcode.outputFileNames.silkscreen_top}
-                      text={`Silkcreen top`}>
+                      text={`Silkcreen top`}
+                      title={`Traces: ${getLength(project.silkscreen_top)}, travel: ${getTravelLength(project.silkscreen_top)}. Save project & reload page to recalculate.`}>
         {project.silkscreen_top.length == 0 ? null : <>
-          <span class={"info"}><AiOutlineClockCircle /> Printer: {getGcodeDurationForTraces(project.silkscreen_top, config.silkscreen)}</span>
+          <span class={"info"}>
+            <AiOutlineClockCircle /> Printer: {getGcodeDurationForTraces(project.silkscreen_top, { ...config.silkscreen })}
+          </span>
         </>}
       </DownloadButton>
       <DownloadButton content={() => generateSilkscreenFile(project, "bottom", config.silkscreen)}
                       fileName={Gcode.outputFileNames.silkscreen_bottom}
                       text={`Silkscreen bottom`}>
         {project.silkscreen_bottom.length == 0 ? null : <>
-          <span class={"info"}><AiOutlineClockCircle /> Printer: {getGcodeDurationForTraces(project.silkscreen_bottom, config.silkscreen)}</span>
+          <span class={"info"}>
+            <AiOutlineClockCircle /> Printer: {getGcodeDurationForTraces(project.silkscreen_bottom, { ...config.silkscreen })}
+          </span>
         </>}
       </DownloadButton>
     </div>

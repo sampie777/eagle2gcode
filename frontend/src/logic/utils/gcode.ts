@@ -78,14 +78,16 @@ export const calculateOffsetForPoint = (alignment: Alignment, point: Location): 
 }
 
 export const getLength = (traces: Trace[]) => traces.reduce((tracesTotal, currentTrace) =>
-  tracesTotal + currentTrace.reduce((total, current, index) => {
-    if (index == 0) return 0;
-    const previous = currentTrace[index - 1];
-    const length = Math.sqrt(Math.pow(current.x - previous.x, 2) + Math.pow(current.y - previous.y, 2))
-    return total + length;
-  }, 0), 0);
+  tracesTotal + currentTrace
+    .filter(it => it.enabled)
+    .reduce((total, current, index) => {
+      if (index == 0) return 0;
+      const previous = currentTrace[index - 1];
+      const length = Math.sqrt(Math.pow(current.x - previous.x, 2) + Math.pow(current.y - previous.y, 2))
+      return total + length;
+    }, 0), 0);
 
-const getTravelLength = (traces: Trace[]) => traces
+export const getTravelLength = (traces: Trace[]) => traces
   .filter(it => it.length > 0)
   .reduce((total, current, index) => {
     const currentLocation = current[0];
@@ -105,14 +107,16 @@ export const getGcodeDurationForTraces = (traces: Trace[], config: {
   iterations: number,
 }) => {
   // Constant calculated based on real data (41 minutes for 40 iterations of a 1026.8 mm length project) with a feed rate of 1400
-  const SECONDS_PER_MM = (41 * 60) / (40 * 1026.8 + 183.0);
+  // const SECONDS_PER_MM = (41 * 60) / (40 * 1026.8 + 183.0);
   // const SECONDS_PER_MM = (62 * 60) / (40 * 1743.5 + 263.1);
+  // const SECONDS_PER_MM = (100 * 60) / (40 * 3383.4 + 361.5);
   const FEED_RATE_FACTOR = 1400 / Math.max(1, config.feedRate);
 
   const tracesLength = getLength(traces);
   const travelLength = getTravelLength(traces);
 
-  const totalDuration = SECONDS_PER_MM * FEED_RATE_FACTOR * (tracesLength * config.iterations + travelLength);
+  // Formula from previous 3 readings is: y = 0.037x + 1013.9  where y is seconds and x is length
+  const totalDuration = FEED_RATE_FACTOR * (0.037 * (tracesLength * config.iterations + travelLength) + 1013.9);
 
   const hours = Math.floor(totalDuration / 3600)
   const minutes = Math.ceil((totalDuration - hours * 3600) / 60)

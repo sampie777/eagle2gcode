@@ -7,6 +7,7 @@ type Props = {
   content: () => string,
   fileName: string,
   text?: string,
+  title?: string,
   children?: JSX.Element
 }
 
@@ -45,7 +46,7 @@ const DownloadButton: Component<Props> = (props) => {
             class={"DownloadButton"}
             onClick={onClick}
             download={content().length == 0 ? undefined : props.fileName}
-            title={"Click to download, or Ctrl+Click to view"}>
+            title={props.title ?? "Click to download, or Ctrl+Click to view"}>
     <TbFileDownload />
     <div class={"content"}>
       <span class={"text"}>{isLoading() ? <AiOutlineLoading class={"spinner"} /> : null} {props.text}</span>
