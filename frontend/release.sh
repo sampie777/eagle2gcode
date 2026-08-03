@@ -17,21 +17,37 @@ function usage {
 HEREDOC
 }
 
+function retry() {
+  command="$@"
+  for i in {1..10}; do
+    $command && return
+    echo "Retrying attempt $i/10"
+    sleep 3
+  done
+
+  echo "Retry failed for command: ${command}"
+  exit 1
+}
+
 function setVersion() {
     version="$1"
     buildVersion=$(git rev-list HEAD --first-parent --count)
 
-    npm --no-git-tag-version --allow-same-version version "${version}" || exit 1
+    # Update version in package.json using sed
+    sed -i '' -E 's/("version": ")([^"]+)(")/\1'"$version"'\3/' package.json || exit 1
+
 }
 
 function releasePatch {
+  git pull
+
   bun test || exit 1
 
   git checkout master || exit 1
-  git pull || exit 1
+  retry git pull
 
   # Create patch version
-  CURRENT_VERSION=$(sed 's/.*"version": "\(.*\)".*/\1/;t;d' ./package.json)
+  CURRENT_VERSION=$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' ./package.json)
   RELEASE_VERSION=$(echo ${CURRENT_VERSION} | awk -F'.' '{print $1"."$2"."$3+1}')
 
   git merge develop || exit 1
@@ -42,15 +58,17 @@ function releasePatch {
 }
 
 function releaseMinor {
+  git pull
+
   bun test || exit 1
 
   git checkout master || exit 1
-  git pull || exit 1
+  retry git pull
   git merge develop || exit 1
 
-  # Create patch version
-  npm --no-git-tag-version version minor || exit 1
-  RELEASE_VERSION=$(sed 's/.*"version": "\(.*\)".*/\1/;t;d' ./package.json)
+  # Create version
+  CURRENT_VERSION=$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' ./package.json)
+  RELEASE_VERSION=$(echo ${CURRENT_VERSION} | sed 's/v//g' | awk -F'.' '{print $1"."$2+1".0"}')
 
   setVersion "${RELEASE_VERSION}" || exit 1
 
@@ -58,15 +76,16 @@ function releaseMinor {
 }
 
 function releaseMajor {
+  git pull
   bun test || exit 1
 
   git checkout master || exit 1
-  git pull || exit 1
+  retry git pull
   git merge develop || exit 1
 
-  # Create patch version
-  npm --no-git-tag-version version major || exit 1
-  RELEASE_VERSION=$(sed 's/.*"version": "\(.*\)".*/\1/;t;d' ./package.json)
+  # Create version
+  CURRENT_VERSION=$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' ./package.json)
+  RELEASE_VERSION=$(echo ${CURRENT_VERSION} | sed 's/v//g' | awk -F'.' '{print $1+1".0.0"}')
 
   setVersion "${RELEASE_VERSION}" || exit 1
 
@@ -76,33 +95,34 @@ function releaseMajor {
 function pushAndRelease {
   bun test || exit 1
 
-  RELEASE_VERSION=$(sed 's/.*"version": "\(.*\)".*/\1/;t;d' ./package.json)
+  RELEASE_VERSION=$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' ./package.json)
   echo "Release version: ${RELEASE_VERSION}"
 
   git add package.json || exit 1
   git commit -m "version release: ${RELEASE_VERSION}" || exit 1
   git tag "v${RELEASE_VERSION}" || exit 1
-  git push -u origin master --tags || exit 1
 
-  ./docker.sh build || exit 1
-  ./docker.sh push || exit 1
+  retry ./docker.sh build
+  retry ./docker.sh push
+
+  retry git push -u origin master --tags
 }
 
 function setNextDevelopmentVersion {
   git checkout develop || exit 1
-  git pull || exit 1
+  retry git pull
   git rebase master || exit 1
 
   # Generate next (minor) development version
-  npm --no-git-tag-version version minor || exit 1
-  DEV_VERSION=$(sed 's/.*"version": "\(.*\)".*/\1/;t;d' ./package.json)-SNAPSHOT
+  CURRENT_VERSION=$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' ./package.json)
+  DEV_VERSION=$(echo ${CURRENT_VERSION} | sed 's/v//g' | awk -F'.' '{print $1"."$2+1".0"}')-SNAPSHOT
 
   echo "Next development version: ${DEV_VERSION}"
   setVersion "${DEV_VERSION}" || exit 1
 
   git add package.json || exit 1
   git commit -m "next development version" || exit 1
-  git push -u origin develop --tags || exit 1
+  retry git push -u origin develop --tags
 }
 
 command="$1"
@@ -117,6 +137,9 @@ case $command in
     ;;
   major)
     releaseMajor
+    setNextDevelopmentVersion
+    ;;
+  setNextDevelopmentVersion)
     setNextDevelopmentVersion
     ;;
   setversion)
