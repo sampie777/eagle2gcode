@@ -1,6 +1,6 @@
 # Docker file, thanks to: https://dzone.com/articles/how-to-dockerize-reactjs-app
 # Build stage
-FROM oven/bun:1 as build
+FROM oven/bun:1 AS build
 
 RUN mkdir /app
 WORKDIR /app

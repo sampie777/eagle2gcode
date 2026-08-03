@@ -1,7 +1,7 @@
 #!/bin/bash
 NAME="sajansen/eagle2gcode"
 
-VERSION=$(sed 's/.*"version": "\(.*\)".*/\1/;t;d' ./package.json)
+VERSION=$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' ./package.json)
 progname=$(basename $0)
 
 function usage {
@@ -16,7 +16,7 @@ function usage {
        version              Print project version
 
      optional arguments:
-       -h, --help           show this help message and exit
+       -h, --help           Show this help message and exit
 
 HEREDOC
 }
@@ -27,8 +27,8 @@ function run {
 
 function build {
   echo Building docker image ${NAME}:${VERSION}
-  docker build -t ${NAME} -f docker/Dockerfile .
-  docker tag ${NAME} ${NAME}:${VERSION}
+  docker build -t ${NAME} --build-arg APP_VERSION="${VERSION}" --platform linux/amd64,linux/arm64 -f docker/Dockerfile . || exit 1
+  docker tag ${NAME} ${NAME}:${VERSION} || exit 1
 }
 
 function push {
