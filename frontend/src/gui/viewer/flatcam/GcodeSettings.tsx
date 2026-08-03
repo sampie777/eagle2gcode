@@ -19,7 +19,6 @@ import { AiOutlineClockCircle } from "solid-icons/ai";
 
 type Props = {
   onBack?: () => void
-  showChecklist: () => void
   requestRender: () => void
 }
 
@@ -56,10 +55,6 @@ const GcodeSettings: Component<Props> = (props) => {
   const allBottomTraces = () => [...(config.traces.cutoutProfile ? project.profile : []), ...project.traces_bottom];
 
   return <div class={"FlatcamSettings"}>
-    <button onClick={props.showChecklist}>Checklist</button>
-    <br />
-    <br />
-
     <SettingsContainer name={"Traces"} visible={true}>
       <SettingCheck label={"Cutout profile"} defaultValue={config.traces.cutoutProfile}
                     onChange={(value) => onChangeTraces({ cutoutProfile: value })} />
