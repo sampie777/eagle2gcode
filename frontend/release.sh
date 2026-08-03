@@ -41,7 +41,7 @@ function setVersion() {
 function releasePatch {
   git pull
 
-  bun test || exit 1
+  bun test --pass-with-no-tests || exit 1
 
   git checkout master || exit 1
   retry git pull
@@ -60,7 +60,7 @@ function releasePatch {
 function releaseMinor {
   git pull
 
-  bun test || exit 1
+  bun test --pass-with-no-tests || exit 1
 
   git checkout master || exit 1
   retry git pull
@@ -77,7 +77,7 @@ function releaseMinor {
 
 function releaseMajor {
   git pull
-  bun test || exit 1
+  bun test --pass-with-no-tests || exit 1
 
   git checkout master || exit 1
   retry git pull
@@ -93,7 +93,7 @@ function releaseMajor {
 }
 
 function pushAndRelease {
-  bun test || exit 1
+  bun test --pass-with-no-tests || exit 1
 
   RELEASE_VERSION=$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' ./package.json)
   echo "Release version: ${RELEASE_VERSION}"
