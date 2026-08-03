@@ -7,6 +7,7 @@ import { AiOutlineLoading, AiOutlineReload, AiOutlineSave } from "solid-icons/ai
 import { useChecklist } from "../ChecklistContext";
 // @ts-ignore
 import { version } from "../../../package.json";
+import Checklist from "../checklist/Checklist";
 
 type Props = {
   onResetProject: () => void
@@ -17,6 +18,7 @@ const Header: Component<Props> = (props) => {
   const { config } = useConfig();
   const { resetChecklist } = useChecklist()
   const [isSaving, setIsSaving] = createSignal(false);
+  const [showChecklist, setShowChecklist] = createSignal(false);
 
   const resetProject = () => {
     if (!confirm("Are you sure you want to delete this project?")) return;
@@ -41,6 +43,8 @@ const Header: Component<Props> = (props) => {
   }
 
   return <div class={"Header"}>
+    {!showChecklist() ? null : <Checklist close={() => setShowChecklist(false)}/>}
+f
     <button onClick={resetProject}
             title={"Create a new project, but keep config"}>
       <AiOutlineReload /> New project
@@ -50,6 +54,7 @@ const Header: Component<Props> = (props) => {
             title={"Save project and config"}>
       {isSaving() ? <AiOutlineLoading class={"spinner"} /> : <AiOutlineSave />} {isSaving() ? "Saving..." : "Save"}
     </button>
+    <button onClick={() => setShowChecklist(true)}>Checklist</button>
 
     <span class={"version"}>v{version} {import.meta.env["DEV"] ? "(development)" : null}</span>
   </div>;
