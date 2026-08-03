@@ -8,6 +8,7 @@ WORKDIR /app
 # install app dependencies
 COPY package.json /app
 COPY bun.lockb /app
+RUN bun add -d @rollup/rollup-linux-arm64-gnu
 RUN bun install --frozen-lockfile --production
 
 # add app
