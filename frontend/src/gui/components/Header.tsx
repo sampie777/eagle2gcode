@@ -44,7 +44,7 @@ const Header: Component<Props> = (props) => {
 
   return <div class={"Header"}>
     {!showChecklist() ? null : <Checklist close={() => setShowChecklist(false)} />}
-    f
+
     <button onClick={resetProject}
             title={"Create a new project, but keep config"}>
       <AiOutlineReload /> New project
