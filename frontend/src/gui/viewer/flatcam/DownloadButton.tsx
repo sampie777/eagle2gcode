@@ -29,6 +29,7 @@ const DownloadButton: Component<Props> = (props) => {
       if (generatedContent.length == 0) {
         e.preventDefault();
         setContent("#");
+        alert("No GCode generated");
       } else if (e.ctrlKey) {
         e.preventDefault();
         const it = document.createElement("textarea");

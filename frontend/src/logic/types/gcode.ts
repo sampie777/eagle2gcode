@@ -25,7 +25,9 @@ export type TracesConfig = {
   outOfBounds: OutOfBoundsOption
   offsetX: number
   offsetY: number
-  feedRate: number
+  minFeedRate: number
+  maxFeedRate: number
+  acceleration: number
   iterations: number
 };
 
@@ -37,8 +39,10 @@ export type DrillConfig = {
 
 export type SilkscreenConfig = {
   outOfBounds: OutOfBoundsOption
-  feedRate: number
   iterations: number
+  minFeedRate: number
+  maxFeedRate: number
+  acceleration: number
 } & Alignment;
 
 export type GcodeConfig = {

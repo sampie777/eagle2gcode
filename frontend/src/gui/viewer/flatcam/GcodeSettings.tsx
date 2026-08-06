@@ -75,9 +75,15 @@ const GcodeSettings: Component<Props> = (props) => {
                      onChange={(value) => onChangeTraces({ offsetX: value })} />
       <SettingNumber label={"Offset Y"} defaultValue={config.traces.offsetY}
                      onChange={(value) => onChangeTraces({ offsetY: value })} />
-      <SettingNumber label={"Feed rate"} defaultValue={config.traces.feedRate}
+      <SettingNumber label={"Feed rate (min)"} defaultValue={config.traces.minFeedRate}
                      min={1}
-                     onChange={(value) => onChangeTraces({ feedRate: value })} />
+                     onChange={(value) => onChangeTraces({ minFeedRate: value })} />
+      <SettingNumber label={"Feed rate (max)"} defaultValue={config.traces.maxFeedRate}
+                     min={1}
+                     onChange={(value) => onChangeTraces({ maxFeedRate: value })} />
+      <SettingNumber label={"Acceleration"} defaultValue={config.traces.acceleration}
+                     min={1}
+                     onChange={(value) => onChangeTraces({ acceleration: value })} />
       <SettingNumber label={"Iterations"} defaultValue={config.traces.iterations}
                      min={1}
                      onChange={(value) => onChangeTraces({ iterations: value })} />
@@ -130,9 +136,15 @@ const GcodeSettings: Component<Props> = (props) => {
         </>)}
       </SettingsContainer>
 
-      <SettingNumber label={"Feed rate"} defaultValue={config.silkscreen.feedRate}
+      <SettingNumber label={"Feed rate (min)"} defaultValue={config.silkscreen.minFeedRate}
                      min={1}
-                     onChange={(value) => onChangeSilkscreen({ feedRate: value })} />
+                     onChange={(value) => onChangeSilkscreen({ minFeedRate: value })} />
+      <SettingNumber label={"Feed rate (max)"} defaultValue={config.silkscreen.maxFeedRate}
+                     min={1}
+                     onChange={(value) => onChangeSilkscreen({ maxFeedRate: value })} />
+      <SettingNumber label={"Acceleration"} defaultValue={config.silkscreen.acceleration}
+                     min={1}
+                     onChange={(value) => onChangeSilkscreen({ acceleration: value })} />
       <SettingNumber label={"Iterations"} defaultValue={config.silkscreen.iterations}
                      min={1}
                      onChange={(value) => onChangeSilkscreen({ iterations: value })} />
@@ -145,7 +157,13 @@ const GcodeSettings: Component<Props> = (props) => {
                       text={"Traces top"}>
         {allTopTraces().length == 0 ? null : <>
           <span class={"info"}>
-            <AiOutlineClockCircle /> Printer: {getGcodeDurationForTraces(allTopTraces(), { ...config.traces } /* Use spread operator to trigger rerender on object update */)}
+            <AiOutlineClockCircle /> Printer: {getGcodeDurationForTraces(allTopTraces(), {
+            iterations: config.traces.iterations,
+            feedRate: config.traces.maxFeedRate
+          })} - {getGcodeDurationForTraces(allTopTraces(), {
+            iterations: config.traces.iterations,
+            feedRate: config.traces.minFeedRate
+          })}
           </span>
           <span class={"info"}>
             <AiOutlineClockCircle /> Acid: {getAcidDurationForTraces(allTopTraces())}
@@ -158,7 +176,13 @@ const GcodeSettings: Component<Props> = (props) => {
                       title={`Traces: ${getLength(allBottomTraces())}, travel: ${getTravelLength(allBottomTraces())}. Save project & reload page to recalculate.`}>
         {allBottomTraces().length == 0 ? null : <>
           <span class={"info"}>
-            <AiOutlineClockCircle /> Printer: {getGcodeDurationForTraces(allBottomTraces(), { ...config.traces })}
+            <AiOutlineClockCircle /> Printer: {getGcodeDurationForTraces(allBottomTraces(), {
+            iterations: config.traces.iterations,
+            feedRate: config.traces.maxFeedRate
+          })} - {getGcodeDurationForTraces(allBottomTraces(), {
+            iterations: config.traces.iterations,
+            feedRate: config.traces.minFeedRate
+          })}
           </span>
           <span class={"info"}>
             <AiOutlineClockCircle /> Acid: {getAcidDurationForTraces(allBottomTraces())}
@@ -175,7 +199,13 @@ const GcodeSettings: Component<Props> = (props) => {
                       title={`Traces: ${getLength(project.silkscreen_top)}, travel: ${getTravelLength(project.silkscreen_top)}. Save project & reload page to recalculate.`}>
         {project.silkscreen_top.length == 0 ? null : <>
           <span class={"info"}>
-            <AiOutlineClockCircle /> Printer: {getGcodeDurationForTraces(project.silkscreen_top, { ...config.silkscreen })}
+            <AiOutlineClockCircle /> Printer: {getGcodeDurationForTraces(project.silkscreen_top, {
+            iterations: config.silkscreen.iterations,
+            feedRate: config.silkscreen.maxFeedRate
+          })} - {getGcodeDurationForTraces(project.silkscreen_top, {
+            iterations: config.silkscreen.iterations,
+            feedRate: config.silkscreen.minFeedRate
+          })}
           </span>
         </>}
       </DownloadButton>
@@ -184,7 +214,13 @@ const GcodeSettings: Component<Props> = (props) => {
                       text={`Silkscreen bottom`}>
         {project.silkscreen_bottom.length == 0 ? null : <>
           <span class={"info"}>
-            <AiOutlineClockCircle /> Printer: {getGcodeDurationForTraces(project.silkscreen_bottom, { ...config.silkscreen })}
+            <AiOutlineClockCircle /> Printer: {getGcodeDurationForTraces(project.silkscreen_bottom, {
+            iterations: config.silkscreen.iterations,
+            feedRate: config.silkscreen.maxFeedRate
+          })} - {getGcodeDurationForTraces(project.silkscreen_bottom, {
+            iterations: config.silkscreen.iterations,
+            feedRate: config.silkscreen.minFeedRate
+          })}
           </span>
         </>}
       </DownloadButton>

@@ -10,7 +10,9 @@ export const emptyConfig = (): GcodeConfig => ({
     cutoutProfile: true,
     offsetX: 34,
     offsetY: 26,
-    feedRate: 1400,
+    minFeedRate: 600,
+    maxFeedRate: 1900,
+    acceleration: 500,
     iterations: 40,
   },
   drills: {
@@ -26,7 +28,9 @@ export const emptyConfig = (): GcodeConfig => ({
     offset: [],
     scalingFactor: 1,
     rotationAngle: 0,
-    feedRate: 2000,
+    minFeedRate: 1600,
+    maxFeedRate: 2700,
+    acceleration: 800,
     iterations: 50,
   }
 });
