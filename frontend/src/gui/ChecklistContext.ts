@@ -18,7 +18,7 @@ const checklist = (): Checklist => [
   {
     title: "Etch preparation",
     items: [
-      { text: "Saw the board. Leave an extra 1 mm spacing on each side." },
+      { text: "Saw the board. This leaves an extra 1 mm spacing on each side." },
       { text: "Clean the board with steel wool." },
       { text: "Clean the board with alcohol." },
       { text: "Clean the board with micro fibre." },
