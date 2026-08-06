@@ -17,7 +17,7 @@ const createCanvas = () => {
   const [showOffsetDrillHolesDebug, setShowOffsetDrillHolesDebug] = createSignal(false);
   const { project } = useProject();
   const { config } = useConfig();
-  const { canvas, update } = Graphics.start({ width: 1300, height: 600 });
+  const { canvas, update } = Graphics.start({ width: 1100, height: 600 });
 
   createEffect(() => {
     // Trigger on change of one of the following:
