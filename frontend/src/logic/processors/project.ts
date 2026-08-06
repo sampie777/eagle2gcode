@@ -1,5 +1,5 @@
 import { Dimension, Project } from "../types/project";
-import { Trace, Location, OutOfBoundsOption, GcodeConfig } from "../types/gcode";
+import { GcodeConfig, Location, OutOfBoundsOption, Trace } from "../types/gcode";
 import { Drill } from "../types/cam";
 import { length } from "../utils/math";
 

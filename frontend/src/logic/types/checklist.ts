@@ -1,11 +1,11 @@
 export type CheckItem = {
-    text: string,
-    checked?: boolean
+  text: string,
+  checked?: boolean
 }
 
 export type CheckGroup = {
-    title: string,
-    items: CheckItem[]
+  title: string,
+  items: CheckItem[]
 }
 
 export type Checklist = CheckGroup[]

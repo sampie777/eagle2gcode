@@ -1,10 +1,10 @@
 export enum Screens {
-    FlatcamCommandGeneration = 0,
-    ProjectFilesImport,
-    Viewer,
+  FlatcamCommandGeneration = 0,
+  ProjectFilesImport,
+  Viewer,
 }
 
 export type ScreenProps = {
-    onBack?: () => void
-    onNext?: () => void
+  onBack?: () => void
+  onNext?: () => void
 }

@@ -6,9 +6,7 @@ import './style.less';
 import { useProject } from "../../ProjectContext";
 import { Gcode } from "../../../logic/generators/gcode";
 import DownloadButton from "./DownloadButton";
-import {
-  generateDrillFile,
-} from "../../../logic/generators/drills";
+import { generateDrillFile, } from "../../../logic/generators/drills";
 import { emptyConfig, useConfig } from "../../ConfigContext";
 import { getProjectAlignmentDrills, setTracesVisibility } from "../../../logic/processors/project";
 import { generateCopperFile, generateSilkscreenFile } from "../../../logic/generators/traces";

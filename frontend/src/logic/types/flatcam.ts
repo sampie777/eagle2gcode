@@ -1,27 +1,27 @@
 export enum FlatcamCopperLayer {
-    Top = "Top",
-    Bottom = "Bottom",
+  Top = "Top",
+  Bottom = "Bottom",
 }
 
 export type FlatcamConfig = {
-    traces: {
-        copperLayer: FlatcamCopperLayer
-        mirror: boolean
-        cutoutProfile: boolean
-        offsetX: number
-        offsetY: number
-        feedRate: number
-        iterations: number
-        removeGndPads: boolean
-        usePrinterBedMesh: boolean
-    },
-    silkscreen: {
-        top: boolean
-        bottom: boolean
-        mirror: boolean
-    },
-    drills: {
-        offsetX: number
-        offsetY: number
-    }
+  traces: {
+    copperLayer: FlatcamCopperLayer
+    mirror: boolean
+    cutoutProfile: boolean
+    offsetX: number
+    offsetY: number
+    feedRate: number
+    iterations: number
+    removeGndPads: boolean
+    usePrinterBedMesh: boolean
+  },
+  silkscreen: {
+    top: boolean
+    bottom: boolean
+    mirror: boolean
+  },
+  drills: {
+    offsetX: number
+    offsetY: number
+  }
 }

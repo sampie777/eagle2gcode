@@ -65,17 +65,17 @@ const createCanvas = () => {
                id="boardOpacity" />
 
         <div class={"control-checkboxes"}>
-        <ControlOption name={"Traces (top)"} isChecked={showTopTraces()} onChange={setShowTopTraces} />
-        <ControlOption name={"Traces (bottom)"} isChecked={showBottomTraces()} onChange={setShowBottomTraces} />
-        <ControlOption name={"Silkscreen"} isChecked={showSilkscreen()} onChange={setShowSilkscreen} />
-        <ControlOption name={"Soldermask"} isChecked={showSoldermask()} onChange={setShowSoldermask} />
-        <ControlOption name={"Drills"} isChecked={showDrills()} onChange={setShowDrills} />
-        <ControlOption name={"Grid"} isChecked={showGrid()} onChange={setShowGrid} />
-        <ControlOption name={"Debug alignment holes"} isChecked={showAlignmentHolesDebug()}
-                       onChange={setShowAlignmentHolesDebug}
-                       title={"Yellow will be the alignment hole itself, pink will be the actual location, white will be the calculated location"} />
-        <ControlOption name={"Debug offset drill holes"} isChecked={showOffsetDrillHolesDebug()}
-                       onChange={setShowOffsetDrillHolesDebug} />
+          <ControlOption name={"Traces (top)"} isChecked={showTopTraces()} onChange={setShowTopTraces} />
+          <ControlOption name={"Traces (bottom)"} isChecked={showBottomTraces()} onChange={setShowBottomTraces} />
+          <ControlOption name={"Silkscreen"} isChecked={showSilkscreen()} onChange={setShowSilkscreen} />
+          <ControlOption name={"Soldermask"} isChecked={showSoldermask()} onChange={setShowSoldermask} />
+          <ControlOption name={"Drills"} isChecked={showDrills()} onChange={setShowDrills} />
+          <ControlOption name={"Grid"} isChecked={showGrid()} onChange={setShowGrid} />
+          <ControlOption name={"Debug alignment holes"} isChecked={showAlignmentHolesDebug()}
+                         onChange={setShowAlignmentHolesDebug}
+                         title={"Yellow will be the alignment hole itself, pink will be the actual location, white will be the calculated location"} />
+          <ControlOption name={"Debug offset drill holes"} isChecked={showOffsetDrillHolesDebug()}
+                         onChange={setShowOffsetDrillHolesDebug} />
         </div>
       </div>
     </div>)
