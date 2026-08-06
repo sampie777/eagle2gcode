@@ -11,7 +11,7 @@ type Props = {
 
 const Checklist: Component<Props> = (props) => {
   const { project } = useProject();
-  const [dimensions, setDimensions] = createSignal(getProjectDimensions(project));
+  const [dimensions] = createSignal(getProjectDimensions(project));
   const { checklist } = useChecklist();
 
   return <div class={"Checklist"} onClick={e => e.target === e.currentTarget ? props.close() : null}>

@@ -20,7 +20,7 @@ const checklist = (): Checklist => [
     items: [
       { text: "Saw the board. This leaves an extra 1 mm spacing on each side." },
       { text: "Clean the board with steel wool." },
-      { text: "Clean the board with alcohol." },
+      { text: "Clean the board with alcohol. From now on, don't touch the board with your fingers until you're ready to remove the ink!" },
       { text: "Clean the board with micro fibre." },
       { text: "Cover the board with permanent marker ink (from a marker or a refill bottle)." },
       { text: "With a permanent marker, put a small marking on the non copper side of the board in the corner so you will remember it's alignment when inserting it into the clamp of the printer." },
@@ -40,7 +40,7 @@ const checklist = (): Checklist => [
     title: "Etch using chemicals",
     items: [
       { text: "Turn printer off." },
-      { text: "Remove board from clamp. Prevent touching the ink surface as much as possible." },
+      { text: "Remove board from clamp. Prevent touching the ink surface as much as possible!" },
       { text: "Gentle blow off any copper dust." },
       { text: "Put the board in an etching solution." },
       { text: "Remove board from etching solution after it looks good." },
