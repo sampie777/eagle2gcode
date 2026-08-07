@@ -176,10 +176,17 @@ const generateTraces = (traces: Trace[], config: TraceConfig, state: GenerationS
         : generateBackAndForthTrace(trace, config, state)
 
       return [
-        gcodeMoveCommand(trace[0], config, false),
-        `G01 Z0.0000`,
+        // Travel to the new trace at max speed
+        `${gcodeMoveCommand(trace[0], config, false)} F${config.maxFeedRate.toFixed(0)}`,
+
+        // Plunge safely into the material at min speed
+        `G01 Z0.0000 F${config.minFeedRate.toFixed(0)}`,
+
+        // Execute the accelerated trace
         ...gcode,
-        `G00 Z3.0000`]
+
+        // Retract at max speed to prepare for the next travel
+        `G00 Z3.0000 F${config.maxFeedRate.toFixed(0)}`]
         .join("\n")
     })
     .join("\n\n");
@@ -189,13 +196,13 @@ const generateAlignmentDrillsCheckPoints = (project: Project, config: TraceConfi
   const alignmentDrills = getProjectAlignmentDrills(project);
   return alignmentDrills
     .flatMap(it => [
-      gcodeMoveCommand(it, config, false),
-      "G00 Z0.0000",
+      `${gcodeMoveCommand(it, config, false)} F${config.maxFeedRate.toFixed(0)}`,
+      `G00 Z0.0000 F${config.minFeedRate.toFixed(0)}`,
       "G4 S3 ; count down",
       "M03 ; Empty commands so the printer has time to pause",
       "M03 ; Empty commands so the printer has time to pause",
       "M03 ; Empty commands so the printer has time to pause",
-      "G00 Z3.0000"
+      `G00 Z3.0000 F${config.maxFeedRate.toFixed(0)}`
     ])
     .join("\n")
 }
@@ -232,7 +239,7 @@ export const generateSilkscreenFile = (project: Project, side: "top" | "bottom",
     "M03 ; Empty commands so the printer has time to pause",
     "M03 ; Empty commands so the printer has time to pause",
     generateTraces(side == "top" ? project.silkscreen_top : project.silkscreen_bottom, traceConfig, state),
-    "G00 X0Y0",
+    `G00 X0.0000Y0.0000 F${configWithRotation.maxFeedRate.toFixed(0)}`,
     "M300 S2000 P500 ; Beep end",
     "M05",
   ].join("\n");
@@ -265,7 +272,7 @@ export const generateCopperFile = (project: Project, side: "top" | "bottom", con
     "G4 P1",
     config.cutoutProfile ? generateTraces(project.profile, traceConfig, state) : "; No profile cutout",
     generateTraces(side == "top" ? project.traces_top : project.traces_bottom, traceConfig, state),
-    "G00 X0.0000Y0.0000Z3.0000",
+    `G00 X0.0000Y0.0000Z3.0000 F${config.maxFeedRate.toFixed(0)}`,
     "M300 S2000 P500 ; Beep end",
     "M05",
   ].join("\n");
