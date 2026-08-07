@@ -87,6 +87,25 @@ const GcodeSettings: Component<Props> = (props) => {
       <SettingNumber label={"Iterations"} defaultValue={config.traces.iterations}
                      min={1}
                      onChange={(value) => onChangeTraces({ iterations: value })} />
+
+      <SettingsContainer name={"Auto-Cleaning Brush"} visible={true}>
+        <SettingCheck label={"Enable Brush Cleaning"} defaultValue={config.traces.brush.enabled}
+                      onChange={(value) => updateConfigValue("traces", "brush", "enabled", value)} />
+        <SettingNumber label={"Distance Threshold (mm)"} defaultValue={config.traces.brush.distanceThreshold} step={100}
+                       onChange={(value) => updateConfigValue("traces", "brush", "distanceThreshold", value)} />
+        <SettingNumber label={"Pos A: X"} defaultValue={config.traces.brush.posAx} step={0.1}
+                       onChange={(value) => updateConfigValue("traces", "brush", "posAx", value)} />
+        <SettingNumber label={"Pos A: Y"} defaultValue={config.traces.brush.posAy} step={0.1}
+                       onChange={(value) => updateConfigValue("traces", "brush", "posAy", value)} />
+        <SettingNumber label={"Pos A: Z"} defaultValue={config.traces.brush.posAz} step={0.1}
+                       onChange={(value) => updateConfigValue("traces", "brush", "posAz", value)} />
+        <SettingNumber label={"Pos B: X"} defaultValue={config.traces.brush.posBx} step={0.1}
+                       onChange={(value) => updateConfigValue("traces", "brush", "posBx", value)} />
+        <SettingNumber label={"Pos B: Y"} defaultValue={config.traces.brush.posBy} step={0.1}
+                       onChange={(value) => updateConfigValue("traces", "brush", "posBy", value)} />
+        <SettingNumber label={"Pos B: Z"} defaultValue={config.traces.brush.posBz} step={0.1}
+                       onChange={(value) => updateConfigValue("traces", "brush", "posBz", value)} />
+      </SettingsContainer>
     </SettingsContainer>
 
     <SettingsContainer name={"Drills"}>
@@ -148,6 +167,11 @@ const GcodeSettings: Component<Props> = (props) => {
       <SettingNumber label={"Iterations"} defaultValue={config.silkscreen.iterations}
                      min={1}
                      onChange={(value) => onChangeSilkscreen({ iterations: value })} />
+
+      <SettingsContainer name={"Auto-Cleaning Brush"} visible={true}>
+        <SettingCheck label={"Enable Brush Cleaning"} defaultValue={config.silkscreen.brush.enabled}
+                      onChange={(value) => updateConfigValue("silkscreen", "brush", "enabled", value)} />
+      </SettingsContainer>
     </SettingsContainer>
 
     <div class={"files"}>

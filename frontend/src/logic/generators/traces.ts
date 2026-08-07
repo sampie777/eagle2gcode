@@ -1,5 +1,5 @@
 import { Dimension, Project } from "../types/project";
-import { Alignment, Location, SilkscreenConfig, Trace, TracesConfig } from "../types/gcode";
+import { Alignment, BrushConfig, Location, SilkscreenConfig, Trace, TracesConfig } from "../types/gcode";
 import { getProjectAlignmentDrills, getProjectDimensions } from "../processors/project";
 import { calculateOffsetForPoint } from "../utils/gcode";
 import { getConfigWithRotation } from "../utils/utils";
@@ -14,13 +14,35 @@ type TraceConfig = {
   minFeedRate: number
   maxFeedRate: number
   acceleration: number
+  brush: BrushConfig
 }
 
-const CORNER_ANGLE_THRESHOLD = 5 * (Math.PI / 180); // 20 degrees in radians
+type GenerationState = { distance: number };
+
+const CORNER_ANGLE_THRESHOLD = 5 * (Math.PI / 180); // 5 degrees in radians
 const ACCEL_SEGMENT_LENGTH = 1.0; // Break long lines into 1mm chunks
 
-const generateAcceleratedTrace = (trace: Trace, config: TraceConfig): string[] => {
-  // 1. Convert all points in the Trace to physical machine coordinates[cite: 1, 2]
+function addBrushCleanPath(commands: string[], config: TraceConfig, currentX: number, currentY: number, strokes: number = 7) {
+  commands.push("");
+  commands.push("; --- AUTOMATED BRUSH CLEANING ---");
+  commands.push("G00 Z12.0000");
+
+  commands.push(`G00 X${config.brush.posAx.toFixed(4)} Y${config.brush.posAy.toFixed(4)} F4000`);
+  commands.push(`G01 Z${config.brush.posAz.toFixed(4)}`);
+  for (let i = 0; i < strokes; i++) {
+    commands.push(`G00 X${config.brush.posAx.toFixed(4)} Y${config.brush.posAy.toFixed(4)} Z${config.brush.posAz.toFixed(4)}`);
+    commands.push(`G01 X${config.brush.posBx.toFixed(4)} Y${config.brush.posBy.toFixed(4)} Z${config.brush.posBz.toFixed(4)}`);
+  }
+  commands.push("G00 Z12.0000");
+
+  commands.push("; --- RESUMING TRACE ---");
+  commands.push(`G00 X${currentX.toFixed(4)} Y${currentY.toFixed(4)} F${config.maxFeedRate.toFixed(0)}`);
+  commands.push(`G01 Z0.0000 F${config.minFeedRate.toFixed(0)}`);
+  commands.push("");
+}
+
+const generateAcceleratedTrace = (trace: Trace, config: TraceConfig, state: GenerationState): string[] => {
+  // 1. Convert all points in the Trace to physical machine coordinates
   const points = trace.map(p => getOffsetForLocation(p, config));
   if (points.length === 0) return [];
 
@@ -61,7 +83,8 @@ const generateAcceleratedTrace = (trace: Trace, config: TraceConfig): string[] =
     const dist = Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
     maxSpeeds[i] = Math.min(maxSpeeds[i], maxSpeeds[i - 1] + (config.acceleration * dist));
   }
-// 6. Generate Subdivided G-code
+
+  // 6. Generate Subdivided G-code
   const commands: string[] = [];
   commands.push(`G01 X${points[0].x.toFixed(4)} Y${points[0].y.toFixed(4)} F${maxSpeeds[0].toFixed(0)}`);
 
@@ -81,6 +104,7 @@ const generateAcceleratedTrace = (trace: Trace, config: TraceConfig): string[] =
     while (dist - distanceCovered > 0.001) {
       const step = Math.min(ACCEL_SEGMENT_LENGTH, dist - distanceCovered);
       distanceCovered += step;
+      state.distance += step;
 
       const progress = distanceCovered / dist;
       const currentX = start.x + dx * progress;
@@ -92,6 +116,13 @@ const generateAcceleratedTrace = (trace: Trace, config: TraceConfig): string[] =
       const currentFeedRate = Math.min(config.maxFeedRate, limitFromStart, limitFromEnd);
 
       commands.push(`G01 X${currentX.toFixed(4)} Y${currentY.toFixed(4)} F${currentFeedRate.toFixed(0)}`);
+
+      // Inject Auto-Cleaning Routine if enabled and threshold is reached
+      if (config.brush.enabled && state.distance >= config.brush.distanceThreshold) {
+        addBrushCleanPath(commands, config, currentX, currentY);
+
+        state.distance = 0;
+      }
     }
   }
 
@@ -118,31 +149,31 @@ const gcodeMoveCommand = (location: Location, config: TraceConfig, linear: boole
   return `G0${linear ? 1 : 0} X${result.x.toFixed(4)}Y${result.y.toFixed(4)}`;
 }
 
-const generateBackAndForthTrace = (trace: Trace, config: TraceConfig) => {
+const generateBackAndForthTrace = (trace: Trace, config: TraceConfig, state: GenerationState) => {
   return Array.from(Array(config.iterations))
     .flatMap((_, iteration) => {
       const isForward = iteration % 2 === 0;
       // Copy and reverse the trace array for backward passes so it processes correctly
       const sequentialTrace = isForward ? trace : [...trace].reverse();
-      return generateAcceleratedTrace(sequentialTrace, config);
+      return generateAcceleratedTrace(sequentialTrace, config, state);
     });
 }
 
-const generateContinuousTrace = (trace: Trace, config: TraceConfig) => {
+const generateContinuousTrace = (trace: Trace, config: TraceConfig, state: GenerationState) => {
   return Array.from(Array(config.iterations)).flatMap(_ =>
-    generateAcceleratedTrace(trace, config)
+    generateAcceleratedTrace(trace, config, state)
   );
 }
 
-const generateTraces = (traces: Trace[], config: TraceConfig) => {
+const generateTraces = (traces: Trace[], config: TraceConfig, state: GenerationState) => {
   return traces
     .map(trace => trace.filter(it => it.enabled))
     .filter(it => it.length > 1)
     .map(trace => {
       const canBeContinuous = trace[0].x == trace[trace.length - 1].x && trace[0].y == trace[trace.length - 1].y;
       const gcode = canBeContinuous
-        ? generateContinuousTrace(trace, config)
-        : generateBackAndForthTrace(trace, config)
+        ? generateContinuousTrace(trace, config, state)
+        : generateBackAndForthTrace(trace, config, state)
 
       return [
         gcodeMoveCommand(trace[0], config, false),
@@ -181,7 +212,10 @@ export const generateSilkscreenFile = (project: Project, side: "top" | "bottom",
     minFeedRate: config.minFeedRate,
     maxFeedRate: config.maxFeedRate,
     acceleration: config.acceleration,
+    brush: config.brush
   }
+
+  const state: GenerationState = { distance: 0 };
 
   return [
     "G21",
@@ -197,7 +231,7 @@ export const generateSilkscreenFile = (project: Project, side: "top" | "bottom",
     "M03 ; Empty commands so the printer has time to pause",
     "M03 ; Empty commands so the printer has time to pause",
     "M03 ; Empty commands so the printer has time to pause",
-    generateTraces(side == "top" ? project.silkscreen_top : project.silkscreen_bottom, traceConfig),
+    generateTraces(side == "top" ? project.silkscreen_top : project.silkscreen_bottom, traceConfig, state),
     "G00 X0Y0",
     "M300 S2000 P500 ; Beep end",
     "M05",
@@ -215,7 +249,10 @@ export const generateCopperFile = (project: Project, side: "top" | "bottom", con
     minFeedRate: config.minFeedRate,
     maxFeedRate: config.maxFeedRate,
     acceleration: config.acceleration,
+    brush: config.brush
   }
+
+  const state: GenerationState = { distance: 0 };
 
   return [
     "G21",
@@ -226,8 +263,8 @@ export const generateCopperFile = (project: Project, side: "top" | "bottom", con
     "M03",
     "G28",
     "G4 P1",
-    config.cutoutProfile ? generateTraces(project.profile, traceConfig) : "; No profile cutout",
-    generateTraces(side == "top" ? project.traces_top : project.traces_bottom, traceConfig),
+    config.cutoutProfile ? generateTraces(project.profile, traceConfig, state) : "; No profile cutout",
+    generateTraces(side == "top" ? project.traces_top : project.traces_bottom, traceConfig, state),
     "G00 X0.0000Y0.0000Z3.0000",
     "M300 S2000 P500 ; Beep end",
     "M05",

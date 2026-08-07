@@ -4,6 +4,13 @@ import { Persistency } from "../logic/utils/persistency";
 import { createStore } from "solid-js/store";
 import { SetStoreFunction } from "solid-js/store/types/store";
 
+const defaultBrush = {
+  enabled: true,
+  posAx: 106.9, posAy: 113.3, posAz: 7.3,
+  posBx: 114.2, posBy: 148.9, posBz: 7.0,
+  distanceThreshold: 25000
+};
+
 export const emptyConfig = (): GcodeConfig => ({
   traces: {
     outOfBounds: OutOfBoundsOption.Hide,
@@ -11,9 +18,10 @@ export const emptyConfig = (): GcodeConfig => ({
     offsetX: 34,
     offsetY: 26,
     minFeedRate: 600,
-    maxFeedRate: 1900,
+    maxFeedRate: 2500,
     acceleration: 500,
     iterations: 40,
+    brush: { ...defaultBrush }
   },
   drills: {
     offset: [],
@@ -29,9 +37,10 @@ export const emptyConfig = (): GcodeConfig => ({
     scalingFactor: 1,
     rotationAngle: 0,
     minFeedRate: 1600,
-    maxFeedRate: 2700,
-    acceleration: 800,
+    maxFeedRate: 3000,
+    acceleration: 500,
     iterations: 50,
+    brush: { ...defaultBrush }
   }
 });
 

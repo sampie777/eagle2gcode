@@ -20,6 +20,17 @@ export type Alignment = {
   rotationAngle: number,
 }
 
+export type BrushConfig = {
+  enabled: boolean
+  posAx: number
+  posAy: number
+  posAz: number
+  posBx: number
+  posBy: number
+  posBz: number
+  distanceThreshold: number
+}
+
 export type TracesConfig = {
   cutoutProfile: boolean
   outOfBounds: OutOfBoundsOption
@@ -29,6 +40,7 @@ export type TracesConfig = {
   maxFeedRate: number
   acceleration: number
   iterations: number
+  brush: BrushConfig
 };
 
 export type DrillConfig = {
@@ -43,6 +55,7 @@ export type SilkscreenConfig = {
   minFeedRate: number
   maxFeedRate: number
   acceleration: number
+  brush: BrushConfig
 } & Alignment;
 
 export type GcodeConfig = {
