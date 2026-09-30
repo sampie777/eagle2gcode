@@ -162,10 +162,12 @@ const drawComponents = (board: Eagle.Board, addToBucket: (color: number, geom: B
     })
 
     pack.pads.forEach(it => {
-        const { geometry, color } = createPadGeometry(board, it);
-        geometry.applyMatrix4(matrix);
-        addToBucket(color, geometry);
-    })
+      const { geometries, color } = createPadGeometry(board, it);
+      geometries.forEach(geom => {
+        geom.applyMatrix4(matrix);
+        addToBucket(color, geom);
+      });
+    });
 
     pack.pads.forEach(it => {
         const { geometry, color } = createDrillGeometry(it);
@@ -175,10 +177,18 @@ const drawComponents = (board: Eagle.Board, addToBucket: (color: number, geom: B
   })
 }
 
+const isBottomLayer = (board: Eagle.Board, layerNumberOrName: string): boolean => {
+  if (layerNumberOrName === "16" || layerNumberOrName.toLowerCase() === "bottom") {
+    return true;
+  }
+  const layer = board.layers.find(it => it.number === layerNumberOrName || it.name === layerNumberOrName);
+  return layer?.number === "16" || layer?.name.toLowerCase() === "bottom";
+};
+
 const createWireGeometry = (board: Eagle.Board, wire: Eagle.Wire) => {
   const from = new Vector2(wire.x1, wire.y1);
   const to = new Vector2(wire.x2, wire.y2);
-  const between = (new Vector2()).subVectors(to, from)
+  const between = (new Vector2()).subVectors(to, from);
 
   const shape = new Shape();
   shape.moveTo(0, -0.5 * wire.width);
@@ -190,9 +200,13 @@ const createWireGeometry = (board: Eagle.Board, wire: Eagle.Wire) => {
 
   const geometry = new ShapeGeometry(shape);
 
-  // Transform geometry directly instead of wrapping in a Mesh
+  // Position on top (+0.02 mm) or on the back side (-1.02 mm)
+  const zPosition = isBottomLayer(board, wire.layer)
+    ? -(pcbThickness + Z_SURFACE_OFFSET)
+    : Z_SURFACE_OFFSET;
+
   geometry.rotateZ(between.angle());
-  geometry.translate(from.x, from.y, Z_SURFACE_OFFSET);
+  geometry.translate(from.x, from.y, zPosition);
 
   const color = layerToColor(board.layers, wire.layer);
   return { geometry, color };
@@ -237,20 +251,21 @@ const createPadGeometry = (board: Eagle.Board, pad: Eagle.Pad) => {
     console.error("Unknown pad shape", pad);
   }
 
-  // PROPER THREE.JS HOLE: Create a separate path and push it to shape.holes
   const hole = new Path();
   hole.absarc(padWidth / 2, padWidth / 2, pad.drill / 2, 0, 2 * Math.PI, true);
   shape.holes.push(hole);
 
-  const geometry = new ShapeGeometry(shape);
+  const topGeometry = new ShapeGeometry(shape);
+  topGeometry.translate(-0.5 * padWidth + pad.x, -0.5 * padWidth + pad.y, Z_SURFACE_OFFSET);
 
-  // Transform geometry directly to match pad location
-  geometry.translate(-0.5 * padWidth + pad.x, -0.5 * padWidth + pad.y, 0);
+  // Pad on the bottom face of the PCB
+  const bottomGeometry = topGeometry.clone();
+  bottomGeometry.translate(0, 0, -(pcbThickness + 2 * Z_SURFACE_OFFSET));
 
-  const padLayer = board.layers.find(it => it.name == "Pads")
+  const padLayer = board.layers.find(it => it.name == "Pads");
   const color = layerToColor(board.layers, padLayer?.number ?? "0");
 
-  return { geometry, color };
+  return { geometries: [topGeometry, bottomGeometry], color };
 }
 
 const createDrillGeometry = (pad: Eagle.Pad) => {
