@@ -188,7 +188,7 @@ export namespace Graphics {
       drawDrillsBatched(scene, getProjectAlignmentDrills(project), 0x88aaff)
     }
 
-    drawBoard(scene, project.board, config.boardOpacity)
+    drawBoard(scene, project.board, project.drills, config.boardOpacity)
 
     if (config.showOffsetDrillHolesDebug) {
       drawOffsetDrillHoles(scene, project, projectConfig.drills);

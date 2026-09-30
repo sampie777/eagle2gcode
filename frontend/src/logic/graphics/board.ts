@@ -15,15 +15,25 @@ import {
 } from "three";
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { Eagle } from "../types/eagle";
+import { Drill } from "../types/cam";
 
 const pcbThickness = 1;
+const Z_SURFACE_OFFSET = 0.02; // 20 microns above the board surface
 
 // --- Add Cache Mechanisms ---
 const materialCache = new Map<string, MeshBasicMaterial>();
 const getMaterial = (color: number, opacity: number) => {
   const key = `${color}-${opacity}`;
   if (!materialCache.has(key)) {
-    materialCache.set(key, new MeshBasicMaterial({ color: color, transparent: true, opacity: opacity, side: DoubleSide }));
+    materialCache.set(key, new MeshBasicMaterial({
+      color: color,
+      transparent: true,
+      opacity: opacity,
+      side: DoubleSide,
+      polygonOffset: true,
+      polygonOffsetFactor: -1.0,
+      polygonOffsetUnits: -4.0,
+    }));
   }
   return materialCache.get(key)!;
 };
@@ -36,12 +46,12 @@ const getDrillGeometry = (drillSize: number) => {
   return drillGeometryCache.get(drillSize)!;
 };
 
-export const drawBoard = (scene: Scene, board: Eagle.Board, opacity: number) => {
+export const drawBoard = (scene: Scene, board: Eagle.Board, drills: Drill[], opacity: number) => {
   if (opacity == 0) return;
-  drawOutline(board, scene, opacity);
 
-  // We will collect all geometries into buckets grouped by Color,
-  // so we only create one Mesh per distinct material.
+  // Cut the drill holes directly out of the board substrate
+  drawOutline(board, drills, scene, opacity);
+
   const geometryBuckets = new Map<number, BufferGeometry[]>();
 
   const addToBucket = (color: number, geometry: BufferGeometry) => {
@@ -52,7 +62,6 @@ export const drawBoard = (scene: Scene, board: Eagle.Board, opacity: number) => 
   drawSignals(board, addToBucket);
   drawComponents(board, addToBucket);
 
-  // Merge all geometries in each bucket and add them to the scene
   geometryBuckets.forEach((geometries, color) => {
     if (geometries.length > 0) {
       const mergedGeometry = mergeGeometries(geometries);
@@ -76,21 +85,37 @@ const layerToColor = (layers: Eagle.Layer[], layer: string) => {
   return layerNum !== undefined ? (colors[layerNum] ?? 0x888888) : 0x888888;
 }
 
-function drawOutline(board: Eagle.Board, scene: Scene, opacity: number) {
+function drawOutline(board: Eagle.Board, drills: Drill[], scene: Scene, opacity: number) {
   if (board.plain.length == 0) return;
 
   const shape = new Shape();
   shape.moveTo(board.plain[0].x1, board.plain[0].y1)
   board.plain.forEach(wire => {
     shape.lineTo(wire.x2, wire.y2);
-  })
+  });
+
+  // Punch each drill out of the board shape
+  if (drills) {
+    drills.forEach(drill => {
+      const hole = new Path();
+      hole.absarc(drill.x, drill.y, drill.size / 2, 0, Math.PI * 2, true);
+      shape.holes.push(hole);
+    });
+  }
 
   const geometry = new ExtrudeGeometry(shape, {
     depth: -1 * pcbThickness,
-  })
-  const material = new MeshBasicMaterial({ color: 0x0e442d, transparent: true, opacity: 0.8 * opacity });
-  material.side = DoubleSide;
-  scene.add(new Mesh(geometry, material))
+    bevelEnabled: false,
+  });
+
+  const material = new MeshBasicMaterial({
+    color: 0x0e442d,
+    transparent: true,
+    opacity: 0.8 * opacity,
+    side: DoubleSide
+  });
+
+  scene.add(new Mesh(geometry, material));
 }
 
 const findPackage = (board: Eagle.Board, component: Eagle.Component): Eagle.Package | undefined => {
@@ -167,7 +192,7 @@ const createWireGeometry = (board: Eagle.Board, wire: Eagle.Wire) => {
 
   // Transform geometry directly instead of wrapping in a Mesh
   geometry.rotateZ(between.angle());
-  geometry.translate(from.x, from.y, 0);
+  geometry.translate(from.x, from.y, Z_SURFACE_OFFSET);
 
   const color = layerToColor(board.layers, wire.layer);
   return { geometry, color };
@@ -181,7 +206,7 @@ const createPadGeometry = (board: Eagle.Board, pad: Eagle.Pad) => {
   const shapeType = pad.shape === "null" || !pad.shape ? "round" : pad.shape;
 
   if (shapeType == "octagon") {
-    const verticeLength = padWidth / (1 + Math.sqrt(2))
+    const verticeLength = padWidth / (1 + Math.sqrt(2));
     const diagonalVerticeLength = verticeLength * Math.sqrt(0.5);
 
     shape.moveTo(diagonalVerticeLength, 0);
@@ -209,7 +234,7 @@ const createPadGeometry = (board: Eagle.Board, pad: Eagle.Pad) => {
     shape.moveTo(padWidth, padWidth / 2);
     shape.absarc(padWidth / 2, padWidth / 2, padWidth / 2, 0, 2 * Math.PI, false);
   } else {
-    console.error("Unknown pad shape", pad)
+    console.error("Unknown pad shape", pad);
   }
 
   // PROPER THREE.JS HOLE: Create a separate path and push it to shape.holes
