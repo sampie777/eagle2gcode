@@ -15,11 +15,17 @@ Element.prototype.getAttributeInt = function(name: string): number | null {
 const rotationToNumber = (value: string | null): number | null => {
   if (value == null) return null;
 
-  const match = value.match(/^([LR])(\d+)$/)
+  const match = value.match(/^S?M?([LR])(\d+(\.\d+)?)$/)
   if (match == null) return null;
 
   const [_, direction, amount] = match;
   return +amount / 360 * (direction == "R" ? 1 : -1);
+}
+
+// New helper to extract the Mirror flag from the rotation string
+const isMirrored = (value: string | null): boolean => {
+  if (value == null) return false;
+  return value.includes("M");
 }
 
 function getWires(element: Element): Eagle.Wire[] {
@@ -125,6 +131,8 @@ const getComponents = (xml: Document): Eagle.Component[] => {
           value: it.getAttribute("value"),
         }))
 
+      const rotationString = component.getAttribute("rot");
+
       return {
         name: component.getAttribute("name"),
         library: component.getAttribute("library"),
@@ -132,7 +140,8 @@ const getComponents = (xml: Document): Eagle.Component[] => {
         package: component.getAttribute("package"),
         x: component.getAttributeInt("x") ?? 0,
         y: component.getAttributeInt("y") ?? 0,
-        rotation: rotationToNumber(component.getAttribute("rot")),
+        rotation: rotationToNumber(rotationString),
+        mirror: isMirrored(rotationString),
         attributes: attributes,
         smashed: component.getAttribute("smashed") == "yes",
       }

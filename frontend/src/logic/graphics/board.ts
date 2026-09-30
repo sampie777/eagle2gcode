@@ -148,15 +148,23 @@ const drawComponents = (board: Eagle.Board, addToBucket: (color: number, geom: B
       return;
     }
 
-    // Create a matrix to apply the component's rotation and position to its internal parts
+    // Capture the mirror flag. (Ensure your XML parser adds this property to the component!)
+    const isMirrored = (component as any).mirror === true;
+
     const matrix = new Matrix4();
     if (component.rotation) {
         matrix.makeRotationZ(component.rotation * 2 * Math.PI);
     }
+
+    // In Eagle, mirroring flips the component's X-axis
+    if (isMirrored) {
+        matrix.scale(new Vector3(-1, 1, 1));
+    }
+
     matrix.setPosition(new Vector3(component.x, component.y, 0));
 
     pack.wires.forEach(it => {
-        const { geometry, color } = createWireGeometry(board, it);
+        const { geometry, color } = createWireGeometry(board, it, isMirrored);
         geometry.applyMatrix4(matrix);
         addToBucket(color, geometry);
     })
@@ -181,11 +189,23 @@ const isBottomLayer = (board: Eagle.Board, layerNumberOrName: string): boolean =
   if (layerNumberOrName === "16" || layerNumberOrName.toLowerCase() === "bottom") {
     return true;
   }
+
   const layer = board.layers.find(it => it.number === layerNumberOrName || it.name === layerNumberOrName);
-  return layer?.number === "16" || layer?.name.toLowerCase() === "bottom";
+  if (!layer) return false;
+
+  const name = layer.name.toLowerCase();
+
+  // Eagle standard bottom layer names (Silkscreen, Soldermask, Keepout, etc.)
+  const bottomLayers = [
+    "bottom", "bplace", "bnames", "bvalues", "bstop",
+    "bcream", "bfinish", "bglue", "btest", "bkeepout",
+    "brestrict", "bdocu"
+  ];
+
+  return layer.number === "16" || bottomLayers.includes(name);
 };
 
-const createWireGeometry = (board: Eagle.Board, wire: Eagle.Wire) => {
+const createWireGeometry = (board: Eagle.Board, wire: Eagle.Wire, isMirrored: boolean = false) => {
   const from = new Vector2(wire.x1, wire.y1);
   const to = new Vector2(wire.x2, wire.y2);
   const between = (new Vector2()).subVectors(to, from);
@@ -200,8 +220,13 @@ const createWireGeometry = (board: Eagle.Board, wire: Eagle.Wire) => {
 
   const geometry = new ShapeGeometry(shape);
 
-  // Position on top (+0.02 mm) or on the back side (-1.02 mm)
-  const zPosition = isBottomLayer(board, wire.layer)
+  // Determine if the wire natively belongs on the bottom layer
+  const isWireOnBottom = isBottomLayer(board, wire.layer);
+
+  // If the entire component is mirrored, invert the wire's layer placement
+  const renderOnBottom = isMirrored ? !isWireOnBottom : isWireOnBottom;
+
+  const zPosition = renderOnBottom
     ? -(pcbThickness + Z_SURFACE_OFFSET)
     : Z_SURFACE_OFFSET;
 

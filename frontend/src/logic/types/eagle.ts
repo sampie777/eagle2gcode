@@ -69,6 +69,7 @@ export namespace Eagle {
     x: number
     y: number
     rotation: number | null
+    mirror: boolean
     attributes: Attribute[]
     smashed: boolean
   }
