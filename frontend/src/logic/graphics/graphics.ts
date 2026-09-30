@@ -8,7 +8,10 @@ import {
   LineSegments,
   MOUSE,
   PerspectiveCamera,
+  Plane,
+  Raycaster,
   Scene,
+  Vector2,
   Vector3,
   WebGLRenderer
 } from "three";
@@ -58,9 +61,46 @@ export namespace Graphics {
       RIGHT: MOUSE.ROTATE
     }
     controls.enableDamping = true;
+    controls.enableZoom = false; // Disable default central zoom in favor of mouse-anchored zoom
+
     controls.addEventListener("change", () => {
       requestRender(renderer, scene, camera, controls);
-    })
+    });
+
+    // Setup mouse-anchored zoom
+    const raycaster = new Raycaster();
+    const mouse = new Vector2();
+    const pcbPlane = new Plane(new Vector3(0, 0, 1), 0); // Z = 0 plane where the PCB lies
+    const intersectionPoint = new Vector3();
+
+    renderer.domElement.addEventListener("wheel", (event: WheelEvent) => {
+      event.preventDefault();
+
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+
+      // Find the point on the PCB plane under the cursor
+      if (raycaster.ray.intersectPlane(pcbPlane, intersectionPoint)) {
+        // Multiplier based on scroll direction (deltaY > 0 is scroll down/zoom out)
+        const zoomFactor = event.deltaY < 0 ? 0.97 : 1.03;
+
+        // Move camera position toward/away from the cursor intersection
+        camera.position.x = intersectionPoint.x + (camera.position.x - intersectionPoint.x) * zoomFactor;
+        camera.position.y = intersectionPoint.y + (camera.position.y - intersectionPoint.y) * zoomFactor;
+        camera.position.z = intersectionPoint.z + (camera.position.z - intersectionPoint.z) * zoomFactor;
+
+        // Keep controls.target aligned to prevent orbit rotation jumping
+        controls.target.x = intersectionPoint.x + (controls.target.x - intersectionPoint.x) * zoomFactor;
+        controls.target.y = intersectionPoint.y + (controls.target.y - intersectionPoint.y) * zoomFactor;
+        controls.target.z = intersectionPoint.z + (controls.target.z - intersectionPoint.z) * zoomFactor;
+
+        controls.update();
+        requestRender(renderer, scene, camera, controls);
+      }
+    }, { passive: false });
 
     requestRender(renderer, scene, camera, controls);
     return {
