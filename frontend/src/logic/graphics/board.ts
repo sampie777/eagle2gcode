@@ -1,27 +1,69 @@
 import {
+  BufferGeometry,
   CylinderGeometry,
   DoubleSide,
   ExtrudeGeometry,
-  Group,
+  Matrix4,
   Mesh,
   MeshBasicMaterial,
   Scene,
   Shape,
   ShapeGeometry,
-  Vector2
+  Vector2,
+  Vector3
 } from "three";
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { Eagle } from "../types/eagle";
 
 const pcbThickness = 1;
 
+// --- Add Cache Mechanisms ---
+const materialCache = new Map<string, MeshBasicMaterial>();
+const getMaterial = (color: number, opacity: number) => {
+  const key = `${color}-${opacity}`;
+  if (!materialCache.has(key)) {
+    materialCache.set(key, new MeshBasicMaterial({ color: color, transparent: true, opacity: opacity, side: DoubleSide }));
+  }
+  return materialCache.get(key)!;
+};
+
+const drillGeometryCache = new Map<number, CylinderGeometry>();
+const getDrillGeometry = (drillSize: number) => {
+  if (!drillGeometryCache.has(drillSize)) {
+    drillGeometryCache.set(drillSize, new CylinderGeometry(drillSize / 2, drillSize / 2, pcbThickness, 16, 1, false));
+  }
+  return drillGeometryCache.get(drillSize)!;
+};
+
 export const drawBoard = (scene: Scene, board: Eagle.Board, opacity: number) => {
   if (opacity == 0) return;
   drawOutline(board, scene, opacity);
-  drawSignals(board, scene, opacity);
-  drawComponents(board, scene, opacity);
+
+  // We will collect all geometries into buckets grouped by Color,
+  // so we only create one Mesh per distinct material.
+  const geometryBuckets = new Map<number, BufferGeometry[]>();
+
+  const addToBucket = (color: number, geometry: BufferGeometry) => {
+    if (!geometryBuckets.has(color)) geometryBuckets.set(color, []);
+    geometryBuckets.get(color)!.push(geometry);
+  };
+
+  drawSignals(board, addToBucket);
+  drawComponents(board, addToBucket);
+
+  // Merge all geometries in each bucket and add them to the scene
+  geometryBuckets.forEach((geometries, color) => {
+    if (geometries.length > 0) {
+      const mergedGeometry = mergeGeometries(geometries);
+      if (mergedGeometry) {
+        const material = getMaterial(color, opacity);
+        scene.add(new Mesh(mergedGeometry, material));
+      }
+    }
+  });
 };
 
-const colors = {
+const colors: Record<number, number> = {
   4: 0xa00909,
   2: 0x31b079,
   7: 0x9f9f9f,
@@ -29,8 +71,8 @@ const colors = {
 }
 
 const layerToColor = (layers: Eagle.Layer[], layer: string) => {
-  const value = colors[layers.find(it => it.number == layer)?.color];
-  return value ?? 0x888888;
+  const layerNum = layers.find(it => it.number == layer)?.color;
+  return layerNum !== undefined ? (colors[layerNum] ?? 0x888888) : 0x888888;
 }
 
 function drawOutline(board: Eagle.Board, scene: Scene, opacity: number) {
@@ -56,43 +98,48 @@ const findPackage = (board: Eagle.Board, component: Eagle.Component): Eagle.Pack
   return library.packages.find(it => it.name == component.package);
 };
 
-const drawSignals = (board: Eagle.Board, scene: Scene, opacity: number) => {
+const drawSignals = (board: Eagle.Board, addToBucket: (color: number, geom: BufferGeometry) => void) => {
   board.signals.forEach(signal => {
     signal.wires.forEach(wire => {
-      scene.add(createWire(board, wire, opacity))
+      const { geometry, color } = createWireGeometry(board, wire);
+      addToBucket(color, geometry);
     })
   })
 }
 
-const drawComponents = (board: Eagle.Board, scene: Scene, opacity: number) => {
+const drawComponents = (board: Eagle.Board, addToBucket: (color: number, geom: BufferGeometry) => void) => {
   board.components.forEach(component => {
     const pack = findPackage(board, component);
     if (pack == null) return;
 
-    const group = new Group();
+    // Create a matrix to apply the component's rotation and position to its internal parts
+    const matrix = new Matrix4();
+    if (component.rotation) {
+      matrix.makeRotationZ(component.rotation * 2 * Math.PI);
+    }
+    matrix.setPosition(new Vector3(component.x, component.y, 0));
+
     pack.wires.forEach(it => {
-      const mesh = createWire(board, it, opacity);
-      group.add(mesh)
-    })
-    pack.pads.forEach(it => {
-      const mesh = createPad(board, it, opacity);
-      group.add(mesh)
-    })
-    pack.pads.forEach(it => {
-      const mesh = createDrill(board, it, opacity);
-      group.add(mesh)
+      const { geometry, color } = createWireGeometry(board, it);
+      geometry.applyMatrix4(matrix);
+      addToBucket(color, geometry);
     })
 
-    group.position.x += component.x;
-    group.position.y += component.y;
-    if (component.rotation) {
-      group.rotateZ(component.rotation * 2 * Math.PI)
-    }
-    scene.add(group)
+    pack.pads.forEach(it => {
+      const { geometry, color } = createPadGeometry(board, it);
+      geometry.applyMatrix4(matrix);
+      addToBucket(color, geometry);
+    })
+
+    pack.pads.forEach(it => {
+      const { geometry, color } = createDrillGeometry(it);
+      geometry.applyMatrix4(matrix);
+      addToBucket(color, geometry);
+    })
   })
 }
 
-const createWire = (board: Eagle.Board, wire: Eagle.Wire, opacity: number) => {
+const createWireGeometry = (board: Eagle.Board, wire: Eagle.Wire) => {
   const from = new Vector2(wire.x1, wire.y1);
   const to = new Vector2(wire.x2, wire.y2);
   const between = (new Vector2()).subVectors(to, from)
@@ -106,22 +153,16 @@ const createWire = (board: Eagle.Board, wire: Eagle.Wire, opacity: number) => {
   shape.arc(0, -0.5 * wire.width, 0.5 * wire.width, 0.5 * 3.14, 1.5 * 3.14);
 
   const geometry = new ShapeGeometry(shape);
-  const material = new MeshBasicMaterial({
-    color: layerToColor(board.layers, wire.layer),
-    transparent: true,
-    opacity: opacity
-  });
-  material.side = DoubleSide;
-  const mesh = new Mesh(geometry, material);
 
-  mesh.rotateZ(between.angle())
-  mesh.position.x = from.x
-  mesh.position.y = from.y
+  // Transform geometry directly instead of wrapping in a Mesh
+  geometry.rotateZ(between.angle());
+  geometry.translate(from.x, from.y, 0);
 
-  return mesh
+  const color = layerToColor(board.layers, wire.layer);
+  return { geometry, color };
 }
 
-const createPad = (board: Eagle.Board, pad: Eagle.Pad, opacity: number) => {
+const createPadGeometry = (board: Eagle.Board, pad: Eagle.Pad) => {
   const padWidth = pad.drill * 1.8;
 
   const shape = new Shape();
@@ -157,39 +198,22 @@ const createPad = (board: Eagle.Board, pad: Eagle.Pad, opacity: number) => {
   }
 
   const geometry = new ShapeGeometry(shape);
+
+  // Transform geometry directly
+  geometry.translate(-0.5 * padWidth + pad.x, -0.5 * padWidth + pad.y, 0);
+
   const padLayer = board.layers.find(it => it.name == "Pads")
-  const material = new MeshBasicMaterial({
-    color: layerToColor(board.layers, padLayer?.number ?? "0"),
-    transparent: true,
-    opacity: opacity
-  });
-  material.side = DoubleSide;
-  const mesh = new Mesh(geometry, material);
+  const color = layerToColor(board.layers, padLayer?.number ?? "0");
 
-  mesh.position.x -= 0.5 * padWidth;
-  mesh.position.y -= 0.5 * padWidth;
-
-  mesh.position.x += pad.x
-  mesh.position.y += pad.y
-  return mesh
+  return { geometry, color };
 }
 
-const createDrill = (board: Eagle.Board, pad: Eagle.Pad, opacity: number) => {
-  const geometry = new CylinderGeometry(
-    pad.drill / 2,
-    pad.drill / 2,
-    pcbThickness,
-    32,
-    1,
-    false);
-  const material = new MeshBasicMaterial({ color: 0x95833d, transparent: true, opacity: opacity });
-  material.side = DoubleSide;
-  const mesh = new Mesh(geometry, material);
+const createDrillGeometry = (pad: Eagle.Pad) => {
+  // Clone the cached template so we don't mutate it
+  const geometry = getDrillGeometry(pad.drill).clone();
 
-  mesh.rotateX(0.5 * Math.PI)
-  mesh.position.z -= 0.5 * pcbThickness;
+  geometry.rotateX(0.5 * Math.PI);
+  geometry.translate(pad.x, pad.y, -0.5 * pcbThickness);
 
-  mesh.position.x += pad.x
-  mesh.position.y += pad.y
-  return mesh
+  return { geometry, color: 0x95833d };
 }

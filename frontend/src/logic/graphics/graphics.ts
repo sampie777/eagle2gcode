@@ -2,13 +2,13 @@ import {
   AxesHelper,
   BufferGeometry,
   Color,
+  Float32BufferAttribute,
   GridHelper,
-  Line,
   LineBasicMaterial,
+  LineSegments,
   MOUSE,
   PerspectiveCamera,
   Scene,
-  Shape,
   Vector3,
   WebGLRenderer
 } from "three";
@@ -144,8 +144,8 @@ export namespace Graphics {
       drawDefaultLines(scene, project.soldermask_bottom, 0x31b079)
     }
     if (config.showDrills) {
-      project.drills.forEach(it => scene.add(drawDrill(it, 0xaa00aa)))
-      getProjectAlignmentDrills(project).forEach(it => scene.add(drawDrill(it, 0x88aaff)))
+      drawDrillsBatched(scene, project.drills, 0xaa00aa)
+      drawDrillsBatched(scene, getProjectAlignmentDrills(project), 0x88aaff)
     }
 
     drawBoard(scene, project.board, config.boardOpacity)
@@ -171,9 +171,7 @@ export namespace Graphics {
       { enabled: true, x: dimensions.x, y: dimensions.y },
     ]
 
-    const lines = drawTrace(trace.filter(it => it.enabled), color);
-    if (!lines) return
-    scene.add(lines);
+    drawDefaultLines(scene, [trace], color);
   }
 
   const drawGrid = (dimensions: { x: number; y: number; width: number; height: number }, scene: Scene) => {
@@ -192,36 +190,41 @@ export namespace Graphics {
   }
 
   const drawDefaultLines = (scene: Scene, traces: Trace[], color: ColorRepresentation) => {
+    const positions: number[] = [];
+
     traces.forEach(trace => {
-      const lines = drawTrace(trace.filter(it => it.enabled), color);
-      if (!lines) return
-      scene.add(lines);
-    })
+      const enabled = trace.filter(it => it.enabled);
+      for (let i = 0; i < enabled.length - 1; i++) {
+        positions.push(enabled[i].x, enabled[i].y, 0);
+        positions.push(enabled[i + 1].x, enabled[i + 1].y, 0);
+      }
+    });
+
+    if (positions.length === 0) return;
+
+    const geometry = new BufferGeometry();
+    geometry.setAttribute('position', new Float32BufferAttribute(positions, 3));
+    const material = new LineBasicMaterial({ color: color, linewidth: 20 });
+    scene.add(new LineSegments(geometry, material));
   }
 
-  const drawTrace = (trace: Trace, color: ColorRepresentation) => {
-    if (trace.length < 2) return;
+  // Replace drawDrill with a batched version
+  const drawDrillsBatched = (scene: Scene, drills: Drill[], color: ColorRepresentation) => {
+    const positions: number[] = [];
 
-    const shape = new Shape();
-    shape.moveTo(trace[0].x, trace[0].y)
-    trace.forEach(wire => shape.lineTo(wire.x, wire.y))
+    drills.forEach(drill => {
+      const radius = drill.size / 2 * Math.sin(0.25 * Math.PI);
+      positions.push(drill.x - radius, drill.y - radius, 0);
+      positions.push(drill.x + radius, drill.y + radius, 0);
+      positions.push(drill.x - radius, drill.y + radius, 0);
+      positions.push(drill.x + radius, drill.y - radius, 0);
+    });
 
-    const geometry = new BufferGeometry().setFromPoints(shape.getPoints())
-    const material = new LineBasicMaterial({ color: color, linewidth: 20 });
-    return new Line(geometry, material)
-  };
+    if (positions.length === 0) return;
 
-  const drawDrill = (drill: Drill, color: ColorRepresentation) => {
-    const shape = new Shape();
-    const radius = drill.size / 2 * Math.sin(0.25 * Math.PI);
-    shape.moveTo(drill.x - radius, drill.y - radius)
-    shape.lineTo(drill.x + radius, drill.y + radius)
-    shape.moveTo(drill.x, drill.y)
-    shape.lineTo(drill.x - radius, drill.y + radius)
-    shape.lineTo(drill.x + radius, drill.y - radius)
-
-    const geometry = new BufferGeometry().setFromPoints(shape.getPoints())
+    const geometry = new BufferGeometry();
+    geometry.setAttribute('position', new Float32BufferAttribute(positions, 3));
     const material = new LineBasicMaterial({ color: color });
-    return new Line(geometry, material)
+    scene.add(new LineSegments(geometry, material));
   }
 }
