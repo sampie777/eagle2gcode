@@ -144,6 +144,23 @@ export namespace Graphics {
                   config: RenderConfig,
                   projectConfig: GcodeConfig,
                   controls?: OrbitControls) => {
+
+    // --- MEMORY CLEANUP: Dispose of old geometries and materials ---
+    scene.children.forEach((child: any) => {
+      if (child.geometry) {
+        child.geometry.dispose();
+      }
+      if (child.material) {
+        // Materials can be an array or a single object
+        if (Array.isArray(child.material)) {
+          child.material.forEach((mat: any) => mat.dispose());
+        } else {
+          child.material.dispose();
+        }
+      }
+    });
+    // -------------------------------------------------------------
+
     scene.clear()
 
     const dimensions = getProjectDimensions(project);
