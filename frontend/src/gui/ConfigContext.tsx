@@ -8,7 +8,7 @@ const defaultBrush = {
   enabled: true,
   posAx: 106.9, posAy: 113.3, posAz: 7.3,
   posBx: 114.2, posBy: 148.9, posBz: 7.0,
-  distanceThreshold: 25000
+  distanceThreshold: 2000
 };
 
 export const emptyConfig = (): GcodeConfig => ({
