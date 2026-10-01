@@ -3,7 +3,6 @@ import {
   BufferGeometry,
   Color,
   Float32BufferAttribute,
-  GridHelper,
   LineBasicMaterial,
   LineSegments,
   MOUSE,
@@ -244,18 +243,72 @@ export namespace Graphics {
   }
 
   const drawGrid = (dimensions: { x: number; y: number; width: number; height: number }, scene: Scene) => {
-    const gridSize = Math.max(100, 2 * Math.ceil(Math.max(dimensions.x + dimensions.width, dimensions.y + dimensions.height) / 10) * 10);
-    const gridHelper = new GridHelper(gridSize, gridSize, 0xffffff);
-    gridHelper.rotateX(0.5 * Math.PI)
-    gridHelper.material.transparent = true;
-    gridHelper.material.opacity = 0.2;
-    scene.add(gridHelper)
+    const hasDimensions = dimensions.width > 0 && dimensions.height > 0;
 
-    const gridHelper2 = new GridHelper(gridSize, gridSize / 10, 0xffffff, 0xffffff);
-    gridHelper2.rotateX(0.5 * Math.PI)
-    gridHelper2.material.transparent = true;
-    gridHelper2.material.opacity = 0.15;
-    scene.add(gridHelper2)
+    let minX: number;
+    let minY: number;
+    let maxX: number;
+    let maxY: number;
+
+    if (!hasDimensions) {
+      minX = 0;
+      minY = 0;
+      maxX = 50;
+      maxY = 50;
+    } else {
+      // If lines/board are not on negative axis, clamp minimum to 0
+      minX = dimensions.x >= -0.01 ? Math.max(0, Math.floor(dimensions.x / 10) * 10) : Math.floor(dimensions.x / 10) * 10;
+      minY = dimensions.y >= -0.01 ? Math.max(0, Math.floor(dimensions.y / 10) * 10) : Math.floor(dimensions.y / 10) * 10;
+      maxX = Math.ceil((dimensions.x + dimensions.width) / 10) * 10;
+      maxY = Math.ceil((dimensions.y + dimensions.height) / 10) * 10;
+
+      // Ensure at least 1 cm grid
+      if (maxX <= minX) maxX = minX + 10;
+      if (maxY <= minY) maxY = minY + 10;
+    }
+
+    const startX = Math.round(minX);
+    const endX = Math.round(maxX);
+    const startY = Math.round(minY);
+    const endY = Math.round(maxY);
+
+    const majorPositions: number[] = [];
+    const minorPositions: number[] = [];
+    const z = -0.01;
+
+    for (let x = startX; x <= endX; x++) {
+      const isMajor = x % 10 === 0;
+      const target = isMajor ? majorPositions : minorPositions;
+      target.push(x, startY, z, x, endY, z);
+    }
+
+    for (let y = startY; y <= endY; y++) {
+      const isMajor = y % 10 === 0;
+      const target = isMajor ? majorPositions : minorPositions;
+      target.push(startX, y, z, endX, y, z);
+    }
+
+    if (minorPositions.length > 0) {
+      const minorGeometry = new BufferGeometry();
+      minorGeometry.setAttribute("position", new Float32BufferAttribute(minorPositions, 3));
+      const minorMaterial = new LineBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.1,
+      });
+      scene.add(new LineSegments(minorGeometry, minorMaterial));
+    }
+
+    if (majorPositions.length > 0) {
+      const majorGeometry = new BufferGeometry();
+      majorGeometry.setAttribute("position", new Float32BufferAttribute(majorPositions, 3));
+      const majorMaterial = new LineBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.25,
+      });
+      scene.add(new LineSegments(majorGeometry, majorMaterial));
+    }
   }
 
   const drawDefaultLines = (scene: Scene, traces: Trace[], color: ColorRepresentation) => {
