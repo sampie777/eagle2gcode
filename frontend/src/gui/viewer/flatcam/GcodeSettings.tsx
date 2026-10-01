@@ -129,12 +129,15 @@ const GcodeSettings: Component<Props> = (props) => {
                      onChange={(value) => onChangeTraces({ offsetY: value })} />
       <SettingNumber label={"Feed rate (min)"} defaultValue={config.traces.minFeedRate}
                      min={1}
+                     step={100}
                      onChange={(value) => onChangeTraces({ minFeedRate: value })} />
       <SettingNumber label={"Feed rate (max)"} defaultValue={config.traces.maxFeedRate}
                      min={1}
+                     step={100}
                      onChange={(value) => onChangeTraces({ maxFeedRate: value })} />
       <SettingNumber label={"Acceleration"} defaultValue={config.traces.acceleration}
                      min={1}
+                     step={10}
                      onChange={(value) => onChangeTraces({ acceleration: value })} />
       <SettingNumber label={"Iterations"} defaultValue={config.traces.iterations}
                      min={1}
@@ -143,7 +146,8 @@ const GcodeSettings: Component<Props> = (props) => {
       <SettingsContainer name={"Auto-Cleaning Brush"} visible={true}>
         <SettingCheck label={"Enable Brush Cleaning"} defaultValue={config.traces.brush.enabled}
                       onChange={(value) => updateConfigValue("traces", "brush", "enabled", value)} />
-        <SettingNumber label={"Distance Threshold (mm)"} defaultValue={config.traces.brush.distanceThreshold} step={100}
+        <SettingNumber label={"Distance Threshold (mm)"} defaultValue={config.traces.brush.distanceThreshold}
+                       step={1000}
                        onChange={(value) => updateConfigValue("traces", "brush", "distanceThreshold", value)} />
         <SettingNumber label={"Pos A: X"} defaultValue={config.traces.brush.posAx} step={0.1}
                        onChange={(value) => updateConfigValue("traces", "brush", "posAx", value)} />
@@ -175,6 +179,7 @@ const GcodeSettings: Component<Props> = (props) => {
 
       <SettingNumber label={"Feed rate Move"} defaultValue={config.drills.feedRateMove}
                      min={1}
+                     step={100}
                      onChange={(value) => onChangeDrills({ feedRateMove: value })} />
       <SettingNumber label={"Feed rate Drill"} defaultValue={config.drills.feedRateDrill}
                      min={1}
@@ -209,12 +214,15 @@ const GcodeSettings: Component<Props> = (props) => {
 
       <SettingNumber label={"Feed rate (min)"} defaultValue={config.silkscreen.minFeedRate}
                      min={1}
+                     step={100}
                      onChange={(value) => onChangeSilkscreen({ minFeedRate: value })} />
       <SettingNumber label={"Feed rate (max)"} defaultValue={config.silkscreen.maxFeedRate}
                      min={1}
+                     step={100}
                      onChange={(value) => onChangeSilkscreen({ maxFeedRate: value })} />
       <SettingNumber label={"Acceleration"} defaultValue={config.silkscreen.acceleration}
                      min={1}
+                     step={10}
                      onChange={(value) => onChangeSilkscreen({ acceleration: value })} />
       <SettingNumber label={"Iterations"} defaultValue={config.silkscreen.iterations}
                      min={1}
