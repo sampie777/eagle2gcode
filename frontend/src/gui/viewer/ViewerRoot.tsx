@@ -43,10 +43,14 @@ const ViewerRoot: Component<Props> = (props) => {
     <small>{dimensions().width.toFixed(1)} x {dimensions().height.toFixed(1)} mm</small>
 
     <div class={"container"}>
-      <Canvas />
+      <div class={"viewer-canvas-column"}>
+        <Canvas />
+      </div>
 
-      <GcodeSettings onBack={props.onBack}
-                     requestRender={rerender} />
+      <div class={"viewer-settings-column"}>
+        <GcodeSettings onBack={props.onBack}
+                       requestRender={rerender} />
+      </div>
     </div>
   </div>;
 }

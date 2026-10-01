@@ -1,4 +1,4 @@
-import { createEffect, createSignal } from "solid-js";
+import { createEffect, createSignal, onCleanup, onMount } from "solid-js";
 import { useProject } from "../ProjectContext";
 import { Graphics } from "../../logic/graphics/graphics";
 import { AiOutlineReload } from "solid-icons/ai";
@@ -17,7 +17,23 @@ const createCanvas = () => {
   const [showOffsetDrillHolesDebug, setShowOffsetDrillHolesDebug] = createSignal(false);
   const { project, projectVersion } = useProject();
   const { config } = useConfig();
-  const { canvas, update } = Graphics.start({ width: 1100, height: 600 });
+  const { canvas, update, resize } = Graphics.start({ width: 1100, height: 600 });
+  let wrapperRef: HTMLDivElement | undefined;
+
+  onMount(() => {
+    if (!wrapperRef) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const width = Math.floor(entry.contentRect.width);
+        if (width > 0) {
+          const height = Math.min(650, Math.max(400, Math.round(width * 0.58)));
+          resize(width, height);
+        }
+      }
+    });
+    observer.observe(wrapperRef);
+    onCleanup(() => observer.disconnect());
+  });
 
   createEffect(() => {
     projectVersion();
@@ -52,7 +68,9 @@ const createCanvas = () => {
   return {
     rerender: renderProject,
     Canvas: () => (<div class={"Canvas"}>
-      {canvas}
+      <div ref={wrapperRef} class={"canvas-wrapper"}>
+        {canvas}
+      </div>
 
       <div class={"canvas-control"}>
         <button onClick={renderProject} title={"Rerender"}>

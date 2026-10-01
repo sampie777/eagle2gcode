@@ -1,28 +1,101 @@
 .Viewer {
+  width: 100%;
+  box-sizing: border-box;
+
   & > .container {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    margin-top: 40px;
-    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 25px;
+    width: 100%;
+    box-sizing: border-box;
+
+    @media (max-width: 960px) {
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+  }
+
+  .viewer-canvas-column {
+    flex: 1 1 0;
+    min-width: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .viewer-settings-column {
+    flex: 0 0 420px;
+    width: 420px;
+    max-width: 100%;
+    position: sticky;
+    top: 70px;
+    align-self: flex-start;
+    max-height: calc(100vh - 90px);
+    overflow-y: auto;
+    padding-right: 6px;
+    box-sizing: border-box;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    @media (max-width: 960px) {
+      flex: 1 1 auto;
+      width: 100%;
+      position: static;
+      max-height: none;
+      overflow-y: visible;
+      padding-right: 0;
+    }
   }
 }
 
 .Canvas {
-  margin: 0 10px 40px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
 
-  canvas {
-    border: 1px solid #4a4a4a;
-    border-radius: 10px;
-    box-shadow: 0 0 25px #00000070;
+  .canvas-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+
+    canvas {
+      width: 100% !important;
+      max-width: 100%;
+      height: auto !important;
+      border: 1px solid #4a4a4a;
+      border-radius: 10px;
+      box-shadow: 0 0 25px #00000070;
+      display: block;
+    }
   }
 }
 
 .canvas-control {
+  margin-top: 15px;
+  width: 100%;
+  max-width: 800px;
+
   .control-checkboxes {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    justify-content: center;
     grid-gap: 10px;
     padding: 10px;
   }

@@ -45,6 +45,7 @@ export namespace Graphics {
 
   export const start = (config: { width: number, height: number }): {
     canvas: HTMLCanvasElement,
+    resize: (width: number, height: number) => void,
     update: (project: Project, config: RenderConfig, projectConfig: GcodeConfig) => void,
   } => {
     const renderer = new WebGLRenderer();
@@ -102,9 +103,18 @@ export namespace Graphics {
       }
     }, { passive: false });
 
+    const resize = (width: number, height: number) => {
+      if (width <= 0 || height <= 0) return;
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(width, height);
+      requestRender(renderer, scene, camera, controls);
+    };
+
     requestRender(renderer, scene, camera, controls);
     return {
       canvas: renderer.domElement,
+      resize,
       update: (project, config, projectConfig: GcodeConfig) => requestAnimationFrame(() => {
         update(scene, camera, project, config, projectConfig, controls)
         requestRender(renderer, scene, camera, controls);
