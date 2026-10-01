@@ -1,4 +1,4 @@
-import { Component } from "solid-js";
+import { Component, createEffect } from "solid-js";
 import SettingsContainer from "./../../components/settings/SettingsContainer";
 import SettingCheck from "./../../components/settings/SettingCheck";
 import SettingNumber from "./../../components/settings/SettingNumber";
@@ -29,30 +29,82 @@ const GcodeSettings: Component<Props> = (props) => {
   const { config, loadConfig, updateConfigValue } = useConfig()
   const { project } = useProject();
 
-  const onChangeTraces = (value: Object) => updateConfigValue("traces", value)
   const onChangeDrills = (value: Object) => updateConfigValue("drills", value)
   const onChangeSilkscreen = (value: Object) => updateConfigValue("silkscreen", value)
 
-  const updateOffsets = () => {
+  const isNewBoardOrUnset = () => {
     const alignmentHoles = getProjectAlignmentDrills(project)
-    const drillOffsets = alignmentHoles.map((it, i) => ({
-      original: it,
-      actual: (config.drills?.offset[i]) ? config.drills.offset[i].actual : { x: it.x, y: it.y },
-    }));
-    const silkscreenOffset = alignmentHoles.map((it, i) => ({
-      original: it,
-      actual: (config.silkscreen?.offset[i]) ? config.silkscreen.offset[i].actual : { x: it.x, y: it.y },
-    }));
-    onChangeDrills({ offset: drillOffsets })
-    onChangeSilkscreen({ offset: silkscreenOffset })
-  };
+    if (!config.drills?.offset || config.drills.offset.length !== alignmentHoles.length) return true
+    if (!config.silkscreen?.offset || config.silkscreen.offset.length !== alignmentHoles.length) return true
+    const holesMismatch = alignmentHoles.some((hole, i) =>
+      config.drills.offset[i]?.original?.x !== hole.x ||
+      config.drills.offset[i]?.original?.y !== hole.y ||
+      config.silkscreen.offset[i]?.original?.x !== hole.x ||
+      config.silkscreen.offset[i]?.original?.y !== hole.y
+    )
+    if (holesMismatch) return true
 
-  const resetConfig = () => {
-    loadConfig(emptyConfig())
-    alert("Please go to the previous page using the Back button and come back for the changes to be visible.");
+    // Check if offsets were stored without the traces offset
+    const tracesOffsetX = config.traces.offsetX ?? 0
+    const tracesOffsetY = config.traces.offsetY ?? 0
+    if (tracesOffsetX !== 0 || tracesOffsetY !== 0) {
+      const silkscreenMissingTraceOffset = config.silkscreen.offset.some(
+        it => it.actual.x === it.original.x && it.actual.y === it.original.y
+      )
+      const drillsMissingTraceOffset = config.drills.offset.some(
+        it => it.actual.x === it.original.x && it.actual.y === it.original.y
+      )
+      if (silkscreenMissingTraceOffset || drillsMissingTraceOffset) return true
+    }
+
+    return false
   }
 
-  updateOffsets();
+  const updateOffsets = (tracesOffsetX = config.traces.offsetX, tracesOffsetY = config.traces.offsetY) => {
+    const alignmentHoles = getProjectAlignmentDrills(project)
+    const drillOffsets = alignmentHoles.map((it) => ({
+      original: it,
+      actual: { x: it.x + tracesOffsetX, y: it.y + tracesOffsetY },
+    }))
+    const silkscreenOffset = alignmentHoles.map((it) => ({
+      original: it,
+      actual: { x: it.x + tracesOffsetX, y: it.y + tracesOffsetY },
+    }))
+    onChangeDrills({ offset: drillOffsets })
+    onChangeSilkscreen({ offset: silkscreenOffset })
+    props.requestRender?.()
+  }
+
+  const onChangeTraces = (value: { [key: string]: any }) => {
+    updateConfigValue("traces", value)
+    if ("offsetX" in value || "offsetY" in value) {
+      const newOffsetX = "offsetX" in value ? value.offsetX : config.traces.offsetX
+      const newOffsetY = "offsetY" in value ? value.offsetY : config.traces.offsetY
+      updateOffsets(newOffsetX, newOffsetY)
+    }
+  }
+
+  if (isNewBoardOrUnset()) {
+    updateOffsets()
+  }
+
+  createEffect((prev?: { offsetX: number, offsetY: number }) => {
+    const offsetX = config.traces.offsetX
+    const offsetY = config.traces.offsetY
+
+    if (prev !== undefined && (prev.offsetX !== offsetX || prev.offsetY !== offsetY)) {
+      updateOffsets(offsetX, offsetY)
+    }
+
+    return { offsetX, offsetY }
+  })
+
+  const resetConfig = () => {
+    const empty = emptyConfig()
+    loadConfig(empty)
+    updateOffsets(empty.traces.offsetX, empty.traces.offsetY)
+    alert("Please go to the previous page using the Back button and come back for the changes to be visible.");
+  }
 
   const allTopTraces = () => [...(config.traces.cutoutProfile ? project.profile : []), ...project.traces_top];
   const allBottomTraces = () => [...(config.traces.cutoutProfile ? project.profile : []), ...project.traces_bottom];
