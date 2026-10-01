@@ -49,7 +49,6 @@ const SettingNumber: Component<Props> = (props) => {
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.key === "ArrowUp" || e.key === "ArrowDown") {
       e.preventDefault();
-      console.log(props)
       const step = props.step ?? 1;
       const current = parseValue(text());
       const delta = e.key === "ArrowUp" ? step : -step;
