@@ -47,11 +47,15 @@ const FlatcamRoot: Component<Props> = (props) => {
 
   const loadExampleProject = () => {
     loadProject(exampleProject);
-    nextScreen();
+    setCookie("project.camDirectory", config.project.camDirectory, 365);
+    if (props.onExampleLoaded) {
+      props.onExampleLoaded();
+    } else {
+      props.onNext?.();
+    }
   }
 
   return <div class={"FlatcamRoot"}>
-    <h1>FlatCAM command generation</h1>
     <ol style={{ "text-align": "left" }}>
       <li>Edit the configuration below and copy the generated commands.</li>
       <li>Open a new <a href="http://flatcam.org/" target={"_blank"}>FlatCAM</a> project and paste these commands

@@ -27,7 +27,7 @@ type Props = {
 
 const GcodeSettings: Component<Props> = (props) => {
   const { config, loadConfig, updateConfigValue } = useConfig()
-  const { project } = useProject();
+  const { project, projectVersion } = useProject();
 
   const onChangeDrills = (value: Object) => updateConfigValue("drills", value)
   const onChangeSilkscreen = (value: Object) => updateConfigValue("silkscreen", value)
@@ -88,6 +88,13 @@ const GcodeSettings: Component<Props> = (props) => {
     updateOffsets()
   }
 
+  createEffect(() => {
+    projectVersion();
+    if (isNewBoardOrUnset()) {
+      updateOffsets()
+    }
+  })
+
   createEffect((prev?: { offsetX: number, offsetY: number }) => {
     const offsetX = config.traces.offsetX
     const offsetY = config.traces.offsetY
@@ -106,8 +113,15 @@ const GcodeSettings: Component<Props> = (props) => {
     alert("Please go to the previous page using the Back button and come back for the changes to be visible.");
   }
 
-  const allTopTraces = () => [...(config.traces.cutoutProfile ? project.profile : []), ...project.traces_top];
-  const allBottomTraces = () => [...(config.traces.cutoutProfile ? project.profile : []), ...project.traces_bottom];
+  const allTopTraces = () => {
+    projectVersion();
+    return [...(config.traces.cutoutProfile ? project.profile : []), ...project.traces_top];
+  };
+
+  const allBottomTraces = () => {
+    projectVersion();
+    return [...(config.traces.cutoutProfile ? project.profile : []), ...project.traces_bottom];
+  };
 
   return <div class={"FlatcamSettings"}>
     <SettingsContainer name={"Traces"} visible={true}>
@@ -137,7 +151,7 @@ const GcodeSettings: Component<Props> = (props) => {
                      onChange={(value) => onChangeTraces({ maxFeedRate: value })} />
       <SettingNumber label={"Acceleration"} defaultValue={config.traces.acceleration}
                      min={1}
-                     step={10}
+                     step={100}
                      onChange={(value) => onChangeTraces({ acceleration: value })} />
       <SettingNumber label={"Iterations"} defaultValue={config.traces.iterations}
                      min={1}

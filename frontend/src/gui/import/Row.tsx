@@ -11,10 +11,11 @@ type Props = {
 }
 
 const Row: Component<Props> = (props) => {
-  const { project } = useProject();
+  const { project, projectVersion } = useProject();
   const upload = props.upload;
 
   const getStatusMark = () => {
+    projectVersion();
     if (upload && (upload.status == "waiting" || upload.status == "reading")) return <LoadingIcon />;
 
     if (project[props.type] && project[props.type].length > 0) return <AiFillCheckCircle />;

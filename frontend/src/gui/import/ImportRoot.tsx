@@ -9,7 +9,7 @@ import { getCookie } from "../../logic/cookies";
 type Props = ScreenProps
 
 const ImportRoot: Component<Props> = (props) => {
-  const { project } = useProject();
+  const { project, touchProject, projectVersion } = useProject();
   const [uploads, setUploads] = createSignal<Upload.Type[]>([]);
 
   createEffect(() => {
@@ -19,7 +19,7 @@ const ImportRoot: Component<Props> = (props) => {
   })
 
   const onFilesChange = async (e: Event) => {
-    const files = Array.from((e.target as HTMLInputElement).files);
+    const files = Array.from((e.target as HTMLInputElement).files ?? []);
     setUploads(prev => [...prev, ...files.map(it => ({
       file: it,
       status: "waiting",
@@ -50,12 +50,16 @@ const ImportRoot: Component<Props> = (props) => {
 
       upload.status = "done"
       setUploads(prev => [...prev])
+      touchProject();
     }
   };
 
-  return <div class={"Import"}>
-    <h1>Import EAGLE files</h1>
+  const isAvailable = () => {
+    projectVersion();
+    return Upload.isProjectAvailable(project) || uploads().length > 0;
+  };
 
+  return <div class={"Import"}>
     <input type={"file"}
            name={"files"}
            onChange={onFilesChange}
@@ -76,7 +80,7 @@ const ImportRoot: Component<Props> = (props) => {
       <button onClick={props.onBack}>
         Back
       </button>
-      <button disabled={!(Upload.isProjectAvailable(project) || uploads().length > 0 /* to trigger the project */)}
+      <button disabled={!isAvailable()}
               onClick={props.onNext}>
         Next
       </button>

@@ -11,6 +11,7 @@ import Checklist from "../checklist/Checklist";
 
 type Props = {
   onResetProject: () => void
+  onNavigateToStep?: (id: string) => void
 }
 
 const Header: Component<Props> = (props) => {
@@ -45,16 +46,32 @@ const Header: Component<Props> = (props) => {
   return <div class={"Header"}>
     {!showChecklist() ? null : <Checklist close={() => setShowChecklist(false)} />}
 
-    <button onClick={resetProject}
-            title={"Create a new project, but keep config"}>
-      <AiOutlineReload /> New project
-    </button>
-    <button onClick={saveProject}
-            disabled={isSaving()}
-            title={"Save project and config"}>
-      {isSaving() ? <AiOutlineLoading class={"spinner"} /> : <AiOutlineSave />} {isSaving() ? "Saving..." : "Save"}
-    </button>
-    <button onClick={() => setShowChecklist(true)}>Checklist</button>
+    <div class={"header-actions"}>
+      <button onClick={resetProject}
+              title={"Create a new project, but keep config"}>
+        <AiOutlineReload /> New project
+      </button>
+      <button onClick={saveProject}
+              disabled={isSaving()}
+              title={"Save project and config"}>
+        {isSaving() ? <AiOutlineLoading class={"spinner"} /> : <AiOutlineSave />} {isSaving() ? "Saving..." : "Save"}
+      </button>
+      <button onClick={() => setShowChecklist(true)}>Checklist</button>
+    </div>
+
+    {props.onNavigateToStep && (
+      <div class={"header-steps"}>
+        <button class={"step-nav-btn"} onClick={() => props.onNavigateToStep?.("step-flatcam")}>
+          1. Prepare
+        </button>
+        <button class={"step-nav-btn"} onClick={() => props.onNavigateToStep?.("step-import")}>
+          2. Upload
+        </button>
+        <button class={"step-nav-btn"} onClick={() => props.onNavigateToStep?.("step-viewer")}>
+          3. Execute
+        </button>
+      </div>
+    )}
 
     <span class={"version"}>v{version} {import.meta.env["DEV"] ? "(development)" : null}</span>
   </div>;

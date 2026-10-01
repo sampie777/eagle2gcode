@@ -167,8 +167,10 @@ export namespace Graphics {
     camera.position.x = dimensions.width / 2
     camera.position.y = dimensions.height / 2
     // Auto zoom based on board dimensions (notice we're working with perspectives here)
-    const heightFactor = (37 / 28) * dimensions.height / dimensions.width;
-    camera.position.z = heightFactor * Math.max(dimensions.width, dimensions.height) / 2 / Math.tan(camera.fov / 2 / 180 * Math.PI)
+    const safeWidth = dimensions.width > 0 ? dimensions.width : 50;
+    const safeHeight = dimensions.height > 0 ? dimensions.height : 50;
+    const heightFactor = (37 / 28) * safeHeight / safeWidth;
+    camera.position.z = heightFactor * Math.max(safeWidth, safeHeight) / 2 / Math.tan(camera.fov / 2 / 180 * Math.PI);
     camera.lookAt(camera.position.x, camera.position.y + 1, 0)  // Look straight down
     if (controls) {
       controls.target = new Vector3(camera.position.x, camera.position.y, 0)

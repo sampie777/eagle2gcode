@@ -7,4 +7,5 @@ export enum Screens {
 export type ScreenProps = {
   onBack?: () => void
   onNext?: () => void
+  onExampleLoaded?: () => void
 }

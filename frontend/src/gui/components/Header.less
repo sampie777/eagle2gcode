@@ -1,14 +1,45 @@
 .Header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: rgba(36, 36, 36, 0.95);
+  backdrop-filter: blur(8px);
+  padding: 10px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: row;
   gap: 20px;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+
+  .header-actions, .header-steps {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .header-steps {
+    .step-nav-btn {
+      font-size: 0.85em;
+      padding: 4px 12px;
+      border-radius: 14px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+
+      &:hover {
+        background-color: #434c5e;
+        border-color: #88c0d0;
+      }
+    }
+  }
 
   button {
     padding: 5px 10px;
     font-size: 0.8em;
-    opacity: 0.7;
+    opacity: 0.85;
     display: flex;
     place-items: center;
     gap: 5px;
@@ -21,5 +52,6 @@
   .version {
     font-size: 0.8em;
     opacity: 0.7;
+    margin-left: auto;
   }
 }

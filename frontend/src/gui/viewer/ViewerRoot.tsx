@@ -11,12 +11,13 @@ type Props = ScreenProps
 
 const ViewerRoot: Component<Props> = (props) => {
   const { config } = useConfig()
-  const { project } = useProject();
+  const { project, projectVersion } = useProject();
   const [dimensions, setDimensions] = createSignal(getProjectDimensions(project));
 
   project.isLoaded = true;
 
   createEffect(() => {
+    projectVersion();
     // Trigger on change of one of the following:
     [
       config.traces.outOfBounds,
@@ -28,10 +29,11 @@ const ViewerRoot: Component<Props> = (props) => {
   });
 
   const projectName = () => {
+    projectVersion();
     if (project.path == undefined) return "Unknown project";
     const projectPathSegments = project.path.split("/");
     return projectPathSegments[projectPathSegments.length - 1]
-      .replace(/[_.\-]/g, " ")
+      .replace(/[_.\\-]/g, " ")
   }
 
   const { rerender, Canvas } = createCanvas();

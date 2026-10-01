@@ -15,11 +15,12 @@ const createCanvas = () => {
   const [showGrid, setShowGrid] = createSignal(true);
   const [showAlignmentHolesDebug, setShowAlignmentHolesDebug] = createSignal(false);
   const [showOffsetDrillHolesDebug, setShowOffsetDrillHolesDebug] = createSignal(false);
-  const { project } = useProject();
+  const { project, projectVersion } = useProject();
   const { config } = useConfig();
   const { canvas, update } = Graphics.start({ width: 1100, height: 600 });
 
   createEffect(() => {
+    projectVersion();
     // Trigger on change of one of the following:
     [
       config.traces.cutoutProfile,

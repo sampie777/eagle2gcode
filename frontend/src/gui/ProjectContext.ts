@@ -1,4 +1,4 @@
-import { createContext, useContext } from "solid-js";
+import { createContext, createSignal, useContext } from "solid-js";
 import { Project } from "../logic/types/project";
 import { Persistency } from "../logic/utils/persistency";
 
@@ -21,6 +21,9 @@ export const emptyProject = (): Project => ({
   drills: [],
 });
 
+const [projectVersion, setProjectVersion] = createSignal(0);
+export const touchProject = () => setProjectVersion(v => v + 1);
+
 const loadProject = (to: Project, from: Project | null | undefined) => {
   if (from == null) return;
   to.path = from.path;
@@ -34,12 +37,20 @@ const loadProject = (to: Project, from: Project | null | undefined) => {
   to.soldermask_bottom = from.soldermask_bottom;
   to.drills = from.drills;
   to.board = from.board;
+  touchProject();
 }
 
 const defaultValue = emptyProject()
-export const ProjectContext = createContext<{ project: Project, loadProject: (from?: Project) => void }>({
+export const ProjectContext = createContext<{
+  project: Project,
+  loadProject: (from?: Project) => void,
+  touchProject: () => void,
+  projectVersion: () => number
+}>({
   project: defaultValue,
-  loadProject: (from = Persistency.loadAll()?.project) => loadProject(defaultValue, from)
+  loadProject: (from = Persistency.loadAll()?.project) => loadProject(defaultValue, from),
+  touchProject,
+  projectVersion,
 });
 
 export const useProject = () => useContext(ProjectContext)
