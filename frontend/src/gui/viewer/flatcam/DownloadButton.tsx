@@ -43,7 +43,7 @@ const DownloadButton: Component<Props> = (props) => {
       downloadElement.download = props.fileName;
       document.body.appendChild(downloadElement);
       downloadElement.click();
-      document.removeChild(downloadElement);
+      downloadElement.remove();
     })
   }
 
