@@ -6,10 +6,12 @@ declare global {
   }
 }
 
-Element.prototype.getAttributeInt = function(name: string): number | null {
-  const value = this.getAttribute(name);
-  if (value == null) return null;
-  return +value
+if (typeof Element !== 'undefined' && !Element.prototype.getAttributeInt) {
+  Element.prototype.getAttributeInt = function(name: string): number | null {
+    const value = this.getAttribute(name);
+    if (value == null) return null;
+    return +value;
+  };
 }
 
 const rotationToNumber = (value: string | null): number | null => {

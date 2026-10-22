@@ -4,6 +4,7 @@ import Row from "./Row";
 import { Upload } from "../../logic/upload";
 import { ScreenProps } from "../../logic/screens";
 import { useProject } from "../ProjectContext";
+import { useChecklist } from "../ChecklistContext";
 import { getCookie } from "../../logic/cookies";
 import { AiOutlineCloudUpload } from "solid-icons/ai";
 
@@ -11,6 +12,7 @@ type Props = ScreenProps
 
 const ImportRoot: Component<Props> = (props) => {
   const { project, touchProject, projectVersion } = useProject();
+  const { activeCad } = useChecklist();
   const [uploads, setUploads] = createSignal<Upload.Type[]>([]);
   const [isDraggingOver, setIsDraggingOver] = createSignal(false);
   let isProcessing = false;
@@ -135,12 +137,12 @@ const ImportRoot: Component<Props> = (props) => {
         <div class={"dropzone-content"}>
           <AiOutlineCloudUpload class={"dropzone-icon"} />
           <h2>Drop files anywhere to upload</h2>
-          <p>Drop EAGLE (.brd) or FlatCAM (.gcode, .xln) files here</p>
+          <p>Drop {activeCad() === "altium" ? "Altium (.gbr)" : "EAGLE (.brd)"} or FlatCAM (.gcode, .xln) files here</p>
         </div>
       </div>
     )}
 
-    <h1>Import EAGLE files</h1>
+    <h1>Import {activeCad() === "altium" ? "Altium" : "EAGLE"} & FlatCAM files</h1>
 
     <input type={"file"}
            name={"files"}
@@ -150,8 +152,10 @@ const ImportRoot: Component<Props> = (props) => {
     <div class={"result"}>
       <div>
         {Object.keys(Upload.fileMatchers).map(key => {
-            const upload: Upload.Type | undefined = uploads().find(it => it.file.name.match(Upload.fileMatchers[key]))
-            return <Row type={key} upload={upload} />
+            const matcher = (Upload.fileMatchers as any)[key];
+            const matchingUploads = uploads().filter(it => it.file.name.match(matcher));
+            const singleUpload = matchingUploads[0];
+            return <Row type={key} upload={singleUpload} uploads={matchingUploads} />;
           }
         )}
       </div>

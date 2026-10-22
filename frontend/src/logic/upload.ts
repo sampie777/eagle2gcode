@@ -20,8 +20,8 @@ export namespace Upload {
     silkscreen_bottom: RegExp(`^${Flatcam.SILKSCREEN_BOTTOM_OUTPUT_FILE}$`),
     soldermask_top: RegExp(`^${Flatcam.SOLDERMASK_TOP_OUTPUT_FILE}$`),
     soldermask_bottom: RegExp(`^${Flatcam.SOLDERMASK_BOTTOM_OUTPUT_FILE}$`),
-    drill: /^drill_1_16\.xln/,
-    board: /^.+\.brd/,
+    drill: /^(drill_1_16\.xln|.+_(PTH|NPTH)_Drill\.gbr)$/i,
+    board: /^.+\.brd$/,
   }
 
   export const isProjectAvailable = (project: Project): boolean => {
@@ -55,6 +55,23 @@ export namespace Upload {
     if (name.match(fileMatchers.silkscreen_bottom)) return project.silkscreen_bottom = processTraces(content)
     if (name.match(fileMatchers.soldermask_top)) return project.soldermask_top = processTraces(content)
     if (name.match(fileMatchers.soldermask_bottom)) return project.soldermask_bottom = processTraces(content)
-    if (name.match(fileMatchers.drill)) return project.drills = processDrillFile(content)
+    if (name.match(fileMatchers.drill)) {
+      const parsedDrills = processDrillFile(content);
+      const existing = project.drills ?? [];
+      const combined = [...existing];
+      for (const d of parsedDrills) {
+        // Prevent duplicate drills if the same file is uploaded multiple times
+        const exists = combined.some(c =>
+          Math.abs(c.x - d.x) < 0.0001 &&
+          Math.abs(c.y - d.y) < 0.0001 &&
+          Math.abs(c.size - d.size) < 0.0001
+        );
+        if (!exists) {
+          combined.push(d);
+        }
+      }
+      project.drills = combined;
+      return combined;
+    }
   }
 }
