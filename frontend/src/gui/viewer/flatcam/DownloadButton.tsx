@@ -38,12 +38,15 @@ const DownloadButton: Component<Props> = (props) => {
         return;
       }
 
+      const blob = new Blob([generatedContent], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
       const downloadElement = document.createElement("a");
-      downloadElement.href = `data:text/plain;charset=utf-8,${encodeURIComponent(generatedContent)}`;
+      downloadElement.href = url;
       downloadElement.download = props.fileName;
       document.body.appendChild(downloadElement);
       downloadElement.click();
       downloadElement.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
     })
   }
 
