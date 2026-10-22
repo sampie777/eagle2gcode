@@ -17,7 +17,11 @@ const ImportRoot: Component<Props> = (props) => {
 
   createEffect(() => {
     if (!project.path) {
-      project.path = getCookie("project.camDirectory") ?? undefined;
+      const storedPath = localStorage.getItem("project.lastPath")
+        || localStorage.getItem("project.eagle.path")
+        || localStorage.getItem("project.altium.path")
+        || getCookie("project.camDirectory");
+      project.path = storedPath || undefined;
     }
   });
 
