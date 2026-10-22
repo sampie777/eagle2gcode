@@ -21,7 +21,7 @@ export namespace Upload {
     soldermask_top: RegExp(`^${Flatcam.SOLDERMASK_TOP_OUTPUT_FILE}$`),
     soldermask_bottom: RegExp(`^${Flatcam.SOLDERMASK_BOTTOM_OUTPUT_FILE}$`),
     drill: /^(drill_1_16\.xln|.+_(PTH|NPTH)_Drill\.gbr)$/i,
-    board: /^.+\.brd$/,
+    board: /^(.*\.brd|.*\.PcbDoc)$/i,
   }
 
   export const isProjectAvailable = (project: Project): boolean => {
@@ -38,17 +38,42 @@ export namespace Upload {
   }
 
   export const isBoardAvailable = (board: Eagle.Board): boolean => {
-    if (board.layers.length > 0) return true;
-    if (board.libraries.length > 0) return true;
-    if (board.plain.length > 0) return true;
-    if (board.components.length > 0) return true;
-    if (board.signals.length > 0) return true;
+    if (!board) return false;
+    if (board.layers?.length > 0) return true;
+    if (board.libraries?.length > 0) return true;
+    if (board.plain?.length > 0) return true;
+    if (board.components?.length > 0) return true;
+    if (board.signals?.length > 0) return true;
     return false;
   }
 
   export const processFile = (project: Project, name: string, content: string) => {
     if (name.match(fileMatchers.board)) return project.board = processBoardFile(content)
-    if (name.match(fileMatchers.profile)) return project.profile = processTraces(content)
+    if (name.match(fileMatchers.profile)) {
+      const profile = processTraces(content);
+      project.profile = profile;
+      if (!project.board.plain || project.board.plain.length === 0) {
+        const flatTraces = profile.flat().filter(p => p.enabled);
+        if (flatTraces.length >= 3) {
+          const plainWires: Eagle.Wire[] = [];
+          for (let i = 0; i < flatTraces.length; i++) {
+            const cur = flatTraces[i];
+            const next = flatTraces[(i + 1) % flatTraces.length];
+            plainWires.push({
+              layer: "20",
+              x1: cur.x,
+              y1: cur.y,
+              x2: next.x,
+              y2: next.y,
+              width: 0.1,
+              curve: null
+            });
+          }
+          project.board.plain = plainWires;
+        }
+      }
+      return profile;
+    }
     if (name.match(fileMatchers.traces_top)) return project.traces_top = processTraces(content)
     if (name.match(fileMatchers.traces_bottom)) return project.traces_bottom = processTraces(content)
     if (name.match(fileMatchers.silkscreen_top)) return project.silkscreen_top = processTraces(content)

@@ -137,7 +137,7 @@ const ImportRoot: Component<Props> = (props) => {
         <div class={"dropzone-content"}>
           <AiOutlineCloudUpload class={"dropzone-icon"} />
           <h2>Drop files anywhere to upload</h2>
-          <p>Drop {activeCad() === "altium" ? "Altium (.gbr)" : "EAGLE (.brd)"} or FlatCAM (.gcode, .xln) files here</p>
+          <p>Drop {activeCad() === "altium" ? "Altium (.gbr, .PcbDoc)" : "EAGLE (.brd)"} or FlatCAM (.gcode, .xln) files here</p>
         </div>
       </div>
     )}
@@ -172,6 +172,6 @@ const ImportRoot: Component<Props> = (props) => {
       </button>
     </div>
   </div>;
-}
+};
 
 export default ImportRoot;

@@ -14,9 +14,9 @@ export const getBoundaries = (locations: Location[]): Dimension & { minimumPoint
     if (maxX == undefined || it.x > maxX) maxX = it.x;
     if (minY == undefined || it.y < minY) minY = it.y;
     if (maxY == undefined || it.y > maxY) maxY = it.y;
-  }
+  };
 
-  locations.forEach(checkForBoundaries)
+  locations.forEach(checkForBoundaries);
 
   return {
     x: minX ?? 0,
@@ -24,8 +24,8 @@ export const getBoundaries = (locations: Location[]): Dimension & { minimumPoint
     width: maxX != undefined ? maxX - (minX ?? 0) : 0,
     height: maxY != undefined ? maxY - (minY ?? 0) : 0,
     minimumPointWasUndefined: minX == undefined && minY == undefined,
-  }
-}
+  };
+};
 
 export const getProjectDimensions = (project: Project): Dimension => {
   const allTraces: Trace = [
@@ -37,11 +37,25 @@ export const getProjectDimensions = (project: Project): Dimension => {
     project.soldermask_top,
     project.soldermask_bottom
   ]
-    .flatMap(traces => traces.flatMap(trace => trace.filter(it => it.enabled)))
-  const dimension = getBoundaries(allTraces)
+    .flatMap(traces => traces.flatMap(trace => trace.filter(it => it.enabled)));
+  const dimension = getBoundaries(allTraces);
 
   if (dimension.minimumPointWasUndefined) {
-    const drillDimension = getBoundaries(project.drills)
+    if (project.board && project.board.plain && project.board.plain.length > 0) {
+      const boardPoints = project.board.plain.flatMap(w => [{ x: w.x1, y: w.y1 }, { x: w.x2, y: w.y2 }]);
+      const boardDimension = getBoundaries(boardPoints);
+      if (!boardDimension.minimumPointWasUndefined) {
+        dimension.x = boardDimension.x;
+        dimension.y = boardDimension.y;
+        dimension.width = boardDimension.width;
+        dimension.height = boardDimension.height;
+        dimension.minimumPointWasUndefined = false;
+      }
+    }
+  }
+
+  if (dimension.minimumPointWasUndefined) {
+    const drillDimension = getBoundaries(project.drills);
 
     if (dimension.x == undefined || drillDimension.x < dimension.x) dimension.x = drillDimension.x;
     if (dimension.y == undefined || drillDimension.y < dimension.y) dimension.y = drillDimension.y;
@@ -50,7 +64,7 @@ export const getProjectDimensions = (project: Project): Dimension => {
   }
 
   return dimension;
-}
+};
 
 export const getProjectAlignmentDrills = (project: Project): Drill[] => {
   let leftMostHole: Drill | undefined;
@@ -61,7 +75,7 @@ export const getProjectAlignmentDrills = (project: Project): Drill[] => {
     .forEach(it => {
       if (leftMostHole == undefined || length(it) < length(leftMostHole)) leftMostHole = it;
       if (rightMostHole == undefined || length(it) > length(rightMostHole)) rightMostHole = it;
-    })
+    });
 
   if (leftMostHole == undefined || rightMostHole == undefined) {
     // If there are no small drills, then ignore the size constraint
@@ -69,7 +83,7 @@ export const getProjectAlignmentDrills = (project: Project): Drill[] => {
       .forEach(it => {
         if (leftMostHole == undefined || length(it) < length(leftMostHole)) leftMostHole = it;
         if (rightMostHole == undefined || length(it) > length(rightMostHole)) rightMostHole = it;
-      })
+      });
   }
 
   if (leftMostHole == undefined) leftMostHole = rightMostHole;
@@ -77,32 +91,32 @@ export const getProjectAlignmentDrills = (project: Project): Drill[] => {
   if (leftMostHole == undefined || rightMostHole == undefined) return [];
 
   return [leftMostHole, rightMostHole];
-}
+};
 
 export const setTracesVisibility = (project: Project, config: GcodeConfig) => {
-  const profileDimensions = getBoundaries(project.profile.flatMap(it => it))
+  const profileDimensions = getBoundaries(project.profile.flatMap(it => it));
 
   const process = (traces: Trace[], outOfBounds: OutOfBoundsOption) => traces.forEach(trace => {
     const checkIfOutOfBounds = (it: Location) =>
       it.x < profileDimensions.x
       || it.y < profileDimensions.y
       || it.x > profileDimensions.x + profileDimensions.width
-      || it.y > profileDimensions.y + profileDimensions.height
+      || it.y > profileDimensions.y + profileDimensions.height;
 
     if (outOfBounds == OutOfBoundsOption.Ignore) {
-      trace.forEach(it => it.enabled = true)
+      trace.forEach(it => it.enabled = true);
     } else if (outOfBounds == OutOfBoundsOption.Hide) {
-      const isOutOfBounds = trace.some(checkIfOutOfBounds)
-      trace.forEach(it => it.enabled = !isOutOfBounds)
+      const isOutOfBounds = trace.some(checkIfOutOfBounds);
+      trace.forEach(it => it.enabled = !isOutOfBounds);
     } else if (outOfBounds == OutOfBoundsOption.Crop) {
-      trace.forEach(it => it.enabled = !checkIfOutOfBounds(it))
+      trace.forEach(it => it.enabled = !checkIfOutOfBounds(it));
     }
-  })
+  });
 
-  process(project.traces_top, config.traces.outOfBounds)
-  process(project.traces_bottom, config.traces.outOfBounds)
-  process(project.soldermask_top, config.traces.outOfBounds)
-  process(project.soldermask_bottom, config.traces.outOfBounds)
-  process(project.silkscreen_top, config.silkscreen.outOfBounds)
-  process(project.silkscreen_bottom, config.silkscreen.outOfBounds)
-}
+  process(project.traces_top, config.traces.outOfBounds);
+  process(project.traces_bottom, config.traces.outOfBounds);
+  process(project.soldermask_top, config.traces.outOfBounds);
+  process(project.soldermask_bottom, config.traces.outOfBounds);
+  process(project.silkscreen_top, config.silkscreen.outOfBounds);
+  process(project.silkscreen_bottom, config.silkscreen.outOfBounds);
+};
