@@ -19,10 +19,10 @@ const Row: Component<Props> = (props) => {
     projectVersion();
     if (props.type === "drill" && project.drills.length > 0) return true;
     if (props.type === "board" && Upload.isBoardAvailable(project.board)) return true;
-    if (project[props.type] && project[props.type].length > 0) return true;
+    const projectItems = project[props.type as keyof typeof project];
+    if (Array.isArray(projectItems) && projectItems.length > 0) return true;
     if (props.uploads && props.uploads.length > 0 && props.uploads.every(u => u.status === "done")) return true;
-    if (upload && upload.status === "done") return true;
-    return false;
+    return upload?.status === "done";
   };
 
   const getStatusMark = () => {

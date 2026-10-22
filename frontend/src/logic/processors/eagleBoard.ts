@@ -32,7 +32,7 @@ const isMirrored = (value: string | null): boolean => {
 function getWires(element: Element): Eagle.Wire[] {
   return Array.from(element.getElementsByTagName("wire"))
     .map(it => ({
-      layer: it.getAttribute("layer"),
+      layer: it.getAttribute("layer") ?? "0",
       x1: it.getAttributeInt("x1") ?? 0,
       y1: it.getAttributeInt("y1") ?? 0,
       x2: it.getAttributeInt("x2") ?? 0,
@@ -45,11 +45,11 @@ function getWires(element: Element): Eagle.Wire[] {
 function getPads(element: Element): Eagle.Pad[] {
   return Array.from(element.getElementsByTagName("pad"))
     .map(it => ({
-      name: it.getAttribute("name"),
+      name: it.getAttribute("name") ?? "",
       x: it.getAttributeInt("x") ?? 0,
       y: it.getAttributeInt("y") ?? 0,
       drill: it.getAttributeInt("drill") ?? 0,
-      shape: it.getAttribute("shape"),
+      shape: it.getAttribute("shape") ?? "",
       rotation: rotationToNumber(it.getAttribute("rot")),
     }));
 }
@@ -57,7 +57,7 @@ function getPads(element: Element): Eagle.Pad[] {
 function getRectangle(element: Element): Eagle.Rectangle[] {
   return Array.from(element.getElementsByTagName("rectangle"))
     .map(it => ({
-      layer: it.getAttribute("layer"),
+      layer: it.getAttribute("layer") ?? "0",
       x1: it.getAttributeInt("x1") ?? 0,
       y1: it.getAttributeInt("y1") ?? 0,
       x2: it.getAttributeInt("x2") ?? 0,
@@ -72,17 +72,17 @@ function getText(element: Element): Eagle.Text[] {
       y: it.getAttributeInt("y") ?? 0,
       size: it.getAttributeInt("size") ?? 0,
       ratio: it.getAttributeInt("ratio") ?? 0,
-      layer: it.getAttribute("layer"),
+      layer: it.getAttribute("layer") ?? "0",
       rotation: rotationToNumber(it.getAttribute("rot")),
-      value: it.textContent,
+      value: it.textContent ?? "",
     }));
 }
 
 const getLayers = (xml: Document): Eagle.Layer[] => {
   return Array.from(xml.getElementsByTagName("layers")[0].children)
     .map(it => ({
-      number: it.getAttribute("number"),
-      name: it.getAttribute("name"),
+      number: it.getAttribute("number") ?? "0",
+      name: it.getAttribute("name") ?? "",
       color: it.getAttributeInt("color") ?? 0,
       fill: it.getAttributeInt("fill") ?? 0,
       visible: it.getAttribute("visible") == "yes",
@@ -95,9 +95,9 @@ const getLibraries = (xml: Document): Eagle.Library[] => {
     .map(library => {
       const packages = Array.from(library.getElementsByTagName("package"))
         .map(pack => ({
-          name: pack.getAttribute("name"),
-          urn: pack.getAttribute("urn"),
-          library_version: pack.getAttribute("library_version"),
+          name: pack.getAttribute("name") ?? "",
+          urn: pack.getAttribute("urn") ?? "",
+          library_version: pack.getAttribute("library_version") ?? "",
           wires: getWires(pack),
           pads: getPads(pack),
           text: getText(pack),
@@ -105,8 +105,8 @@ const getLibraries = (xml: Document): Eagle.Library[] => {
         }));
 
       return {
-        name: library.getAttribute("name"),
-        urn: library.getAttribute("urn"),
+        name: library.getAttribute("name") ?? "",
+        urn: library.getAttribute("urn") ?? "",
         packages: packages
       };
     });
@@ -121,24 +121,24 @@ const getComponents = (xml: Document): Eagle.Component[] => {
     .map(component => {
       const attributes: Eagle.Attribute[] = Array.from(component.getElementsByTagName("attribute"))
         .map(it => ({
-          layer: it.getAttribute("layer"),
+          layer: it.getAttribute("layer") ?? "0",
           display: it.getAttribute("display") != "off",
-          name: it.getAttribute("name"),
+          name: it.getAttribute("name") ?? "",
           x: it.getAttributeInt("x") ?? 0,
           y: it.getAttributeInt("y") ?? 0,
           size: it.getAttributeInt("size") ?? 0,
-          ratio: it.getAttributeInt("ratio"),
+          ratio: it.getAttributeInt("ratio") ?? 1,
           rotation: rotationToNumber(it.getAttribute("rot")),
-          value: it.getAttribute("value"),
+          value: it.getAttribute("value") ?? "",
         }));
 
       const rotationString = component.getAttribute("rot");
 
       return {
-        name: component.getAttribute("name"),
-        library: component.getAttribute("library"),
-        library_urn: component.getAttribute("library_urn"),
-        package: component.getAttribute("package"),
+        name: component.getAttribute("name") ?? "",
+        library: component.getAttribute("library") ?? "",
+        library_urn: component.getAttribute("library_urn") ?? "",
+        package: component.getAttribute("package") ?? "",
         x: component.getAttributeInt("x") ?? 0,
         y: component.getAttributeInt("y") ?? 0,
         rotation: rotationToNumber(rotationString),
@@ -154,14 +154,14 @@ const getSignals = (xml: Document): Eagle.Signal[] => {
     .map(signal => {
       const contacts: Eagle.Contact[] = Array.from(signal.getElementsByTagName("contactref"))
         .map(it => ({
-          component: it.getAttribute("element"),
-          pad: it.getAttribute("pad"),
+          component: it.getAttribute("element") ?? "",
+          pad: it.getAttribute("pad") ?? "",
         }));
 
       const wires = getWires(signal);
 
       return {
-        name: signal.getAttribute("name"),
+        name: signal.getAttribute("name") ?? "",
         wires: wires,
         contacts: contacts,
       };
