@@ -1,6 +1,6 @@
 import { Dimension, Project } from "../types/project";
 import { Alignment, BrushConfig, Location, SilkscreenConfig, Trace, TracesConfig } from "../types/gcode";
-import { getProjectAlignmentDrills, getProjectDimensions } from "../processors/project";
+import { getBoundaries, getProjectAlignmentDrills, getProjectDimensions } from "../processors/project";
 import { calculateOffsetForPoint } from "../utils/gcode";
 import { getConfigWithRotation } from "../utils/utils";
 
@@ -170,7 +170,7 @@ const generateTraces = (traces: Trace[], config: TraceConfig, state: GenerationS
     .map(trace => trace.filter(it => it.enabled))
     .filter(it => it.length > 1)
     .map(trace => {
-      const canBeContinuous = trace[0].x == trace[trace.length - 1].x && trace[0].y == trace[trace.length - 1].y;
+      const canBeContinuous = Math.hypot(trace[0].x - trace[trace.length - 1].x, trace[0].y - trace[trace.length - 1].y) < 0.001;
       const gcode = canBeContinuous
         ? generateContinuousTrace(trace, config, state)
         : generateBackAndForthTrace(trace, config, state)
@@ -192,6 +192,42 @@ const generateTraces = (traces: Trace[], config: TraceConfig, state: GenerationS
     .join("\n\n");
 }
 
+const generateBoardOutlineCheck = (traces: Trace[], config: TraceConfig, state: GenerationState): string => {
+  return traces
+    .map(trace => trace.filter(it => it.enabled))
+    .filter(it => it.length > 1)
+    .map(trace => {
+      const canBeContinuous = Math.hypot(trace[0].x - trace[trace.length - 1].x, trace[0].y - trace[trace.length - 1].y) < 0.001;
+
+      // Pass 1 & Pass 2 at Z 1.0000 (1mm Z offset above the copper plate)
+      const pass1 = generateAcceleratedTrace(trace, config, state);
+      const pass2 = canBeContinuous
+        ? generateAcceleratedTrace(trace, config, state)
+        : generateAcceleratedTrace([...trace].reverse(), config, state);
+
+      // Pass 3 at Z 0.0000 (down to 0 mm for the third pass)
+      const pass3 = generateAcceleratedTrace(trace, config, state);
+
+      return [
+        // Travel to the outline trace start at max speed
+        `${gcodeMoveCommand(trace[0], config, false)} F${config.maxFeedRate.toFixed(0)}`,
+
+        // Plunge to Z 1.0000 for the first two passes
+        `G01 Z1.0000 F${config.minFeedRate.toFixed(0)}`,
+        ...pass1,
+        ...pass2,
+
+        // Plunge down to Z 0.0000 for the third pass
+        `G01 Z0.0000 F${config.minFeedRate.toFixed(0)}`,
+        ...pass3,
+
+        // Retract at max speed
+        `G00 Z3.0000 F${config.maxFeedRate.toFixed(0)}`
+      ].join("\n");
+    })
+    .join("\n\n");
+};
+
 const generateAlignmentDrillsCheckPoints = (project: Project, config: TraceConfig): string => {
   const alignmentDrills = getProjectAlignmentDrills(project);
   return alignmentDrills
@@ -206,6 +242,58 @@ const generateAlignmentDrillsCheckPoints = (project: Project, config: TraceConfi
     ])
     .join("\n")
 }
+
+export const createRectangleTrace = (minX: number, minY: number, maxX: number, maxY: number): Trace => [
+  { x: minX, y: minY, enabled: true },
+  { x: maxX, y: minY, enabled: true },
+  { x: maxX, y: maxY, enabled: true },
+  { x: minX, y: maxY, enabled: true },
+  { x: minX, y: minY, enabled: true },
+];
+
+export const getBoardOutline = (project: Project): Trace[] => {
+  // 1. Check profile traces from FlatCAM first - this is the actual physical board cutout toolpath
+  if (project.profile && project.profile.length > 0) {
+    const pts = project.profile.flat().filter(p => p.enabled !== false);
+    const bounds = getBoundaries(pts);
+    if (!bounds.minimumPointWasUndefined && bounds.width > 0 && bounds.height > 0) {
+      return [createRectangleTrace(bounds.x, bounds.y, bounds.x + bounds.width, bounds.y + bounds.height)];
+    }
+  }
+
+  // 2. Next, check overall project dimensions (derived from active traces)
+  const dim = getProjectDimensions(project);
+  if (dim.width > 0 && dim.height > 0) {
+    // If CAD board plain wires exist and actually enclose the project dimensions, prefer them
+    if (project.board?.plain && project.board.plain.length > 0) {
+      const dimWires = project.board.plain.filter(w => w.layer === "20" || String(w.layer) === "20");
+      const wires = dimWires.length > 0 ? dimWires : project.board.plain;
+      const pts = wires.flatMap(w => [{ x: w.x1, y: w.y1 }, { x: w.x2, y: w.y2 }]);
+      const boardBounds = getBoundaries(pts);
+      if (
+        !boardBounds.minimumPointWasUndefined &&
+        boardBounds.width >= dim.width - 0.1 &&
+        boardBounds.height >= dim.height - 0.1
+      ) {
+        return [createRectangleTrace(boardBounds.x, boardBounds.y, boardBounds.x + boardBounds.width, boardBounds.y + boardBounds.height)];
+      }
+    }
+    return [createRectangleTrace(dim.x, dim.y, dim.x + dim.width, dim.y + dim.height)];
+  }
+
+  // 3. Fallback to board plain if project dimensions were empty
+  if (project.board?.plain && project.board.plain.length > 0) {
+    const dimWires = project.board.plain.filter(w => w.layer === "20" || String(w.layer) === "20");
+    const wires = dimWires.length > 0 ? dimWires : project.board.plain;
+    const pts = wires.flatMap(w => [{ x: w.x1, y: w.y1 }, { x: w.x2, y: w.y2 }]);
+    const bounds = getBoundaries(pts);
+    if (!bounds.minimumPointWasUndefined && bounds.width > 0 && bounds.height > 0) {
+      return [createRectangleTrace(bounds.x, bounds.y, bounds.x + bounds.width, bounds.y + bounds.height)];
+    }
+  }
+
+  return [];
+};
 
 export const generateSilkscreenFile = (project: Project, side: "top" | "bottom", config: SilkscreenConfig): string => {
   const configWithRotation = getConfigWithRotation(config);
@@ -260,6 +348,18 @@ export const generateCopperFile = (project: Project, side: "top" | "bottom", con
   }
 
   const state: GenerationState = { distance: 0 };
+  const outlineTraces = getBoardOutline(project);
+  const outlineConfig: TraceConfig = {
+    ...traceConfig,
+    iterations: 3,
+  };
+
+  const outlineGcode = outlineTraces.length > 0
+    ? [
+        "; --- BOARD OUTLINE CHECK (3 PASSES: 2x Z1.0mm, 1x Z0.0mm) ---",
+        generateBoardOutlineCheck(outlineTraces, outlineConfig, state)
+      ].join("\n")
+    : "; No board outline";
 
   return [
     "G21",
@@ -270,10 +370,11 @@ export const generateCopperFile = (project: Project, side: "top" | "bottom", con
     "M03",
     "G28",
     "G4 P1",
+    outlineGcode,
     config.cutoutProfile ? generateTraces(project.profile, traceConfig, state) : "; No profile cutout",
     generateTraces(side == "top" ? project.traces_top : project.traces_bottom, traceConfig, state),
     `G00 X0.0000Y0.0000Z3.0000 F${config.maxFeedRate.toFixed(0)}`,
     "M300 S2000 P500 ; Beep end",
     "M05",
-  ].join("\n");
+  ].filter(line => line.length > 0).join("\n");
 }

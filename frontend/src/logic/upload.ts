@@ -4,6 +4,7 @@ import { Flatcam } from "./flatcam";
 import { processTraces } from "./processors/traces";
 import { Project } from "./types/project";
 import { Eagle } from "./types/eagle";
+import { getBoundaries } from "./processors/project";
 
 export namespace Upload {
   export type Type = {
@@ -52,24 +53,25 @@ export namespace Upload {
     if (name.match(fileMatchers.profile)) {
       const profile = processTraces(content);
       project.profile = profile;
-      if (!project.board.plain || project.board.plain.length === 0) {
-        const flatTraces = profile.flat().filter(p => p.enabled);
-        if (flatTraces.length >= 3) {
-          const plainWires: Eagle.Wire[] = [];
-          for (let i = 0; i < flatTraces.length; i++) {
-            const cur = flatTraces[i];
-            const next = flatTraces[(i + 1) % flatTraces.length];
-            plainWires.push({
-              layer: "20",
-              x1: cur.x,
-              y1: cur.y,
-              x2: next.x,
-              y2: next.y,
-              width: 0.1,
-              curve: null
-            });
-          }
-          project.board.plain = plainWires;
+      const flatTraces = profile.flat().filter(p => p.enabled);
+      const profBounds = getBoundaries(flatTraces);
+      const boardBounds = project.board?.plain && project.board.plain.length > 0
+        ? getBoundaries(project.board.plain.flatMap(w => [{ x: w.x1, y: w.y1 }, { x: w.x2, y: w.y2 }]))
+        : null;
+
+      if (
+        !boardBounds ||
+        boardBounds.minimumPointWasUndefined ||
+        boardBounds.width < profBounds.width - 1 ||
+        boardBounds.height < profBounds.height - 1
+      ) {
+        if (!profBounds.minimumPointWasUndefined && profBounds.width > 0 && profBounds.height > 0) {
+          project.board.plain = [
+            { layer: "20", x1: profBounds.x, y1: profBounds.y, x2: profBounds.x + profBounds.width, y2: profBounds.y, width: 0.1, curve: null },
+            { layer: "20", x1: profBounds.x + profBounds.width, y1: profBounds.y, x2: profBounds.x + profBounds.width, y2: profBounds.y + profBounds.height, width: 0.1, curve: null },
+            { layer: "20", x1: profBounds.x + profBounds.width, y1: profBounds.y + profBounds.height, x2: profBounds.x, y2: profBounds.y + profBounds.height, width: 0.1, curve: null },
+            { layer: "20", x1: profBounds.x, y1: profBounds.y + profBounds.height, x2: profBounds.x, y2: profBounds.y, width: 0.1, curve: null },
+          ];
         }
       }
       return profile;
