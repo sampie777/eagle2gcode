@@ -2,6 +2,7 @@ import { createContext, createSignal, useContext } from "solid-js";
 import { Checklist } from "../logic/types/checklist";
 import { Gcode } from "../logic/generators/gcode";
 import { CadType } from "../logic/flatcam";
+import { Persistency } from "../logic/utils/persistency";
 
 export const getEagleChecklist = (): Checklist => [
   {
@@ -263,6 +264,9 @@ export const getChecklistForCad = (cadType: CadType): Checklist => {
 };
 
 const getInitialCad = (): CadType => {
+  const loaded = Persistency.loadAll()?.cadType;
+  if (loaded === "altium" || loaded === "eagle") return loaded;
+
   if (typeof localStorage !== "undefined") {
     const saved = localStorage.getItem("project.selectedCad");
     if (saved === "altium") return "altium";
@@ -270,8 +274,16 @@ const getInitialCad = (): CadType => {
   return "eagle";
 };
 
+const getInitialChecklist = (): Checklist => {
+  const loaded = Persistency.loadAll()?.checklist;
+  if (loaded && Array.isArray(loaded) && loaded.length > 0) {
+    return loaded;
+  }
+  return getChecklistForCad(getInitialCad());
+};
+
 const [activeCad, setActiveCad] = createSignal<CadType>(getInitialCad());
-const [currentChecklist, setCurrentChecklist] = createSignal<Checklist>(getChecklistForCad(getInitialCad()));
+const [currentChecklist, setCurrentChecklist] = createSignal<Checklist>(getInitialChecklist());
 
 export const resetChecklist = () => {
   setCurrentChecklist(getChecklistForCad(activeCad()));
@@ -282,16 +294,32 @@ export const setChecklistCad = (cad: CadType) => {
   setCurrentChecklist(getChecklistForCad(cad));
 };
 
+export const restoreChecklist = (savedChecklist?: Checklist, cad?: CadType) => {
+  if (cad) {
+    setActiveCad(cad);
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem("project.selectedCad", cad);
+    }
+  }
+  if (savedChecklist && Array.isArray(savedChecklist) && savedChecklist.length > 0) {
+    setCurrentChecklist(JSON.parse(JSON.stringify(savedChecklist)));
+  } else if (cad) {
+    setCurrentChecklist(getChecklistForCad(cad));
+  }
+};
+
 export const ChecklistContext = createContext<{
   checklist: () => Checklist,
   activeCad: () => CadType,
   setCad: (cad: CadType) => void,
-  resetChecklist: () => void
+  resetChecklist: () => void,
+  restoreChecklist: (savedChecklist?: Checklist, cad?: CadType) => void,
 }>({
   checklist: currentChecklist,
   activeCad: activeCad,
   setCad: setChecklistCad,
-  resetChecklist: resetChecklist
+  resetChecklist: resetChecklist,
+  restoreChecklist: restoreChecklist,
 });
 
 export const useChecklist = () => useContext(ChecklistContext);

@@ -1,4 +1,4 @@
-import { Component, createEffect, createSignal, Show } from "solid-js";
+import { Component, createEffect, createSignal, onMount, Show } from "solid-js";
 import SettingsContainer from "../components/settings/SettingsContainer";
 import SettingNumber from "../components/settings/SettingNumber";
 import { CadType, Flatcam } from "../../logic/flatcam";
@@ -13,7 +13,7 @@ import { exampleProject } from "../../logic/example/project";
 type Props = ScreenProps;
 
 const FlatcamRoot: Component<Props> = (props) => {
-  const { loadProject, project } = useProject();
+  const { loadProject, project, touchProject, projectVersion } = useProject();
   const { activeCad, setCad } = useChecklist();
 
   // Active CAD tab ('eagle' or 'altium')
@@ -41,8 +41,33 @@ const FlatcamRoot: Component<Props> = (props) => {
   const [copied, setCopied] = createSignal(false);
   let textareaRef: HTMLTextAreaElement | undefined;
 
+  onMount(() => {
+    if (!project.path) {
+      const initialPath = activeTab() === "eagle" ? eaglePath() : altiumPath();
+      if (initialPath) {
+        project.path = initialPath;
+        touchProject();
+      }
+    }
+  });
+
   createEffect(() => {
     setActiveTab(activeCad());
+  });
+
+  // Keep eaglePath/altiumPath synchronized when project.path is loaded or modified externally
+  createEffect(() => {
+    projectVersion();
+    const curPath = project.path ?? "";
+    if (activeTab() === "eagle") {
+      if (curPath !== eaglePath()) {
+        setEaglePath(curPath);
+      }
+    } else {
+      if (curPath !== altiumPath()) {
+        setAltiumPath(curPath);
+      }
+    }
   });
 
   createEffect(() => {
@@ -59,6 +84,10 @@ const FlatcamRoot: Component<Props> = (props) => {
     setActiveTab(tab);
     setCad(tab);
     localStorage.setItem("project.selectedCad", tab);
+    const newPath = tab === "eagle" ? eaglePath() : altiumPath();
+    project.path = newPath;
+    localStorage.setItem("project.lastPath", newPath);
+    touchProject();
   };
 
   const onEaglePathChange = (value: string) => {
@@ -66,11 +95,21 @@ const FlatcamRoot: Component<Props> = (props) => {
     localStorage.setItem("project.eagle.path", value);
     localStorage.setItem("project.camDirectory", value);
     setCookie("project.camDirectory", value, 365);
+    if (activeTab() === "eagle") {
+      project.path = value;
+      localStorage.setItem("project.lastPath", value);
+      touchProject();
+    }
   };
 
   const onAltiumPathChange = (value: string) => {
     setAltiumPath(value);
     localStorage.setItem("project.altium.path", value);
+    if (activeTab() === "altium") {
+      project.path = value;
+      localStorage.setItem("project.lastPath", value);
+      touchProject();
+    }
   };
 
   const onPcbNameChange = (value: string) => {
@@ -131,6 +170,7 @@ const FlatcamRoot: Component<Props> = (props) => {
     if (activeTab() === "eagle") {
       setCookie("project.camDirectory", eaglePath(), 365);
     }
+    touchProject();
     props.onNext?.();
   };
 
@@ -141,6 +181,7 @@ const FlatcamRoot: Component<Props> = (props) => {
     if (activeTab() === "eagle") {
       setCookie("project.camDirectory", eaglePath(), 365);
     }
+    touchProject();
     if (props.onExampleLoaded) {
       props.onExampleLoaded();
     } else {
@@ -170,13 +211,25 @@ const FlatcamRoot: Component<Props> = (props) => {
       </button>
     </div>
 
+    <p>
+      In this step you need to enter the project path of your {activeTab() === "eagle" ? "EAGLE" : "Altium"} project.
+      The FlatCAM commands will be generated for you below.
+    </p>
+
     <ol style={{ "text-align": "left" }}>
-      <li>Select your CAD software above (Eagle or Altium).</li>
-      <li>Edit the configuration below and copy the generated commands.</li>
-      <li>Open a new <a href="http://flatcam.org/" target={"_blank"}>FlatCAM</a> project and paste these commands
-        in the command window.
+      <li>
+        {activeTab() === "eagle" ? (
+          <>Open EAGLE, load the board file, and run the CAM processor to export Gerber and Excellon drill files.</>
+        ) : (
+          <>Open Altium Designer, ensure units are set to <strong>Millimeters (mm)</strong>, and generate Gerber & NC Drill outputs.</>
+        )}
       </li>
-      <li>Upload the generated files in the next screen. The generated files can be found in the specified project
+      <li>Open a new <a href="http://flatcam.org/" target={"_blank"}>FlatCAM</a> project.
+      </li>
+      <li>Copy the generated commands below and paste them into the Flatcam command line interface.</li>
+      <li>Press <code>Enter</code> to execute the commands.</li>
+      <li>
+        Wait until FlatCAM has finished processing. The output files will be in your project
         folder under <code>{activeTab() === "eagle" ? "CAMOutputs/" : "Project Outputs for <Project>/"}</code> as <code>*.gcode</code> files.
       </li>
     </ol>
@@ -214,11 +267,9 @@ const FlatcamRoot: Component<Props> = (props) => {
     <div class={"actions"}>
       <button onClick={copy}>{copied() ? "Copied!" : "Copy"}</button>
       <button onClick={nextScreen}>Next</button>
-    </div>
-    <div class={"actions"}>
-      <button onClick={loadExampleProject}>Example project</button>
+      <button class={"load-example"} onClick={loadExampleProject}>Load Example Project</button>
     </div>
   </div>;
-}
+};
 
 export default FlatcamRoot;

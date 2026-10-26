@@ -3,11 +3,12 @@ import { emptyProject, useProject } from "../ProjectContext";
 import { useConfig } from "../ConfigContext";
 import { Persistency } from "../../logic/utils/persistency";
 import './Header.less';
-import { AiOutlineLoading, AiOutlineReload, AiOutlineSave } from "solid-icons/ai";
+import { AiOutlineFolderOpen, AiOutlineLoading, AiOutlineReload, AiOutlineSave } from "solid-icons/ai";
 import { useChecklist } from "../ChecklistContext";
 // @ts-ignore
 import { version } from "../../../package.json";
 import Checklist from "../checklist/Checklist";
+import SavedProjectsModal from "./SavedProjectsModal";
 
 type Props = {
   onResetProject: () => void
@@ -17,34 +18,58 @@ type Props = {
 const Header: Component<Props> = (props) => {
   const { project, loadProject } = useProject();
   const { config } = useConfig();
-  const { resetChecklist } = useChecklist()
+  const { checklist, activeCad, resetChecklist } = useChecklist();
   const [isSaving, setIsSaving] = createSignal(false);
+  const [saveSuccess, setSaveSuccess] = createSignal(false);
   const [showChecklist, setShowChecklist] = createSignal(false);
+  const [showProjects, setShowProjects] = createSignal(false);
+  const [savedCount, setSavedCount] = createSignal(Persistency.getSavedProjects().length);
+
+  const updateSavedCount = () => {
+    setSavedCount(Persistency.getSavedProjects().length);
+  };
 
   const resetProject = () => {
     if (!confirm("Are you sure you want to delete this project?")) return;
 
-    loadProject(emptyProject())
-
-    if (import.meta.env["PROD"]) {
-      Persistency.saveAll(project, config)
-    } else {
-      console.log("Not saving to localstorage in development")
-    }
-
+    loadProject(emptyProject());
     resetChecklist();
-
     props.onResetProject();
   };
 
   const saveProject = () => {
     setIsSaving(true);
-    Persistency.saveAll(project, config)
-    setTimeout(() => setIsSaving(false), 200);
-  }
+    let path = project.path?.trim();
+    if (!path) {
+      const entered = prompt("Enter a project path or name to save this project:", "Untitled Project");
+      if (!entered || !entered.trim()) {
+        setIsSaving(false);
+        return;
+      }
+      path = entered.trim();
+      project.path = path;
+    }
+
+    Persistency.saveProject(project, config, checklist(), activeCad());
+    updateSavedCount();
+    setSaveSuccess(true);
+    setTimeout(() => {
+      setIsSaving(false);
+      setSaveSuccess(false);
+    }, 800);
+  };
 
   return <div class={"Header"}>
     {!showChecklist() ? null : <Checklist close={() => setShowChecklist(false)} />}
+    {!showProjects() ? null : (
+      <SavedProjectsModal
+        close={() => {
+          setShowProjects(false);
+          updateSavedCount();
+        }}
+        onProjectLoaded={updateSavedCount}
+      />
+    )}
 
     <div class={"header-actions"}>
       <button onClick={resetProject}
@@ -53,8 +78,12 @@ const Header: Component<Props> = (props) => {
       </button>
       <button onClick={saveProject}
               disabled={isSaving()}
-              title={"Save project and config"}>
-        {isSaving() ? <AiOutlineLoading class={"spinner"} /> : <AiOutlineSave />} {isSaving() ? "Saving..." : "Save"}
+              title={"Save current project, config, and checklist"}>
+        {isSaving() ? <AiOutlineLoading class={"spinner"} /> : <AiOutlineSave />} {saveSuccess() ? "Saved!" : isSaving() ? "Saving..." : "Save"}
+      </button>
+      <button onClick={() => setShowProjects(true)}
+              title={"View and load saved projects"}>
+        <AiOutlineFolderOpen /> Projects ({savedCount()})
       </button>
       <button onClick={() => setShowChecklist(true)}>Checklist</button>
     </div>
@@ -75,6 +104,6 @@ const Header: Component<Props> = (props) => {
 
     <span class={"version"}>v{version} {import.meta.env["DEV"] ? "(development)" : null}</span>
   </div>;
-}
+};
 
 export default Header;
