@@ -1,10 +1,11 @@
-import { Component, createSignal, For } from "solid-js";
+import { Component, createSignal, For, onCleanup, onMount } from "solid-js";
 import './style.less';
 import Item from "./Item";
 import { useChecklist } from "../ChecklistContext";
 import { getProjectDimensions } from "../../logic/processors/project";
 import { useProject } from "../ProjectContext";
 import { CadType } from "../../logic/flatcam";
+import { AiOutlineClose } from "solid-icons/ai";
 
 type Props = {
   close: () => void
@@ -15,6 +16,23 @@ const Checklist: Component<Props> = (props) => {
   const [dimensions] = createSignal(getProjectDimensions(project));
   const { checklist, activeCad, setCad } = useChecklist();
 
+  onMount(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        props.close();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+
+    onCleanup(() => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    });
+  });
+
   const onCadChange = (cad: CadType) => {
     setCad(cad);
     localStorage.setItem("project.selectedCad", cad);
@@ -22,6 +40,10 @@ const Checklist: Component<Props> = (props) => {
 
   return <div class={"Checklist"} onClick={e => e.target === e.currentTarget ? props.close() : null}>
     <div class={"content"}>
+      <button class={"checklist-close-btn"} onClick={props.close} title={"Close (Esc)"}>
+        <AiOutlineClose />
+      </button>
+
       <div class={"checklist-header"}>
         <h2>PCB Fabrication Checklist</h2>
         <div class={"checklist-cad-tabs"}>
@@ -53,7 +75,7 @@ const Checklist: Component<Props> = (props) => {
                   if (text.startsWith("Saw the board")) {
                     const width = Math.ceil(dimensions().width) + 2;
                     const height = Math.ceil(dimensions().height) + 2;
-                    text = text.replaceAll(/Saw the board.*?\./g, `Saw the board to ${width} x ${height} mm.`);
+                    text = text.replaceAll(/Saw the board.*?\\./g, `Saw the board to ${width} x ${height} mm.`);
                   }
                   return <Item item={{ ...item, text }} />;
                 }}
