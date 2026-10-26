@@ -1,9 +1,20 @@
 .FlatcamSettings {
   display: flex;
   flex-direction: column;
-  gap: 12px;
   width: 100%;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
   box-sizing: border-box;
+
+  /* Pinned top area: tabs & toast */
+  .settings-header-fixed {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
 
   /* Tab navigation bar */
   .settings-tab-nav {
@@ -55,6 +66,30 @@
           color: #ffffff;
         }
       }
+    }
+  }
+
+  /* Scrollable settings area: configuration scrolls here independently */
+  .settings-scroll-area {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.4);
     }
   }
 
@@ -172,31 +207,10 @@
       }
 
       .hole-cad-coords {
-        font-size: 0.75em;
+        font-size: 0.78em;
         color: #94a3b8;
+        font-family: monospace;
       }
-    }
-  }
-
-  /* In-Tab Quick Downloads Area */
-  .tab-downloads-section {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-
-    .section-header {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.85em;
-      font-weight: 600;
-      color: #94a3b8;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin: 0 4px;
     }
   }
 
@@ -256,55 +270,109 @@
     100% { opacity: 0; }
   }
 
-  /* Actions footer */
-  .actions {
+  /* Pinned Bottom Footer: Files and Actions Always Visible */
+  .settings-pinned-footer {
+    flex: 0 0 auto;
     display: flex;
-    flex-direction: row;
-    gap: 10px;
-    margin-top: 8px;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 4px 2px;
+    margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(8px);
+    box-sizing: border-box;
 
-    button {
-      flex: 1;
+    .pinned-downloads-section {
       display: flex;
-      align-items: center;
-      justify-content: center;
+      flex-direction: column;
       gap: 6px;
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 0.88em;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.15s ease;
 
-      &.back-btn {
-        background: rgba(51, 65, 85, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        color: #e2e8f0;
-
-        &:hover {
-          background: rgba(71, 85, 105, 0.8);
-          color: #fff;
-        }
+      .downloads-header {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.8em;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #818cf8;
+        padding: 0 2px;
       }
 
-      &.reset-btn {
-        background: rgba(239, 68, 68, 0.15);
-        border: 1px solid rgba(239, 68, 68, 0.35);
-        color: #fca5a5;
+      .downloads-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+    }
 
-        &:hover {
-          background: rgba(239, 68, 68, 0.3);
-          color: #fff;
+    .actions {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      margin: 4px 0 0;
+
+      button {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-size: 0.88em;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s ease;
+
+        &.back-btn {
+          background: rgba(51, 65, 85, 0.6);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: #e2e8f0;
+
+          &:hover {
+            background: rgba(71, 85, 105, 0.8);
+            color: #fff;
+          }
+        }
+
+        &.reset-btn {
+          background: rgba(239, 68, 68, 0.15);
+          border: 1px solid rgba(239, 68, 68, 0.35);
+          color: #fca5a5;
+
+          &:hover {
+            background: rgba(239, 68, 68, 0.3);
+            color: #fff;
+          }
         }
       }
+    }
+  }
+
+  @media (max-width: 1024px) {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+
+    .settings-scroll-area {
+      overflow-y: visible;
+    }
+
+    .settings-pinned-footer {
+      position: sticky;
+      bottom: 0;
+      z-index: 10;
     }
   }
 }
 
 .DownloadButton {
+  width: 100%;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 10px;
-  margin: 3px 0;
+  margin: 1px 0;
   padding: 8px 12px;
   background-color: rgba(30, 41, 59, 0.65);
   color: #f1f5f9;
@@ -316,6 +384,8 @@
   gap: 12px;
   text-align: left;
   box-sizing: border-box;
+  white-space: normal;
+  line-height: normal;
   transition: all 0.15s ease;
 
   &:hover:not(:disabled) {
@@ -342,20 +412,26 @@
   }
 
   .btn-icon {
-    color: #94a3b8;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    font-size: 1.25em;
+    color: #94a3b8;
     transition: color 0.15s ease;
+
+    .spinner {
+      animation: spin 600ms linear infinite;
+    }
   }
 
   .content {
-    flex: 1;
+    flex: 1 1 auto;
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
+    text-align: left;
 
     .header-row {
       display: flex;
@@ -365,7 +441,7 @@
       gap: 6px;
 
       .text {
-        font-size: 0.95em;
+        font-size: 0.92em;
         font-weight: 600;
         color: #f8fafc;
         display: flex;
@@ -382,16 +458,26 @@
         letter-spacing: 0.04em;
         background: #4f46e5;
         color: #fff;
+        flex-shrink: 0;
       }
     }
 
     .filename-label {
       font-size: 0.76em;
       color: #64748b;
-      font-family: monospace;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      display: block;
+    }
+
+    .meta-info,
+    .btn-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-top: 1px;
     }
 
     .info {
@@ -401,9 +487,13 @@
       flex-direction: row;
       align-items: center;
       gap: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
 
       svg {
         color: #818cf8;
+        flex-shrink: 0;
       }
     }
   }

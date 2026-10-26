@@ -45,6 +45,7 @@ export namespace Graphics {
   export const start = (config: { width: number, height: number }): {
     canvas: HTMLCanvasElement,
     resize: (width: number, height: number) => void,
+    setCameraView: (view: "top" | "bottom" | "isometric" | "reset") => void,
     update: (project: Project, config: RenderConfig, projectConfig: GcodeConfig) => void,
   } => {
     const renderer = new WebGLRenderer();
@@ -110,12 +111,46 @@ export namespace Graphics {
       requestRender(renderer, scene, camera, controls);
     };
 
+    let lastDimensions = { x: 0, y: 0, width: 50, height: 50 };
+
+    const setCameraView = (view: "top" | "bottom" | "isometric" | "reset") => {
+      const cx = lastDimensions.x + lastDimensions.width / 2;
+      const cy = lastDimensions.y + lastDimensions.height / 2;
+      const safeWidth = lastDimensions.width > 0 ? lastDimensions.width : 50;
+      const safeHeight = lastDimensions.height > 0 ? lastDimensions.height : 50;
+      const heightFactor = (37 / 28) * safeHeight / safeWidth;
+      const cz = (heightFactor * Math.max(safeWidth, safeHeight) / 2 / Math.tan(camera.fov / 2 / 180 * Math.PI)) || 120;
+
+      if (controls) {
+        controls.target.set(cx, cy, 0);
+      }
+
+      if (view === "top" || view === "reset") {
+        camera.position.set(cx, cy + 0.001, cz);
+        camera.up.set(0, 1, 0);
+      } else if (view === "bottom") {
+        camera.position.set(cx, cy + 0.001, -cz);
+        camera.up.set(0, 1, 0);
+      } else if (view === "isometric") {
+        camera.position.set(cx - cz * 0.65, cy - cz * 0.65, cz * 0.75);
+        camera.up.set(0, 0, 1);
+      }
+
+      camera.lookAt(cx, cy, 0);
+      if (controls) {
+        controls.update();
+      }
+      requestRender(renderer, scene, camera, controls);
+    };
+
     requestRender(renderer, scene, camera, controls);
     return {
       canvas: renderer.domElement,
       resize,
+      setCameraView,
       update: (project, config, projectConfig: GcodeConfig) => requestAnimationFrame(() => {
-        update(scene, camera, project, config, projectConfig, controls)
+        lastDimensions = getProjectDimensions(project);
+        update(scene, camera, project, config, projectConfig, controls);
         requestRender(renderer, scene, camera, controls);
       })
     };

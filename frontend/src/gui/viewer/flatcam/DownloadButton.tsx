@@ -73,7 +73,11 @@ const DownloadButton: Component<Props> = (props) => {
         ) : null}
       </div>
       <span class={"filename-label"}>{props.fileName}</span>
-      {props.children}
+      {props.children ? (
+        <div class={"meta-info"}>
+          {props.children}
+        </div>
+      ) : null}
     </div>
   </button>;
 };

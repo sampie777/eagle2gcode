@@ -49,7 +49,7 @@ function App() {
 
           <div class={"step-divider"} />
 
-          <section id={"step-viewer"} class={"workflow-step"}>
+          <section id={"step-viewer"} class={"workflow-step viewer-step"}>
             <div class={"step-header"}>
               <span class={"step-badge"}>Step 3</span>
               <span class={"step-subtitle"}>PCB Viewer & G-code Generator</span>

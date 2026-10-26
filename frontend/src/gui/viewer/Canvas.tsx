@@ -18,8 +18,15 @@ const createCanvas = () => {
   const [showOffsetDrillHolesDebug, setShowOffsetDrillHolesDebug] = createSignal(false);
   const { project, projectVersion } = useProject();
   const { config } = useConfig();
-  const { canvas, update, resize } = Graphics.start({ width: 1100, height: 600 });
+  const { canvas, update, resize, setCameraView } = Graphics.start({ width: 1100, height: 600 });
   let wrapperRef: HTMLDivElement | undefined;
+
+  const calculateTargetHeight = (width: number) => {
+    const vh = typeof window !== "undefined" ? window.innerHeight : 900;
+    // Allow the canvas to expand with screen height, optimizing view while retaining space for controls
+    const optimalHeight = Math.max(460, Math.min(vh - 200, 850));
+    return Math.min(optimalHeight, Math.max(420, Math.round(width * 0.58)));
+  };
 
   onMount(() => {
     if (!wrapperRef) return;
@@ -27,13 +34,27 @@ const createCanvas = () => {
       for (const entry of entries) {
         const width = Math.floor(entry.contentRect.width);
         if (width > 0) {
-          const height = Math.min(650, Math.max(400, Math.round(width * 0.58)));
+          const height = calculateTargetHeight(width);
           resize(width, height);
         }
       }
     });
     observer.observe(wrapperRef);
-    onCleanup(() => observer.disconnect());
+
+    const onWindowResize = () => {
+      if (!wrapperRef) return;
+      const width = Math.floor(wrapperRef.clientWidth);
+      if (width > 0) {
+        const height = calculateTargetHeight(width);
+        resize(width, height);
+      }
+    };
+    window.addEventListener("resize", onWindowResize);
+
+    onCleanup(() => {
+      observer.disconnect();
+      window.removeEventListener("resize", onWindowResize);
+    });
   });
 
   createEffect(() => {
@@ -68,6 +89,7 @@ const createCanvas = () => {
 
   return {
     rerender: renderProject,
+    setCameraView,
     Canvas: () => (<div class={"Canvas"}>
       <div ref={wrapperRef} class={"canvas-wrapper"}>
         {canvas}
@@ -75,10 +97,27 @@ const createCanvas = () => {
 
       <div class={"canvas-control"}>
         <div class={"canvas-toolbar-top"}>
-          <button class={"rerender-btn"} onClick={renderProject} title={"Rerender 3D scene"}>
-            <AiOutlineReload />
-            <span>Redraw</span>
-          </button>
+          <div class={"toolbar-left"}>
+            <button class={"rerender-btn"} onClick={renderProject} title={"Rerender 3D scene"}>
+              <AiOutlineReload />
+              <span>Redraw</span>
+            </button>
+
+            <div class={"cam-quick-presets"}>
+              <button class={"cam-mini-btn"} onClick={() => setCameraView("top")} title={"Top View (Look straight down)"}>
+                Top
+              </button>
+              <button class={"cam-mini-btn"} onClick={() => setCameraView("bottom")} title={"Bottom View (Inspect bottom traces)"}>
+                Bottom
+              </button>
+              <button class={"cam-mini-btn"} onClick={() => setCameraView("isometric")} title={"3D Isometric View"}>
+                3D
+              </button>
+              <button class={"cam-mini-btn"} onClick={() => setCameraView("reset")} title={"Reset View & Center Board"}>
+                Fit
+              </button>
+            </div>
+          </div>
 
           <div class={"opacity-slider-group"}>
             <TbLayersLinked size={16} class={"opacity-icon"} />
