@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { generateCopperFile, getBoardOutline } from "./traces";
+import { connectWiresToTraces, generateCopperFile, getBoardOutline } from "./traces";
 import { emptyProject } from "../../gui/ProjectContext";
 import { OutOfBoundsOption, TracesConfig } from "../types/gcode";
 
@@ -25,6 +25,20 @@ const baseTracesConfig: TracesConfig = {
 };
 
 describe("Traces GCode Generator - Continuous Board Outline", () => {
+  it("connects unordered wires into a continuous closed trace", () => {
+    const wires = [
+      { x1: 10, y1: 0, x2: 10, y2: 20 },
+      { x1: 0, y1: 0, x2: 10, y2: 0 },
+      { x1: 0, y1: 20, x2: 0, y2: 0 },
+      { x1: 10, y1: 20, x2: 0, y2: 20 }
+    ];
+
+    const traces = connectWiresToTraces(wires);
+    expect(traces.length).toBe(1);
+    expect(traces[0].length).toBe(5);
+    expect(traces[0][0].x).toBe(traces[0][4].x);
+    expect(traces[0][0].y).toBe(traces[0][4].y);
+  });
 
   it("produces a single continuous rectangle without gaps when project.profile has multiple segments with gaps", () => {
     const project = emptyProject();

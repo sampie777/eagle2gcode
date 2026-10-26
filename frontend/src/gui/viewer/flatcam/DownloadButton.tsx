@@ -8,6 +8,9 @@ type Props = {
   fileName: string,
   text?: string,
   title?: string,
+  badge?: string,
+  badgeColor?: string,
+  disabled?: boolean,
   children?: JSX.Element
 }
 
@@ -15,6 +18,7 @@ const DownloadButton: Component<Props> = (props) => {
   const [isLoading, setIsLoading] = createSignal(false);
 
   const onClick = (e: MouseEvent) => {
+    if (props.disabled) return;
     setIsLoading(true);
 
     const downloadTextareaId = "download-textarea";
@@ -24,7 +28,7 @@ const DownloadButton: Component<Props> = (props) => {
       const generatedContent = props.content();
       setTimeout(() => setIsLoading(false), 100);
 
-      if (generatedContent.length == 0) {
+      if (generatedContent.length === 0) {
         alert("No GCode generated");
         return;
       }
@@ -47,18 +51,31 @@ const DownloadButton: Component<Props> = (props) => {
       downloadElement.click();
       downloadElement.remove();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
-    })
-  }
+    });
+  };
 
-  return <button class={"DownloadButton"}
+  return <button class={`DownloadButton ${props.disabled ? "disabled" : ""}`}
                  onClick={onClick}
-                 title={props.title ?? "Click to download, or Ctrl+Click to view"}>
-    <TbFileDownload />
+                 disabled={props.disabled}
+                 title={props.disabled ? "No traces or features loaded for this file" : (props.title ?? "Click to download, or Ctrl+Click to preview in textarea")}>
+    <div class={"btn-icon"}>
+      {isLoading() ? <AiOutlineLoading class={"spinner"} size={20} /> : <TbFileDownload size={22} />}
+    </div>
+
     <div class={"content"}>
-      <span class={"text"}>{isLoading() ? <AiOutlineLoading class={"spinner"} /> : null} {props.text}</span>
+      <div class={"header-row"}>
+        <span class={"text"}>{props.text}</span>
+        {props.badge ? (
+          <span class={"side-badge"}
+                style={props.badgeColor ? { "background-color": props.badgeColor, color: "#fff" } : {}}>
+            {props.badge}
+          </span>
+        ) : null}
+      </div>
+      <span class={"filename-label"}>{props.fileName}</span>
       {props.children}
     </div>
   </button>;
-}
+};
 
 export default DownloadButton;

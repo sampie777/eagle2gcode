@@ -2,6 +2,7 @@ import { createEffect, createSignal, onCleanup, onMount } from "solid-js";
 import { useProject } from "../ProjectContext";
 import { Graphics } from "../../logic/graphics/graphics";
 import { AiOutlineReload } from "solid-icons/ai";
+import { TbLayersLinked } from "solid-icons/tb";
 import { useConfig } from "../ConfigContext";
 import ControlOption from "./menu/ControlOption";
 
@@ -46,9 +47,9 @@ const createCanvas = () => {
       ...config.silkscreen.offset.map(it => it.actual.x),
       ...config.silkscreen.offset.map(it => it.actual.y),
       config.silkscreen.outOfBounds,
-    ].forEach(() => null)
+    ].forEach(() => null);
     renderProject();
-  })
+  });
 
   const renderProject = () => {
     update(project, {
@@ -62,8 +63,8 @@ const createCanvas = () => {
       showGrid: showGrid(),
       showAlignmentHolesDebug: showAlignmentHolesDebug(),
       showOffsetDrillHolesDebug: showOffsetDrillHolesDebug(),
-    }, config)
-  }
+    }, config);
+  };
 
   return {
     rerender: renderProject,
@@ -73,32 +74,61 @@ const createCanvas = () => {
       </div>
 
       <div class={"canvas-control"}>
-        <button onClick={renderProject} title={"Rerender"}>
-          <AiOutlineReload />
-        </button>
+        <div class={"canvas-toolbar-top"}>
+          <button class={"rerender-btn"} onClick={renderProject} title={"Rerender 3D scene"}>
+            <AiOutlineReload />
+            <span>Redraw</span>
+          </button>
 
-        <label for={"boardOpacity"}>Board opacity</label>
-        <input type="range"
-               min={0} max={100} value={boardOpacity() * 100}
-               onInput={e => setBoardOpacity(+e.target.value / 100)}
-               id="boardOpacity" />
+          <div class={"opacity-slider-group"}>
+            <TbLayersLinked size={16} class={"opacity-icon"} />
+            <label for={"boardOpacity"}>Substrate opacity</label>
+            <input type="range"
+                   min={0} max={100} value={Math.round(boardOpacity() * 100)}
+                   onInput={e => setBoardOpacity(+e.target.value / 100)}
+                   id="boardOpacity" />
+            <span class={"opacity-val"}>{Math.round(boardOpacity() * 100)}%</span>
+          </div>
+        </div>
 
         <div class={"control-checkboxes"}>
-          <ControlOption name={"Traces (top)"} isChecked={showTopTraces()} onChange={setShowTopTraces} />
-          <ControlOption name={"Traces (bottom)"} isChecked={showBottomTraces()} onChange={setShowBottomTraces} />
-          <ControlOption name={"Silkscreen"} isChecked={showSilkscreen()} onChange={setShowSilkscreen} />
-          <ControlOption name={"Soldermask"} isChecked={showSoldermask()} onChange={setShowSoldermask} />
-          <ControlOption name={"Drills"} isChecked={showDrills()} onChange={setShowDrills} />
-          <ControlOption name={"Grid"} isChecked={showGrid()} onChange={setShowGrid} />
-          <ControlOption name={"Debug alignment holes"} isChecked={showAlignmentHolesDebug()}
+          <ControlOption name={"Traces (top)"}
+                         color={"#e67e22"}
+                         isChecked={showTopTraces()}
+                         onChange={setShowTopTraces} />
+          <ControlOption name={"Traces (bottom)"}
+                         color={"#e74c3c"}
+                         isChecked={showBottomTraces()}
+                         onChange={setShowBottomTraces} />
+          <ControlOption name={"Silkscreen"}
+                         color={"#cbd5e1"}
+                         isChecked={showSilkscreen()}
+                         onChange={setShowSilkscreen} />
+          <ControlOption name={"Soldermask"}
+                         color={"#2ecc71"}
+                         isChecked={showSoldermask()}
+                         onChange={setShowSoldermask} />
+          <ControlOption name={"Drills"}
+                         color={"#d946ef"}
+                         isChecked={showDrills()}
+                         onChange={setShowDrills} />
+          <ControlOption name={"Grid"}
+                         color={"#38bdf8"}
+                         isChecked={showGrid()}
+                         onChange={setShowGrid} />
+          <ControlOption name={"Debug alignment holes"}
+                         color={"#facc15"}
+                         isChecked={showAlignmentHolesDebug()}
                          onChange={setShowAlignmentHolesDebug}
-                         title={"Yellow will be the alignment hole itself, pink will be the actual location, white will be the calculated location"} />
-          <ControlOption name={"Debug offset drill holes"} isChecked={showOffsetDrillHolesDebug()}
+                         title={"Yellow: alignment hole, Pink: actual location, White: calculated location"} />
+          <ControlOption name={"Debug offset drill holes"}
+                         color={"#94a3b8"}
+                         isChecked={showOffsetDrillHolesDebug()}
                          onChange={setShowOffsetDrillHolesDebug} />
         </div>
       </div>
     </div>)
-  }
-}
+  };
+};
 
 export default createCanvas;

@@ -243,6 +243,42 @@ const generateAlignmentDrillsCheckPoints = (project: Project, config: TraceConfi
     .join("\n")
 }
 
+export const connectWiresToTraces = (wires: { x1: number, y1: number, x2: number, y2: number }[]): Trace[] => {
+  if (wires.length === 0) return [];
+  const remaining = wires.map(w => ({ ...w }));
+  const traces: Trace[] = [];
+
+  while (remaining.length > 0) {
+    const first = remaining.shift()!;
+    const currentTrace: Trace = [
+      { x: first.x1, y: first.y1, enabled: true },
+      { x: first.x2, y: first.y2, enabled: true }
+    ];
+
+    let found = true;
+    while (found && remaining.length > 0) {
+      found = false;
+      const lastPt = currentTrace[currentTrace.length - 1];
+      for (let i = 0; i < remaining.length; i++) {
+        const w = remaining[i];
+        if (Math.hypot(w.x1 - lastPt.x, w.y1 - lastPt.y) < 0.01) {
+          currentTrace.push({ x: w.x2, y: w.y2, enabled: true });
+          remaining.splice(i, 1);
+          found = true;
+          break;
+        } else if (Math.hypot(w.x2 - lastPt.x, w.y2 - lastPt.y) < 0.01) {
+          currentTrace.push({ x: w.x1, y: w.y1, enabled: true });
+          remaining.splice(i, 1);
+          found = true;
+          break;
+        }
+      }
+    }
+    traces.push(currentTrace);
+  }
+  return traces;
+};
+
 export const createRectangleTrace = (minX: number, minY: number, maxX: number, maxY: number): Trace => [
   { x: minX, y: minY, enabled: true },
   { x: maxX, y: minY, enabled: true },

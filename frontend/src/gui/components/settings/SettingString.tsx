@@ -1,5 +1,5 @@
 import { Component, createEffect, createSignal } from "solid-js";
-import './style.less'
+import './style.less';
 
 type Props = {
   label: string,
@@ -20,7 +20,9 @@ const SettingString: Component<Props> = (props) => {
 
   return <div class={"setting SettingString"}>
     <label for={id}>
-      {props.label}
+      <span class={"label-title"}>
+        <span class={"label-text"}>{props.label}</span>
+      </span>
     </label>
 
     <input id={id}
@@ -33,6 +35,6 @@ const SettingString: Component<Props> = (props) => {
              props.onChange(v);
            }} />
   </div>;
-}
+};
 
 export default SettingString;

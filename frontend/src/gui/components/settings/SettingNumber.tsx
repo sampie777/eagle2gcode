@@ -1,5 +1,5 @@
-import { Component, createEffect, createSignal } from "solid-js";
-import './style.less'
+import { Component, createEffect, createSignal, JSX } from "solid-js";
+import './style.less';
 
 type Props = {
   label: string,
@@ -8,6 +8,9 @@ type Props = {
   step?: number,
   min?: number,
   max?: number,
+  unit?: string,
+  icon?: JSX.Element,
+  hint?: string,
 }
 
 const parseValue = (raw: string): number => {
@@ -55,30 +58,42 @@ const SettingNumber: Component<Props> = (props) => {
       let next = current + delta;
       if (props.min !== undefined && next < props.min) next = props.min;
       if (props.max !== undefined && next > props.max) next = props.max;
-      const decimals = (String(step).split(".")[1] || "").length;
-      next = Number(next.toFixed(Math.max(decimals, 3)));
-      const newText = String(next);
+      const stepDecimals = (String(step).split(".")[1] || "").length;
+      const currentDecimals = (text().split(".")[1] || "").length;
+      const decimals = Math.max(stepDecimals, currentDecimals);
+      next = Number(next.toFixed(decimals));
+      const newText = decimals > 0 ? next.toFixed(decimals) : String(next);
       setText(newText);
       lastSentValue = next;
       props.onChange(next);
     }
   };
 
-  return <div class={"setting SettingNumber"}>
+  return <div class={"setting SettingNumber"} title={props.hint}>
     <label for={id}>
-      {props.label}
+      <span class={"label-title"}>
+        {props.icon ? <span class={"setting-icon"}>{props.icon}</span> : null}
+        <span class={"label-text"}>{props.label}</span>
+      </span>
+      {props.hint ? <span class={"setting-hint"}>{props.hint}</span> : null}
     </label>
 
-    <input id={id}
-           type={"text"}
-           inputMode={"decimal"}
-           step={props.step}
-           min={props.min}
-           max={props.max}
-           value={text()}
-           onInput={onInput}
-           onKeyDown={onKeyDown} />
+    <div class={"input-wrapper"} onClick={(e) => {
+      const input = (e.currentTarget as HTMLElement).querySelector("input");
+      if (input && document.activeElement !== input) input.focus();
+    }}>
+      <input id={id}
+             type={"text"}
+             inputMode={"decimal"}
+             step={props.step}
+             min={props.min}
+             max={props.max}
+             value={text()}
+             onInput={onInput}
+             onKeyDown={onKeyDown} />
+      {props.unit ? <span class={"unit-badge"}>{props.unit}</span> : null}
+    </div>
   </div>;
-}
+};
 
 export default SettingNumber;
