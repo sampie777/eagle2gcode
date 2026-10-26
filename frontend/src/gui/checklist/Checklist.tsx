@@ -75,7 +75,7 @@ const Checklist: Component<Props> = (props) => {
                   if (text.startsWith("Saw the board")) {
                     const width = Math.ceil(dimensions().width) + 2;
                     const height = Math.ceil(dimensions().height) + 2;
-                    text = text.replaceAll(/Saw the board.*?\\./g, `Saw the board to ${width} x ${height} mm.`);
+                    text = text.replaceAll(/Saw the board.*?\./g, `Saw the board to ${width} x ${height} mm.`);
                   }
                   return <Item item={{ ...item, text }} />;
                 }}
