@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import * as fs from "fs";
 import * as path from "path";
-import { Scene, Mesh } from "three";
+import { Mesh, Scene } from "three";
 import { processBoardFile } from "./board";
 import { isAltiumBoardFile, processAltiumBoardFile } from "./altiumBoard";
 import { processEagleBoardFile } from "./eagleBoard";
@@ -93,6 +93,31 @@ describe("Board processor & 3D render", () => {
     expect(Upload.fileMatchers.board.test("PCB1.PcbDoc")).toBe(true);
     expect(Upload.fileMatchers.board.test("board.pcbdoc")).toBe(true);
     expect(Upload.fileMatchers.board.test("PCB1_Profile.gbr")).toBe(false);
+    expect(Upload.fileMatchers.board.test("traces_profile.gcode")).toBe(false);
+  });
+
+  it("does not populate project.board when uploading traces_profile.gcode", () => {
+    const project: Project = {
+      board: { layers: [], libraries: [], plain: [], components: [], signals: [] },
+      drills: [],
+      profile: [],
+      traces_top: [],
+      traces_bottom: [],
+      silkscreen_top: [],
+      silkscreen_bottom: [],
+      soldermask_top: [],
+      soldermask_bottom: [],
+    };
+
+    const profilePath = path.resolve(__dirname, "../../../../data/homesensors/Project Outputs for homesensors/traces_profile.gcode");
+    const profileContent = fs.readFileSync(profilePath, "utf-8");
+
+    Upload.processFile(project, "traces_profile.gcode", profileContent);
+
+    expect(project.profile.length).toBeGreaterThan(0);
+    expect(Upload.isBoardAvailable(project.board)).toBe(false);
+    expect(project.board.plain.length).toBe(0);
+    expect(project.board.components.length).toBe(0);
   });
 
   it("parses Eagle board via eagleBoard.ts and processBoardFile", () => {
