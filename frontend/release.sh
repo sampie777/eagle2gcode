@@ -218,16 +218,16 @@ function runRelease {
   echo "==> Running tests on develop..."
   bun test --pass-with-no-tests
 
-  # 3. Calculate target release version and verify tag doesn't exist
+  # 3. Checkout master and update
+  echo "==> Switching to master and updating..."
+  git checkout master
+  retry git pull origin master
+
+  # 4. Calculate target release version and verify tag doesn't exist
   local release_version
   release_version=$(calculateReleaseVersion "$release_type")
   echo "==> Target release version: ${release_version}"
   checkTagAvailable "${release_version}"
-
-  # 4. Checkout master and update
-  echo "==> Switching to master and updating..."
-  git checkout master
-  retry git pull origin master
 
   # 5. Merge develop into master
   echo "==> Merging develop into master..."
