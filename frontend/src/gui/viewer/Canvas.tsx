@@ -10,10 +10,11 @@ const createCanvas = () => {
   const [boardOpacity, setBoardOpacity] = createSignal(0);
   const [showTopTraces, setShowTopTraces] = createSignal(true);
   const [showBottomTraces, setShowBottomTraces] = createSignal(true);
-  const [showSilkscreen, setShowSilkscreen] = createSignal(true);
+  const [showSilkscreenTop, setShowSilkscreenTop] = createSignal(true);
+  const [showSilkscreenBottom, setShowSilkscreenBottom] = createSignal(true);
   const [showSoldermask, setShowSoldermask] = createSignal(false);
   const [showDrills, setShowDrills] = createSignal(true);
-  const [showGrid, setShowGrid] = createSignal(true);
+  const [showGrid, setShowGrid] = createSignal(false);
   const [showAlignmentHolesDebug, setShowAlignmentHolesDebug] = createSignal(false);
   const [showOffsetDrillHolesDebug, setShowOffsetDrillHolesDebug] = createSignal(false);
   const { project, projectVersion } = useProject();
@@ -78,7 +79,8 @@ const createCanvas = () => {
       showProfile: true,
       showTopTraces: showTopTraces(),
       showBottomTraces: showBottomTraces(),
-      showSilkscreen: showSilkscreen(),
+      showSilkscreenTop: showSilkscreenTop(),
+      showSilkscreenBottom: showSilkscreenBottom(),
       showSoldermask: showSoldermask(),
       showDrills: showDrills(),
       showGrid: showGrid(),
@@ -139,10 +141,14 @@ const createCanvas = () => {
                          color={"#e74c3c"}
                          isChecked={showBottomTraces()}
                          onChange={setShowBottomTraces} />
-          <ControlOption name={"Silkscreen"}
+          <ControlOption name={"Silkscreen (top)"}
                          color={"#cbd5e1"}
-                         isChecked={showSilkscreen()}
-                         onChange={setShowSilkscreen} />
+                         isChecked={showSilkscreenTop()}
+                         onChange={setShowSilkscreenTop} />
+          <ControlOption name={"Silkscreen (bottom)"}
+                         color={"#94a3b8"}
+                         isChecked={showSilkscreenBottom()}
+                         onChange={setShowSilkscreenBottom} />
           <ControlOption name={"Soldermask"}
                          color={"#2ecc71"}
                          isChecked={showSoldermask()}

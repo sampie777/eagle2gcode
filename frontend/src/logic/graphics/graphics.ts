@@ -31,7 +31,9 @@ export namespace Graphics {
     showProfile: boolean,
     showTopTraces: boolean,
     showBottomTraces: boolean,
-    showSilkscreen: boolean,
+    showSilkscreenTop: boolean,
+    showSilkscreenBottom: boolean,
+    showSilkscreen?: boolean,
     showSoldermask: boolean,
     showDrills: boolean,
     showGrid: boolean,
@@ -52,7 +54,7 @@ export namespace Graphics {
     renderer.setSize(config.width, config.height);
 
     const scene = new Scene();
-    scene.background = new Color(0.018, 0.018, 0.018)
+    scene.background = new Color(0.0, 0.0, 0.0)
 
     const camera = new PerspectiveCamera(75, config.width / config.height, 0.1, 10000);
 
@@ -238,8 +240,10 @@ export namespace Graphics {
     if (config.showTopTraces) {
       drawDefaultLines(scene, project.traces_top, 0xa04909)
     }
-    if (config.showSilkscreen) {
+    if (config.showSilkscreenTop ?? config.showSilkscreen) {
       drawDefaultLines(scene, project.silkscreen_top, 0x9f9f9f)
+    }
+    if (config.showSilkscreenBottom ?? config.showSilkscreen) {
       drawDefaultLines(scene, project.silkscreen_bottom, 0x9f9f9f)
     }
     if (config.showSoldermask) {
