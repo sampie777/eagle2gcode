@@ -98,6 +98,7 @@ describe("Board processor & 3D render", () => {
 
   it("does not populate project.board when uploading traces_profile.gcode", () => {
     const project: Project = {
+      isLoaded: false,
       board: { layers: [], libraries: [], plain: [], components: [], signals: [] },
       drills: [],
       profile: [],
@@ -193,6 +194,7 @@ describe("Board processor & 3D render", () => {
   it("calculates project dimensions from board outline when no traces exist", () => {
     const board = processAltiumBoardFile(pcbDocContent);
     const project: Project = {
+      isLoaded: true,
       board,
       drills: [],
       profile: [],

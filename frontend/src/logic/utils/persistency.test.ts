@@ -46,22 +46,22 @@ describe("Persistency - Project and Checklist saving", () => {
   it("overwrites existing project if saved with the same project path", () => {
     const project1 = { ...emptyProject(), path: "/path/to/my-board" };
     const config1 = emptyConfig();
-    config1.traces.feedRate = 100;
+    config1.traces.minFeedRate = 100;
 
     Persistency.saveProject(project1, config1);
     expect(Persistency.getSavedProjects().length).toBe(1);
-    expect(Persistency.getSavedProjects()[0].config.traces.feedRate).toBe(100);
+    expect(Persistency.getSavedProjects()[0].config.traces.minFeedRate).toBe(100);
 
     // Save again with same path but modified config
     const config2 = emptyConfig();
-    config2.traces.feedRate = 250;
+    config2.traces.minFeedRate = 250;
     Persistency.saveProject(project1, config2);
 
     const saved = Persistency.getSavedProjects();
     // Must NOT add a new entry, must overwrite existing
     expect(saved.length).toBe(1);
     expect(saved[0].path).toBe("/path/to/my-board");
-    expect(saved[0].config.traces.feedRate).toBe(250);
+    expect(saved[0].config.traces.minFeedRate).toBe(250);
   });
 
   it("adds new entries for different project paths and keeps at most 5 projects", () => {

@@ -14,8 +14,9 @@ export namespace Gerber {
         return "closed";
       case 3:
         return "flash";
+      default:
+        throw new Error(`Undefined operation code: ${code}`);
     }
-    console.error("Undefined operation", code)
   }
 
   const apertureToAperture = (shape: string, dimensions: string[]): Aperture => {
@@ -43,7 +44,7 @@ export namespace Gerber {
       height: +dimensions[1],
       innerDiameter: dimensions.length > 2 ? +dimensions[2] : undefined,
     }
-    console.error("Undefined aperture", shape, dimensions)
+    throw new Error(`Undefined aperture shape ${shape} with dimensions ${dimensions.join(",")}`);
   }
 
   export const preprocessGerberFile = (content: string): GerberConfig => {
