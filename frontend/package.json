@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "bun run server/index.ts"
   },
   "dependencies": {
     "solid-icons": "^1.1.0",

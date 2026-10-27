@@ -1,4 +1,44 @@
 .Import {
+  .flatcam-generate-box {
+    margin: 15px auto 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+
+    .flatcam-run-btn {
+      background: linear-gradient(135deg, #5e81ac, #81a1c1);
+      color: #ffffff;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s, transform 0.1s;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+
+      &:hover:not(:disabled) {
+        background: linear-gradient(135deg, #81a1c1, #88c0d0);
+        transform: translateY(-1px);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+
+    .status-message {
+      font-size: 0.95rem;
+      color: #a3be8c;
+      font-weight: 500;
+    }
+  }
+
   input[type=file] {
     border: 1px dashed #fff7;
     border-radius: 10px;
