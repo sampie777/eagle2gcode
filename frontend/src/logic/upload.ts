@@ -75,4 +75,78 @@ export namespace Upload {
       return combined;
     }
   }
+
+  export const clearProjectFiles = (project: Project) => {
+    project.profile = [];
+    project.traces_top = [];
+    project.traces_bottom = [];
+    project.silkscreen_top = [];
+    project.silkscreen_bottom = [];
+    project.soldermask_top = [];
+    project.soldermask_bottom = [];
+    project.drills = [];
+    project.board = {
+      layers: [],
+      libraries: [],
+      plain: [],
+      components: [],
+      signals: [],
+    };
+    project.isLoaded = false;
+  }
+
+  export const removeFileType = (project: Project, type: string) => {
+    if (type === "drill") {
+      project.drills = [];
+    } else if (type === "board") {
+      project.board = {
+        layers: [],
+        libraries: [],
+        plain: [],
+        components: [],
+        signals: [],
+      };
+    } else if (type in project) {
+      (project as any)[type] = [];
+    }
+
+    if (!isProjectAvailable(project)) {
+      project.isLoaded = false;
+    }
+  }
+
+  export const removeFile = (project: Project, fileName: string, remainingUploads: Type[] = []) => {
+    let matchedKey: string | null = null;
+    for (const key of Object.keys(fileMatchers)) {
+      const matcher = (fileMatchers as any)[key];
+      if (fileName.match(matcher)) {
+        matchedKey = key;
+        break;
+      }
+    }
+
+    if (matchedKey === "drill") {
+      project.drills = [];
+      const remainingDrills = remainingUploads.filter(u => u.file.name.match(fileMatchers.drill) && u.content);
+      for (const d of remainingDrills) {
+        processFile(project, d.file.name, d.content!);
+      }
+    } else if (matchedKey === "board") {
+      project.board = { layers: [], libraries: [], plain: [], components: [], signals: [] };
+      const remainingBoard = remainingUploads.find(u => u.file.name.match(fileMatchers.board) && u.content);
+      if (remainingBoard) {
+        processFile(project, remainingBoard.file.name, remainingBoard.content!);
+      }
+    } else if (matchedKey && matchedKey in project) {
+      (project as any)[matchedKey] = [];
+      const remainingMatching = remainingUploads.find(u => u.file.name.match((fileMatchers as any)[matchedKey]) && u.content);
+      if (remainingMatching) {
+        processFile(project, remainingMatching.file.name, remainingMatching.content!);
+      }
+    }
+
+    if (!isProjectAvailable(project)) {
+      project.isLoaded = false;
+    }
+  }
 }

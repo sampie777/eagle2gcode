@@ -1,4 +1,4 @@
-import { Component, createEffect, createSignal, onCleanup, onMount, Show } from "solid-js";
+import { Component, createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import './style.less';
 import Row from "./Row";
 import { Upload } from "../../logic/upload";
@@ -6,13 +6,13 @@ import { ScreenProps } from "../../logic/screens";
 import { useProject } from "../ProjectContext";
 import { useChecklist } from "../ChecklistContext";
 import { getCookie } from "../../logic/cookies";
-import { AiOutlineCloudUpload } from "solid-icons/ai";
+import { AiOutlineClose, AiOutlineCloudUpload, AiOutlineDelete } from "solid-icons/ai";
 import LoadingIcon from "../components/LoadingIcon";
 
 type Props = ScreenProps;
 
 const ImportRoot: Component<Props> = (props) => {
-  const { project, touchProject, projectVersion } = useProject();
+  const { project, touchProject, projectVersion, clearProject, clearFileType } = useProject();
   const { activeCad } = useChecklist();
   const [uploads, setUploads] = createSignal<Upload.Type[]>([]);
   const [isDraggingOver, setIsDraggingOver] = createSignal(false);
@@ -20,6 +20,7 @@ const ImportRoot: Component<Props> = (props) => {
   const [backendAvailable, setBackendAvailable] = createSignal(false);
   const [statusMessage, setStatusMessage] = createSignal<string>("");
   let isProcessing = false;
+  let fileInputRef: HTMLInputElement | undefined;
 
   // Check backend FlatCAM API availability
   onMount(async () => {
@@ -89,6 +90,63 @@ const ImportRoot: Component<Props> = (props) => {
     } finally {
       isProcessing = false;
     }
+  };
+
+  const removeUploadedFile = (fileName: string) => {
+    const remaining = uploads().filter(u => u.file.name !== fileName);
+    setUploads(remaining);
+    Upload.removeFile(project, fileName, remaining);
+    touchProject();
+  };
+
+  const removeRowCategory = (key: string) => {
+    const matcher = (Upload.fileMatchers as any)[key];
+    if (matcher) {
+      setUploads(prev => prev.filter(u => !u.file.name.match(matcher)));
+    }
+    clearFileType(key);
+  };
+
+  const resetAllUploads = () => {
+    if (!confirm("Are you sure you want to remove all uploaded files and reset project data?")) return;
+    setUploads([]);
+    clearProject();
+    if (fileInputRef) {
+      fileInputRef.value = "";
+    }
+    setStatusMessage("All uploaded files have been reset.");
+    setTimeout(() => setStatusMessage(""), 4000);
+  };
+
+  const hasAnyFiles = () => {
+    projectVersion();
+    return uploads().length > 0 || Upload.isProjectAvailable(project);
+  };
+
+  const totalActiveFilesCount = () => {
+    projectVersion();
+    if (uploads().length > 0) return uploads().length;
+    let count = 0;
+    if (project.profile?.length > 0) count++;
+    if (project.traces_top?.length > 0) count++;
+    if (project.traces_bottom?.length > 0) count++;
+    if (project.silkscreen_top?.length > 0) count++;
+    if (project.silkscreen_bottom?.length > 0) count++;
+    if (project.soldermask_top?.length > 0) count++;
+    if (project.soldermask_bottom?.length > 0) count++;
+    if (project.drills?.length > 0) count++;
+    if (Upload.isBoardAvailable(project.board)) count++;
+    return count;
+  };
+
+  const unassignedUploads = () => {
+    projectVersion();
+    return uploads().filter(u => {
+      return !Object.keys(Upload.fileMatchers).some(key => {
+        const matcher = (Upload.fileMatchers as any)[key];
+        return u.file.name.match(matcher);
+      });
+    });
   };
 
   // Detect whether uploaded files contain Gerber (.gbr) files that can be processed with FlatCAM
@@ -225,7 +283,32 @@ const ImportRoot: Component<Props> = (props) => {
 
     <h1>Import {activeCad() === "altium" ? "Altium" : "EAGLE"} & FlatCAM files</h1>
 
-    <input type={"file"}
+    <div class={"import-toolbar"}>
+      <div class={"toolbar-left"}>
+        <Show when={hasAnyFiles()}>
+          <span class={"active-count-label"}>
+            {totalActiveFilesCount()} active file{totalActiveFilesCount() === 1 ? "" : "s"}
+          </span>
+        </Show>
+      </div>
+
+      <div class={"toolbar-right"}>
+        <Show when={hasAnyFiles()}>
+          <button
+            type="button"
+            class={"reset-files-btn"}
+            onClick={resetAllUploads}
+            title={"Remove all uploaded files and reset project"}
+          >
+            <AiOutlineDelete size={15} />
+            <span>Reset all files</span>
+          </button>
+        </Show>
+      </div>
+    </div>
+
+    <input ref={fileInputRef}
+           type={"file"}
            name={"files"}
            onChange={onFilesChange}
            multiple={true} />
@@ -253,16 +336,54 @@ const ImportRoot: Component<Props> = (props) => {
     </Show>
 
     <div class={"result"}>
-      <div>
+      <div class={"result-list"}>
         {Object.keys(Upload.fileMatchers).map(key => {
             const matcher = (Upload.fileMatchers as any)[key];
             const matchingUploads = uploads().filter(it => it.file.name.match(matcher));
             const singleUpload = matchingUploads[0];
-            return <Row type={key} upload={singleUpload} uploads={matchingUploads} />;
+            return <Row
+              type={key}
+              upload={singleUpload}
+              uploads={matchingUploads}
+              onRemove={() => removeRowCategory(key)}
+              onRemoveFile={removeUploadedFile}
+            />;
           }
         )}
       </div>
     </div>
+
+    <Show when={unassignedUploads().length > 0}>
+      <div class={"unassigned-files-card"}>
+        <div class={"unassigned-header"}>
+          <span>Other Uploaded Files ({unassignedUploads().length})</span>
+        </div>
+        <div class={"unassigned-chips"}>
+          <For each={unassignedUploads()}>
+            {(u) => (
+              <span class={"unassigned-chip"} title={u.file.name}>
+                <span class={"chip-name"}>{u.file.name}</span>
+                <button
+                  type="button"
+                  class={"chip-remove-btn"}
+                  onClick={() => removeUploadedFile(u.file.name)}
+                  title={`Remove ${u.file.name}`}
+                >
+                  <AiOutlineClose size={12} />
+                </button>
+              </span>
+            )}
+          </For>
+        </div>
+      </div>
+    </Show>
+
+    <Show when={statusMessage() && (!backendAvailable() || uploadedGerberFiles().length === 0)}>
+      <div class={"import-status-banner"}>
+        <span>{statusMessage()}</span>
+      </div>
+    </Show>
+
     <br />
 
     <div class={"actions"}>

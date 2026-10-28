@@ -1,6 +1,7 @@
 import { createContext, createSignal, useContext } from "solid-js";
 import { Project } from "../logic/types/project";
 import { Persistency } from "../logic/utils/persistency";
+import { Upload } from "../logic/upload";
 
 export const emptyProject = (): Project => ({
   isLoaded: false,
@@ -24,6 +25,16 @@ export const emptyProject = (): Project => ({
 const [projectVersion, setProjectVersion] = createSignal(0);
 export const touchProject = () => setProjectVersion(v => v + 1);
 
+export const clearProjectData = (to: Project) => {
+  Upload.clearProjectFiles(to);
+  touchProject();
+};
+
+export const clearProjectFileType = (to: Project, type: string) => {
+  Upload.removeFileType(to, type);
+  touchProject();
+};
+
 const loadProject = (to: Project, from: Project | null | undefined) => {
   if (from == null) return;
   to.path = from.path;
@@ -38,19 +49,23 @@ const loadProject = (to: Project, from: Project | null | undefined) => {
   to.drills = from.drills;
   to.board = from.board;
   touchProject();
-}
+};
 
-const defaultValue = emptyProject()
+const defaultValue = emptyProject();
 export const ProjectContext = createContext<{
   project: Project,
   loadProject: (from?: Project) => void,
+  clearProject: () => void,
+  clearFileType: (type: string) => void,
   touchProject: () => void,
   projectVersion: () => number
 }>({
   project: defaultValue,
   loadProject: (from = Persistency.loadAll()?.project) => loadProject(defaultValue, from),
+  clearProject: () => clearProjectData(defaultValue),
+  clearFileType: (type: string) => clearProjectFileType(defaultValue, type),
   touchProject,
   projectVersion,
 });
 
-export const useProject = () => useContext(ProjectContext)
+export const useProject = () => useContext(ProjectContext);
