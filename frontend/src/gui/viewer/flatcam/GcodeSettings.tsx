@@ -518,13 +518,7 @@ const GcodeSettings: Component<Props> = (props) => {
                             disabled={!hasTopTraces()}>
               <Show when={hasTopTraces()}>
                 <span class={"info"}>
-                  <AiOutlineClockCircle /> CNC: {getGcodeDurationForTraces(allTopTraces(), {
-                    iterations: config.traces.iterations,
-                    feedRate: config.traces.maxFeedRate
-                  })} - {getGcodeDurationForTraces(allTopTraces(), {
-                    iterations: config.traces.iterations,
-                    feedRate: config.traces.minFeedRate
-                  })}
+                  <AiOutlineClockCircle /> CNC: {getGcodeDurationForTraces(allTopTraces(), config.traces)}
                 </span>
                 <span class={"info"}>
                   <AiOutlineClockCircle /> Acid: {getAcidDurationForTraces(allTopTraces())}
@@ -541,13 +535,7 @@ const GcodeSettings: Component<Props> = (props) => {
                             title={`Traces: ${getLength(allBottomTraces())}, travel: ${getTravelLength(allBottomTraces())}`}>
               <Show when={hasBottomTraces()}>
                 <span class={"info"}>
-                  <AiOutlineClockCircle /> CNC: {getGcodeDurationForTraces(allBottomTraces(), {
-                    iterations: config.traces.iterations,
-                    feedRate: config.traces.maxFeedRate
-                  })} - {getGcodeDurationForTraces(allBottomTraces(), {
-                    iterations: config.traces.iterations,
-                    feedRate: config.traces.minFeedRate
-                  })}
+                  <AiOutlineClockCircle /> CNC: {getGcodeDurationForTraces(allBottomTraces(), config.traces)}
                 </span>
                 <span class={"info"}>
                   <AiOutlineClockCircle /> Acid: {getAcidDurationForTraces(allBottomTraces())}
@@ -585,13 +573,7 @@ const GcodeSettings: Component<Props> = (props) => {
                             title={`Traces: ${getLength(project.silkscreen_top)}, travel: ${getTravelLength(project.silkscreen_top)}`}>
               <Show when={hasSilkscreenTop()}>
                 <span class={"info"}>
-                  <AiOutlineClockCircle /> CNC: {getGcodeDurationForTraces(project.silkscreen_top, {
-                    iterations: config.silkscreen.iterations,
-                    feedRate: config.silkscreen.maxFeedRate
-                  })} - {getGcodeDurationForTraces(project.silkscreen_top, {
-                    iterations: config.silkscreen.iterations,
-                    feedRate: config.silkscreen.minFeedRate
-                  })}
+                  <AiOutlineClockCircle /> CNC: {getGcodeDurationForTraces(project.silkscreen_top, config.silkscreen)}
                 </span>
               </Show>
             </DownloadButton>
@@ -604,13 +586,7 @@ const GcodeSettings: Component<Props> = (props) => {
                             disabled={!hasSilkscreenBottom()}>
               <Show when={hasSilkscreenBottom()}>
                 <span class={"info"}>
-                  <AiOutlineClockCircle /> CNC: {getGcodeDurationForTraces(project.silkscreen_bottom, {
-                    iterations: config.silkscreen.iterations,
-                    feedRate: config.silkscreen.maxFeedRate
-                  })} - {getGcodeDurationForTraces(project.silkscreen_bottom, {
-                    iterations: config.silkscreen.iterations,
-                    feedRate: config.silkscreen.minFeedRate
-                  })}
+                  <AiOutlineClockCircle /> CNC: {getGcodeDurationForTraces(project.silkscreen_bottom, config.silkscreen)}
                 </span>
               </Show>
             </DownloadButton>
@@ -637,13 +613,7 @@ const GcodeSettings: Component<Props> = (props) => {
                             disabled={!hasTopTraces()}>
               <Show when={hasTopTraces()}>
                 <span class={"info"}>
-                  <AiOutlineClockCircle /> CNC: {getGcodeDurationForTraces(allTopTraces(), {
-                    iterations: config.traces.iterations,
-                    feedRate: config.traces.maxFeedRate
-                  })} - {getGcodeDurationForTraces(allTopTraces(), {
-                    iterations: config.traces.iterations,
-                    feedRate: config.traces.minFeedRate
-                  })}
+                  <AiOutlineClockCircle /> CNC: {getGcodeDurationForTraces(allTopTraces(), config.traces)}
                 </span>
                 <span class={"info"}>
                   <AiOutlineClockCircle /> Acid: {getAcidDurationForTraces(allTopTraces())}
@@ -660,13 +630,7 @@ const GcodeSettings: Component<Props> = (props) => {
                             title={`Traces: ${getLength(allBottomTraces())}, travel: ${getTravelLength(allBottomTraces())}`}>
               <Show when={hasBottomTraces()}>
                 <span class={"info"}>
-                  <AiOutlineClockCircle /> CNC: {getGcodeDurationForTraces(allBottomTraces(), {
-                    iterations: config.traces.iterations,
-                    feedRate: config.traces.maxFeedRate
-                  })} - {getGcodeDurationForTraces(allBottomTraces(), {
-                    iterations: config.traces.iterations,
-                    feedRate: config.traces.minFeedRate
-                  })}
+                  <AiOutlineClockCircle /> CNC: {getGcodeDurationForTraces(allBottomTraces(), config.traces)}
                 </span>
                 <span class={"info"}>
                   <AiOutlineClockCircle /> Acid: {getAcidDurationForTraces(allBottomTraces())}
@@ -710,13 +674,7 @@ const GcodeSettings: Component<Props> = (props) => {
                             title={`Traces: ${getLength(project.silkscreen_top)}, travel: ${getTravelLength(project.silkscreen_top)}`}>
               <Show when={hasSilkscreenTop()}>
                 <span class={"info"}>
-                  <AiOutlineClockCircle /> CNC: {getGcodeDurationForTraces(project.silkscreen_top, {
-                    iterations: config.silkscreen.iterations,
-                    feedRate: config.silkscreen.maxFeedRate
-                  })} - {getGcodeDurationForTraces(project.silkscreen_top, {
-                    iterations: config.silkscreen.iterations,
-                    feedRate: config.silkscreen.minFeedRate
-                  })}
+                  <AiOutlineClockCircle /> CNC: {getGcodeDurationForTraces(project.silkscreen_top, config.silkscreen)}
                 </span>
               </Show>
             </DownloadButton>
@@ -729,13 +687,7 @@ const GcodeSettings: Component<Props> = (props) => {
                             disabled={!hasSilkscreenBottom()}>
               <Show when={hasSilkscreenBottom()}>
                 <span class={"info"}>
-                  <AiOutlineClockCircle /> CNC: {getGcodeDurationForTraces(project.silkscreen_bottom, {
-                    iterations: config.silkscreen.iterations,
-                    feedRate: config.silkscreen.maxFeedRate
-                  })} - {getGcodeDurationForTraces(project.silkscreen_bottom, {
-                    iterations: config.silkscreen.iterations,
-                    feedRate: config.silkscreen.minFeedRate
-                  })}
+                  <AiOutlineClockCircle /> CNC: {getGcodeDurationForTraces(project.silkscreen_bottom, config.silkscreen)}
                 </span>
               </Show>
             </DownloadButton>
