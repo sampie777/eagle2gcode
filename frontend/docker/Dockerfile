@@ -19,11 +19,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     FLATCAM_BIN=/opt/flatcam/flatcam.py \
     PYTHON_BIN=python3
 
-# Install system dependencies including Nginx, Tcl/Tk, OpenGL runtime libraries
+# Install system dependencies including Nginx (from nginx.org), Tcl/Tk, OpenGL runtime libraries
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    nginx \
-    git \
+    curl \
+    gnupg2 \
     ca-certificates \
+    git \
     tcl-dev \
     tk-dev \
     python3-tk \
@@ -31,6 +32,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgles2 \
     libglx-mesa0 \
     libgl1-mesa-dri \
+    && curl -fsSL https://nginx.org/keys/nginx_signing.key | gpg --dearmor -o /usr/share/keyrings/nginx-archive-keyring.gpg \
+    && echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/mainline/debian bookworm nginx" > /etc/apt/sources.list.d/nginx.list \
+    && apt-get update && apt-get install -y --no-install-recommends nginx \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Bun binary from oven/bun image
