@@ -2,7 +2,7 @@ import { Component, createSignal } from "solid-js";
 import { emptyProject, useProject } from "../ProjectContext";
 import { useConfig } from "../ConfigContext";
 import { Persistency } from "../../logic/utils/persistency";
-import './Header.less';
+import "./Header.less";
 import { AiOutlineFolderOpen, AiOutlineLoading, AiOutlineReload, AiOutlineSave } from "solid-icons/ai";
 import { useChecklist } from "../ChecklistContext";
 // @ts-ignore
@@ -13,6 +13,8 @@ import SavedProjectsModal from "./SavedProjectsModal";
 type Props = {
   onResetProject: () => void
   onNavigateToStep?: (id: string) => void
+  showManualFlatcam?: boolean
+  onToggleManualFlatcam?: () => void
 }
 
 const Header: Component<Props> = (props) => {
@@ -90,14 +92,20 @@ const Header: Component<Props> = (props) => {
 
     {props.onNavigateToStep && (
       <div class={"header-steps"}>
-        <button class={"step-nav-btn"} onClick={() => props.onNavigateToStep?.("step-flatcam")}>
-          1. Prepare
-        </button>
+        {props.onToggleManualFlatcam && (
+          <button
+            class={`step-nav-btn ${props.showManualFlatcam ? "active" : ""}`}
+            onClick={props.onToggleManualFlatcam}
+            title={"Toggle manual FlatCAM command generation"}
+          >
+            {props.showManualFlatcam ? "Hide FlatCAM" : "Manual G-code"}
+          </button>
+        )}
         <button class={"step-nav-btn"} onClick={() => props.onNavigateToStep?.("step-import")}>
-          2. Upload
+          1. Upload
         </button>
         <button class={"step-nav-btn"} onClick={() => props.onNavigateToStep?.("step-viewer")}>
-          3. Execute
+          2. Execute
         </button>
       </div>
     )}

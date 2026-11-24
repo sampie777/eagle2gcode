@@ -1,10 +1,10 @@
 import { serve } from "bun";
 import { existsSync, promises as fs } from "fs";
 import * as path from "path";
+import { env, logEnv } from "./env";
 import { executeFlatcam } from "./runner";
 
-const PORT = parseInt(process.env.PORT || "3001", 10);
-const DIST_DIR = process.env.DIST_DIR || path.resolve(__dirname, "../dist");
+logEnv();
 
 const MIME_TYPES: Record<string, string> = {
   ".html": "text/html",
@@ -21,7 +21,7 @@ const MIME_TYPES: Record<string, string> = {
 };
 
 export const server = serve({
-  port: PORT,
+  port: env.PORT,
   async fetch(req) {
     const url = new URL(req.url);
 
@@ -37,7 +37,7 @@ export const server = serve({
       try {
         const contentType = req.headers.get("content-type") || "";
         let files: { filename: string; content: string }[] = [];
-        let cadType: "eagle" | "altium" = "eagle";
+        let cadType: "eagle" | "altium" | undefined;
         let diaWidth = 0.20188;
         let pcbName: string | undefined;
         let customScript: string | undefined;
@@ -45,13 +45,13 @@ export const server = serve({
         if (contentType.includes("application/json")) {
           const body = await req.json();
           files = body.files ?? [];
-          cadType = body.cadType ?? "eagle";
+          cadType = body.cadType;
           diaWidth = body.diaWidth ?? 0.20188;
           pcbName = body.pcbName;
           customScript = body.customScript;
         } else if (contentType.includes("multipart/form-data")) {
           const formData = await req.formData();
-          cadType = (formData.get("cadType") as any) ?? "eagle";
+          cadType = (formData.get("cadType") as "eagle" | "altium" | null) ?? undefined;
           diaWidth = parseFloat((formData.get("diaWidth") as string) || "0.20188");
           pcbName = (formData.get("pcbName") as string) || undefined;
           customScript = (formData.get("customScript") as string) || undefined;
@@ -91,11 +91,20 @@ export const server = serve({
           customScript,
         });
 
+        if (!result.success) {
+          console.error(`FlatCAM generation failed: ${result.error}`);
+        }
+
+        const status = result.success
+          ? 200
+          : (!customScript && (result.matchedFiles?.length ?? 0) === 0 ? 400 : 500);
+
         return new Response(JSON.stringify(result), {
-          status: result.success ? 200 : 500,
+          status,
           headers: { "Content-Type": "application/json" },
         });
       } catch (err: any) {
+        console.error("Unexpected error in /api/flatcam/generate:", err);
         return new Response(JSON.stringify({ error: err.message || String(err) }), {
           status: 500,
           headers: { "Content-Type": "application/json" },
@@ -105,10 +114,10 @@ export const server = serve({
 
     // Static file serving (SPA support)
     if (req.method === "GET" || req.method === "HEAD") {
-      let filePath = path.join(DIST_DIR, url.pathname === "/" ? "index.html" : url.pathname);
+      let filePath = path.join(env.DIST_DIR, url.pathname === "/" ? "index.html" : url.pathname);
 
       if (!existsSync(filePath) || (await fs.stat(filePath)).isDirectory()) {
-        filePath = path.join(DIST_DIR, "index.html");
+        filePath = path.join(env.DIST_DIR, "index.html");
       }
 
       if (existsSync(filePath)) {
@@ -129,4 +138,4 @@ export const server = serve({
   },
 });
 
-console.log(`Server started on port ${PORT}, serving dist from ${DIST_DIR}`);
+console.log(`Server started on port ${env.PORT}, serving dist from ${env.DIST_DIR}`);

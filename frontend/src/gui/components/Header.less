@@ -28,10 +28,18 @@
       background-color: #2e3440;
       color: #d8dee9;
       border: 1px solid rgba(255, 255, 255, 0.15);
+      cursor: pointer;
+      transition: all 0.2s;
 
       &:hover {
         background-color: #434c5e;
         border-color: #88c0d0;
+      }
+
+      &.active {
+        background-color: #434c5e;
+        border-color: #ebcb8b;
+        color: #ebcb8b;
       }
     }
   }

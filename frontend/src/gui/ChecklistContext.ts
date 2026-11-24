@@ -10,11 +10,15 @@ export const getEagleChecklist = (): Checklist => [
     items: [
       { text: "Use two ground planes in EAGLE. One with the settings width=4, isolate=12. This will make sure the ground plane reaches everywhere. And the other with the settings width=10, isolate=12. This will make sure the ground thermal pads are thick enough." },
       { text: "Export EAGLE files using the CAM processor (disable Cutouts in Profile)." },
-      { text: "Generate Flatcam commands using this GUI and paste them into Flatcam." },
+      { text: "Upload the generated files to automatically generate G-code. Then go to the step 'Etch preparation'. If this does not work, continue with the next step 'Flatcam'." },
+    ]
+  },
+  {
+    title: "Flatcam",
+    items: [
+      { text: "Generate Flatcam commands using this GUI (Altium tab) and paste them into Flatcam." },
       { text: "Wait until Flatcam completes running the commands." },
       { text: "On the next screen in the GUI, upload the generated .gcode files and the drill file." },
-      { text: "On the next screen, check that the generated traces. Modify the settings if necessary." },
-      { text: "Download the gCode files." },
     ]
   },
   {
@@ -138,16 +142,22 @@ export const getAltiumChecklist = (): Checklist => [
       { text: "In Altium Designer, ensure polygon pours / ground planes are properly repoured before export." },
       { text: "In Gerber / Fabrication Outputs setup, ensure units are set to Millimeters (mm) instead of Inches (Gerber Units: Millimeters, Format: 4:4 or higher)." },
       { text: "Export Altium Gerber files (Profile, Copper Signal Top/Bot, Legend Top/Bot, Soldermask Top/Bot) and NC Drill files." },
+      { text: "Upload the generated files to automatically generate G-code. Then go to the step 'Etch preparation'. If this does not work, continue with the next step 'Flatcam'." },
+    ]
+  },
+  {
+    title: "Flatcam",
+    items: [
       { text: "Generate Flatcam commands using this GUI (Altium tab) and paste them into Flatcam." },
       { text: "Wait until Flatcam completes running the commands." },
       { text: "On the next screen in the GUI, upload the generated .gcode files and the drill file." },
-      { text: "On the next screen, check that the generated traces. Modify the settings if necessary." },
-      { text: "Download the gCode files." },
     ]
   },
   {
     title: "Etch preparation",
     items: [
+      { text: "Check the generated traces. Modify the settings if necessary." },
+      { text: "Download the gCode files." },
       { text: "Saw the board. This leaves an extra 1 mm spacing on each side." },
       { text: "Clean the board with steel wool." },
       { text: "Clean the board with alcohol. From now on, don't touch the board with your fingers until you're ready to remove the ink!" },

@@ -4,21 +4,29 @@ import Row from "./Row";
 import { Upload } from "../../logic/upload";
 import { ScreenProps } from "../../logic/screens";
 import { useProject } from "../ProjectContext";
-import { useChecklist } from "../ChecklistContext";
 import { getCookie } from "../../logic/cookies";
-import { AiOutlineClose, AiOutlineCloudUpload, AiOutlineDelete } from "solid-icons/ai";
+import {
+  AiOutlineClose,
+  AiOutlineCloudUpload,
+  AiOutlineCode,
+  AiOutlineDelete,
+  AiOutlineInfoCircle
+} from "solid-icons/ai";
 import LoadingIcon from "../components/LoadingIcon";
 
-type Props = ScreenProps;
+type Props = ScreenProps & {
+  showManualFlatcam?: boolean;
+  onToggleManualFlatcam?: () => void;
+};
 
 const ImportRoot: Component<Props> = (props) => {
   const { project, touchProject, projectVersion, clearProject, clearFileType } = useProject();
-  const { activeCad } = useChecklist();
   const [uploads, setUploads] = createSignal<Upload.Type[]>([]);
   const [isDraggingOver, setIsDraggingOver] = createSignal(false);
   const [isGeneratingGcode, setIsGeneratingGcode] = createSignal(false);
   const [backendAvailable, setBackendAvailable] = createSignal(false);
   const [statusMessage, setStatusMessage] = createSignal<string>("");
+  const [errorMessage, setErrorMessage] = createSignal<string>("");
   let isProcessing = false;
   let fileInputRef: HTMLInputElement | undefined;
 
@@ -46,10 +54,15 @@ const ImportRoot: Component<Props> = (props) => {
 
   const handleFiles = (files: File[]) => {
     if (!files || files.length === 0) return;
-    setUploads(prev => [...prev, ...files.map(it => ({
-      file: it,
-      status: "waiting",
-    } as Upload.Type))]);
+    setErrorMessage("");
+    const incomingNames = new Set(files.map(f => f.name));
+    setUploads(prev => [
+      ...prev.filter(u => !incomingNames.has(u.file.name)),
+      ...files.map(it => ({
+        file: it,
+        status: "waiting",
+      } as Upload.Type)),
+    ]);
     processUploads();
   };
 
@@ -114,6 +127,7 @@ const ImportRoot: Component<Props> = (props) => {
     if (fileInputRef) {
       fileInputRef.value = "";
     }
+    setErrorMessage("");
     setStatusMessage("All uploaded files have been reset.");
     setTimeout(() => setStatusMessage(""), 4000);
   };
@@ -150,8 +164,11 @@ const ImportRoot: Component<Props> = (props) => {
   };
 
   // Detect whether uploaded files contain Gerber (.gbr) files that can be processed with FlatCAM
+  // (exclude drill .gbr files which are already parsed directly by the drill processor)
   const uploadedGerberFiles = () => {
-    return uploads().filter(u => u.file.name.match(/\.(gbr|ger|pho)$/i) && u.content);
+    return uploads().filter(
+      u => u.file.name.match(/\.(gbr|ger|pho)$/i) && !u.file.name.match(Upload.fileMatchers.drill) && u.content
+    );
   };
 
   const generateGcodeWithFlatcam = async () => {
@@ -162,16 +179,13 @@ const ImportRoot: Component<Props> = (props) => {
     }
 
     setIsGeneratingGcode(true);
+    setErrorMessage("");
     setStatusMessage("Running FlatCAM in container to generate G-code...");
 
     try {
-      const cad = activeCad();
-      const pcbName = localStorage.getItem("project.altium.pcbName") || "PCB1";
       const diaWidth = 0.20188;
 
       const payload = {
-        cadType: cad,
-        pcbName,
         diaWidth,
         files: gerbers.map(g => ({
           filename: g.file.name,
@@ -187,7 +201,16 @@ const ImportRoot: Component<Props> = (props) => {
 
       const data = await response.json();
       if (!response.ok || !data.success) {
-        throw new Error(data.error || data.logs || "FlatCAM failed to generate G-code.");
+        if (data.logs) {
+          console.error("FlatCAM raw logs:\n", data.logs);
+        }
+        const primaryError = data.error || "FlatCAM failed to generate G-code.";
+        const includeLogs =
+          data.logs &&
+          !primaryError.includes("FlatCAM details:") &&
+          !primaryError.includes("FlatCAM output:");
+        const fullError = includeLogs ? `${primaryError}\n\nLogs:\n${data.logs}` : primaryError;
+        throw new Error(fullError);
       }
 
       // Ingest the generated G-code files directly into project
@@ -204,11 +227,24 @@ const ImportRoot: Component<Props> = (props) => {
       }
 
       touchProject();
-      setStatusMessage(`Successfully generated ${generatedOutputs.length} G-code file(s) with FlatCAM!`);
-      setTimeout(() => setStatusMessage(""), 5000);
+      const warningSuffix =
+        Array.isArray(data.warnings) && data.warnings.length > 0
+          ? ` (${data.warnings.join("; ")})`
+          : "";
+      setStatusMessage(
+        `Successfully generated ${generatedOutputs.length} G-code file(s) with FlatCAM!${warningSuffix}`
+      );
+      if (!warningSuffix) {
+        setTimeout(() => setStatusMessage(""), 5000);
+      }
     } catch (err: any) {
-      alert(`FlatCAM Generation Error:\n\n${err.message || String(err)}`);
+      const details = err.message || String(err);
+      console.error(`FlatCAM Generation Error:\n\n${details}`);
+      setErrorMessage(details);
       setStatusMessage("");
+      alert(
+        `FlatCAM Generation Error:\n\n${details}\n\nYou can also manually generate the necessary files using the 'Manual G-code File Generation' option.`
+      );
     } finally {
       setIsGeneratingGcode(false);
     }
@@ -276,12 +312,36 @@ const ImportRoot: Component<Props> = (props) => {
         <div class={"dropzone-content"}>
           <AiOutlineCloudUpload class={"dropzone-icon"} />
           <h2>Drop files anywhere to upload</h2>
-          <p>Drop {activeCad() === "altium" ? "Altium (.gbr, .PcbDoc)" : "EAGLE (.brd)"} or FlatCAM (.gcode, .xln) files here</p>
+          <p>Drop EAGLE and/or Altium Gerber (.gbr), drill (.xln, *_Drill.gbr), board (.brd, .PcbDoc), or FlatCAM (.gcode) files here</p>
         </div>
       </div>
     )}
 
-    <h1>Import {activeCad() === "altium" ? "Altium" : "EAGLE"} & FlatCAM files</h1>
+    <div class={"direct-upload-info-box"}>
+      <div class={"info-box-header"}>
+        <span class={"info-box-title"}>
+          <AiOutlineInfoCircle size={18} />
+          Direct Gerber Upload
+        </span>
+        {props.onToggleManualFlatcam && (
+          <button
+            type="button"
+            class={`manual-gen-toggle-btn ${props.showManualFlatcam ? "active" : ""}`}
+            onClick={props.onToggleManualFlatcam}
+            title={"Toggle manual FlatCAM command generation"}
+          >
+            <AiOutlineCode size={16} />
+            <span>{props.showManualFlatcam ? "Hide Manual FlatCAM Generation" : "Manual G-code File Generation"}</span>
+          </button>
+        )}
+      </div>
+      <p class={"info-box-description"}>
+        You can upload your EAGLE and/or Altium Gerber files (<code>.gbr</code>), drill files (<code>.xln</code> / <code>*_Drill.gbr</code>),
+        and board file (<code>.brd</code> / <code>.PcbDoc</code>) directly — even mixed together.
+        If automatic processing does not work, you can choose to manually generate the necessary files for upload in
+        FlatCAM.
+      </p>
+    </div>
 
     <div class={"import-toolbar"}>
       <div class={"toolbar-left"}>
@@ -332,6 +392,38 @@ const ImportRoot: Component<Props> = (props) => {
         <Show when={statusMessage()}>
           <span class={"status-message"}>{statusMessage()}</span>
         </Show>
+      </div>
+    </Show>
+
+    <Show when={errorMessage()}>
+      <div class={"flatcam-error-box"} role="alert">
+        <div class={"error-box-header"}>
+          <strong>FlatCAM Generation Error</strong>
+          <button
+            type="button"
+            class={"error-dismiss-btn"}
+            onClick={() => setErrorMessage("")}
+            title={"Dismiss error"}
+          >
+            <AiOutlineClose size={14} />
+          </button>
+        </div>
+        <pre class={"error-box-details"}>{errorMessage()}</pre>
+      </div>
+    </Show>
+
+    <Show when={!backendAvailable() && uploadedGerberFiles().length > 0}>
+      <div class={"flatcam-unavailable-box"}>
+        <span>Automatic FlatCAM processing is unavailable (backend server is not running).</span>
+        {props.onToggleManualFlatcam && (
+          <button
+            type="button"
+            class={"manual-flatcam-inline-btn"}
+            onClick={props.onToggleManualFlatcam}
+          >
+            Generate FlatCAM Commands Manually
+          </button>
+        )}
       </div>
     </Show>
 
@@ -387,9 +479,11 @@ const ImportRoot: Component<Props> = (props) => {
     <br />
 
     <div class={"actions"}>
-      <button onClick={props.onBack}>
-        Back
-      </button>
+      <Show when={props.showManualFlatcam && props.onBack}>
+        <button onClick={props.onBack}>
+          Back to Manual FlatCAM
+        </button>
+      </Show>
       <button disabled={!isAvailable()}
               onClick={props.onNext}>
         Next
