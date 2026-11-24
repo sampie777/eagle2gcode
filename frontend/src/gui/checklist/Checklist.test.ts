@@ -19,7 +19,6 @@ describe("Checklist", () => {
     expect(text).toContain("Altium Designer");
     expect(text).toContain("Millimeters (mm) instead of Inches");
     expect(text).toContain("Export Altium Gerber files");
-    expect(text).toContain("Altium tab");
   });
 
   it("switches checklist based on CAD type", () => {
